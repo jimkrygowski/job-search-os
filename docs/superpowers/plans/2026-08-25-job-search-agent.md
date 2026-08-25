@@ -80,6 +80,13 @@ at the `bootstrap` skill rather than improvising a setup flow.
   `tools/tracker.py` — never hand-edit these files.
 - `opportunity/<Company>/<Role>/` — per-opportunity documents (JD,
   contacts, notes, tailored resume/cover letter, transcripts)
+
+## Contacts
+
+Whenever you learn of a new contact for an opportunity — a name, title,
+or role in the process — add them to that opportunity's
+`opportunity/<Company>/<Role>/contacts.md`. Don't wait to be asked; this
+applies during any skill session, not just a dedicated one.
 ```
 
 - [ ] **Step 2: Write `.claude/settings.json`**
@@ -1510,12 +1517,28 @@ contact" line.
 Delete it entirely — contacts now live per-opportunity in
 `opportunity/<Company>/<Role>/contacts.md`, read dynamically per Step 3.
 
-- [ ] **Step 8: Verify no hardcoded personal facts remain**
+- [ ] **Step 8: Genericize the named example in the `search_threads` caveat**
 
-Run: `grep -niE 'jim|krygowski|boredm\.com|fiveelms\.com|altana\.ai|zensearch\.jobs|applications\.csv|00_Admin' .claude/skills/morning-scan/SKILL.md`
+The file preserves a real operational lesson worth keeping (the tiered
+`search_threads`/`get_thread` verification method, because
+`search_threads` has been observed to silently drop recent messages) —
+keep that lesson, but it currently illustrates it with a specific
+person and company. Find:
+```
+Relying on it directly caused a real new message from Louis (BoreDM) to be reported as "no new activity."
+```
+
+Replace with:
+```
+Relying on it directly caused a real new message from an active contact to be reported as "no new activity."
+```
+
+- [ ] **Step 9: Verify no hardcoded personal facts remain**
+
+Run: `grep -niE 'jim|krygowski|boredm|fiveelms|altana\.ai|zensearch\.jobs|applications\.csv|00_Admin|louis' .claude/skills/morning-scan/SKILL.md`
 Expected: no matches (exit code 1)
 
-- [ ] **Step 9: Verify frontmatter still parses and the tracker command matches the real CLI**
+- [ ] **Step 10: Verify frontmatter still parses and the tracker command matches the real CLI**
 
 Run: `python3 -c "
 import re
@@ -1528,7 +1551,7 @@ Then: `python3 tools/tracker.py record-event --help`
 Expected: first command prints nothing; second prints usage including
 `--event`, `--date`.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 11: Commit**
 
 ```bash
 git add .claude/skills/morning-scan/SKILL.md career/job_alert_sources.md
