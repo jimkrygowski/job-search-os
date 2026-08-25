@@ -1,6 +1,6 @@
 ---
 name: score-opportunity
-description: Use when a user pastes a job description to evaluate, or wants to re-score an opportunity already in the pipeline. Scores against career/trajectory.md, creates the opportunity folder, and adds/updates the tracker row via tools/tracker.py.
+description: Use when a user pastes a job description to evaluate, or wants to re-score an opportunity already in the pipeline. Scores against career/trajectory.md, creates the opportunity folder, and adds it to the tracker via tools/tracker.py.
 ---
 
 # Score Opportunity
