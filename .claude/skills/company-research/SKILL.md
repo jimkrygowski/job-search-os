@@ -8,7 +8,8 @@ description: Use when a user wants research on a target company — for a new op
 ## Purpose
 
 Research a company relevant to a specific opportunity and record findings
-in `state/opportunity/<Company>/<Role>/notes.md` with sources attached.
+in that opportunity's resolved folder (see Session Start), in `notes.md`,
+with sources attached.
 
 ## Session Start
 

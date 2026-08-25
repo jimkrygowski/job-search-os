@@ -89,6 +89,17 @@ class TrackerCLITest(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("already exists", result.stderr)
 
+    def test_add_duplicate_fails_on_slug_collision_not_just_exact_match(self):
+        # "VP Engineering" and "VP  Engineering" resolve to the identical
+        # opportunity folder (opportunity_path collapses the whitespace),
+        # so they must be rejected as the same opportunity here too —
+        # otherwise the tracker ends up with two active rows pointing at
+        # one folder.
+        self.run_cli("add", "Altana", "VP Engineering", "--stage", "Identified")
+        result = self.run_cli("add", "Altana", "VP  Engineering", "--stage", "Identified")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("already exists", result.stderr)
+
     def test_update_status_on_missing_row_fails(self):
         result = self.run_cli("update-status", "Nope", "Nowhere", "--stage", "X")
         self.assertNotEqual(result.returncode, 0)

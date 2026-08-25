@@ -148,8 +148,15 @@ def write_table(path: Path, rows: list[dict], title: str) -> None:
 
 
 def find_row(rows, company, role):
+    """Matches by slug, not raw string equality — so "VP Engineering" and
+    "VP  Engineering" are treated as the same opportunity here too, not
+    just when resolving the folder path. Without this, cmd_add's
+    duplicate check would let slug-collision variants through as two
+    separate active rows even though opportunity_path() resolves both to
+    the identical folder."""
+    target_company, target_role = slugify(company), slugify(role)
     for row in rows:
-        if row["Company"] == company and row["Role"] == role:
+        if slugify(row["Company"]) == target_company and slugify(row["Role"]) == target_role:
             return row
     return None
 

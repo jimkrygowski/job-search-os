@@ -7,9 +7,9 @@ description: Use when a user wants a resume and/or cover letter tailored to a sp
 
 ## Purpose
 
-Produce `state/opportunity/<Company>/<Role>/resume.md` and
-`state/opportunity/<Company>/<Role>/cover_letter.md` from the master resume and
-the specific JD — without inventing anything not in the master resume or
+Produce `resume.md` and `cover_letter.md` in the target opportunity's
+resolved folder (see Session Start) from the master resume and the
+specific JD — without inventing anything not in the master resume or
 `state/career/profile.md`.
 
 ## Session Start
