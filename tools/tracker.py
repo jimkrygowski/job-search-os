@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CLI for reading and writing tracker.md / tracker_closed.md.
+"""CLI for reading and writing state/tracker.md / state/tracker_closed.md.
 
 This is the only code that should ever write these files. Skills call it
 via `python3 tools/tracker.py <command> ...` rather than editing the
@@ -28,8 +28,8 @@ CLOSED_TITLE = "Closed Opportunities"
 
 @contextmanager
 def locked(timeout: float = 10.0):
-    """Mutual exclusion for read-modify-write cycles against tracker.md /
-    tracker_closed.md. Concurrent invocations (e.g. morning-scan recording
+    """Mutual exclusion for read-modify-write cycles against state/tracker.md /
+    state/tracker_closed.md. Concurrent invocations (e.g. morning-scan recording
     several calendar events in parallel) would otherwise race: both read
     the same snapshot, and the later write silently clobbers the earlier
     one. Uses exclusive file creation (portable across platforms) rather
@@ -144,7 +144,7 @@ def cmd_add(args):
         rows = read_table(ACTIVE_PATH)
         if find_row(rows, args.company, args.role):
             print(
-                f"error: {args.company} / {args.role} already exists in tracker.md "
+                f"error: {args.company} / {args.role} already exists in state/tracker.md "
                 "— use update-status",
                 file=sys.stderr,
             )
@@ -166,7 +166,7 @@ def cmd_update_status(args):
         rows = read_table(ACTIVE_PATH)
         row = find_row(rows, args.company, args.role)
         if row is None:
-            print(f"error: {args.company} / {args.role} not found in tracker.md", file=sys.stderr)
+            print(f"error: {args.company} / {args.role} not found in state/tracker.md", file=sys.stderr)
             sys.exit(1)
         row["Stage"] = args.stage
         if args.next_action is not None:
@@ -183,7 +183,7 @@ def cmd_record_event(args):
         rows = read_table(ACTIVE_PATH)
         row = find_row(rows, args.company, args.role)
         if row is None:
-            print(f"error: {args.company} / {args.role} not found in tracker.md", file=sys.stderr)
+            print(f"error: {args.company} / {args.role} not found in state/tracker.md", file=sys.stderr)
             sys.exit(1)
         row["Next Action"] = args.event
         row["Next Action Date"] = args.date
@@ -197,7 +197,7 @@ def cmd_close(args):
         rows = read_table(ACTIVE_PATH)
         row = find_row(rows, args.company, args.role)
         if row is None:
-            print(f"error: {args.company} / {args.role} not found in tracker.md", file=sys.stderr)
+            print(f"error: {args.company} / {args.role} not found in state/tracker.md", file=sys.stderr)
             sys.exit(1)
         rows.remove(row)
         write_table(ACTIVE_PATH, rows, ACTIVE_TITLE)
@@ -224,7 +224,7 @@ def cmd_list(args):
 
 
 def build_parser():
-    parser = argparse.ArgumentParser(description="Manage tracker.md / tracker_closed.md")
+    parser = argparse.ArgumentParser(description="Manage state/tracker.md / state/tracker_closed.md")
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_add = sub.add_parser("add")
