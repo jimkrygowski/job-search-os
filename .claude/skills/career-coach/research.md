@@ -85,7 +85,7 @@ This document records the evidence base for every framework in the career-coach 
 - Inaction regret inflation: people underestimate how much they adapt to negative outcomes (Gilbert, 2006, *Stumbling on Happiness*). May systematically over-push toward bold action.
 - Not useful for comparing multiple competing alternatives — it is a go/no-go reframing device.
 
-**Why kept (narrowed):** Useful when Jim is frozen by risk aversion about a single choice. Not useful for comparing two or three real competing offers. The skill now scopes it correctly.
+**Why kept (narrowed):** Useful when the user is frozen by risk aversion about a single choice. Not useful for comparing two or three real competing offers. The skill now scopes it correctly.
 
 ---
 
@@ -120,9 +120,9 @@ This document records the evidence base for every framework in the career-coach 
 - Career change does not happen through introspection first, then action. It happens through doing: experimenting with new professional activities, building new networks, and iterating on identity.
 - People who spend too long in values-clarification and "find yourself" exercises before acting typically stall. Action creates the evidence that revises identity.
 
-**Why added:** The most directly applicable research-backed framework for executive career transitions. Directly addresses the trap of over-analyzing options and under-experimenting. Relevant to Jim's current search: if he is heavily weighing introspective exercises (what are my values? where do I want to be in 5 years?) before taking exploratory actions, Ibarra's research suggests the causation should run the other way.
+**Why added:** The most directly applicable research-backed framework for executive career transitions. Directly addresses the trap of over-analyzing options and under-experimenting. Relevant to the user's current search: if they are heavily weighing introspective exercises (what are my values? where do I want to be in 5 years?) before taking exploratory actions, Ibarra's research suggests the causation should run the other way.
 
-**How to use:** When Jim is stuck in analysis, blocked on a choice, or spending more energy evaluating than experimenting — surface the Ibarra frame. The right question is "what experiments can you run to gather real data?" not "what do your values tell you to do?"
+**How to use:** When the user is stuck in analysis, blocked on a choice, or spending more energy evaluating than experimenting — surface the Ibarra frame. The right question is "what experiments can you run to gather real data?" not "what do your values tell you to do?"
 
 ---
 
@@ -139,7 +139,7 @@ This document records the evidence base for every framework in the career-coach 
 
 Deprivation of any of these three needs predicts dissatisfaction and disengagement even when compensation is high. Satisfaction of all three is the strongest single predictor of sustainable motivation.
 
-**Why added:** Gives a simple, evidence-backed diagnostic that can be applied to any opportunity: does this role satisfy Jim's needs for autonomy, competence, and relatedness? Particularly useful when an opportunity scores well financially but Jim has a nagging sense something is wrong.
+**Why added:** Gives a simple, evidence-backed diagnostic that can be applied to any opportunity: does this role satisfy the user's needs for autonomy, competence, and relatedness? Particularly useful when an opportunity scores well financially but the user has a nagging sense something is wrong.
 
 ---
 
@@ -149,13 +149,13 @@ Deprivation of any of these three needs predicts dissatisfaction and disengageme
 
 **What it is:** Six personality/interest types (Realistic, Investigative, Artistic, Social, Enterprising, Conventional). Most empirically validated career interest framework in existence. 50+ years of meta-analyses support predictive validity for career satisfaction and occupational choice (Nauta, 2010, *Journal of Vocational Behavior*).
 
-**Why not added:** RIASEC was designed for occupational entry, not senior career transitions. At CTO/VPE level the relevant question is not "what kind of work interests me" (Jim has answered that over 25 years) but "which specific senior role and organization fits." RIASEC doesn't differentiate well at this level.
+**Why not added:** RIASEC was designed for occupational entry, not senior career transitions. At CTO/VPE level the relevant question is not "what kind of work interests me" (the user has answered that over 25 years) but "which specific senior role and organization fits." RIASEC doesn't differentiate well at this level.
 
 ### Savickas Career Construction Theory / Life Design
 
 **What it is:** The dominant paradigm in academic career counseling since 2010s. Emphasizes career adaptability (Concern, Control, Curiosity, Confidence) and narrative identity (Savickas, *Career Counseling*, APA, 2011). PMC 2024 review confirms it is the most active area of career research internationally.
 
-**Why not added:** The narrative/meaning-making approach is time-intensive and harder to operationalize in a structured coaching session. Designed for longer-term career counseling engagements, not decision support in an active job search. May be worth adding if Jim's search extends and the work shifts from opportunity evaluation to deeper career identity work.
+**Why not added:** The narrative/meaning-making approach is time-intensive and harder to operationalize in a structured coaching session. Designed for longer-term career counseling engagements, not decision support in an active job search. May be worth adding if the user's search extends and the work shifts from opportunity evaluation to deeper career identity work.
 
 ### MBTI
 
@@ -163,7 +163,7 @@ Deprivation of any of these three needs predicts dissatisfaction and disengageme
 
 ### CliftonStrengths (Gallup StrengthsFinder)
 
-**Why not added:** Widely used by coaches and has a large community. However, the technical report (Lopez et al., 2005) is commercially produced by Gallup and has not been rigorously externally validated. Independent replication is thin. ERIC review found insufficient evidence for higher education applications. Treat as a conversation-starting heuristic if Jim brings it up — don't rely on it as a framework.
+**Why not added:** Widely used by coaches and has a large community. However, the technical report (Lopez et al., 2005) is commercially produced by Gallup and has not been rigorously externally validated. Independent replication is thin. ERIC review found insufficient evidence for higher education applications. Treat as a conversation-starting heuristic if the user brings it up — don't rely on it as a framework.
 
 ---
 

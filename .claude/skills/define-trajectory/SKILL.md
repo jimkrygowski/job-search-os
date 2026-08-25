@@ -8,7 +8,7 @@ description: Use when a user needs to define or revisit their target role and ca
 ## Purpose
 
 Produce or update `career/trajectory.md` — the target-role definition
-used by `score-opportunity`, `career-coach`, and `tailor-resume`. Shaped
+used by `score-opportunity`, `career-coach`, and `interview-prep`. Shaped
 as a "Mnookin Two-Pager" (from *Never Search Alone*, Phyl Terry): a
 concise, honest pitch document, not an internal wishlist. It should be
 something the user could actually hand to a recruiter or a contact.

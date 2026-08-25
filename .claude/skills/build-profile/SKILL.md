@@ -24,6 +24,11 @@ must be concrete, not vague.
    If yes, read it and draft an initial pass at the sections below for
    them to correct rather than starting from a blank page. If no, build
    the sections from conversation alone.
+   - If the user provides an existing resume (pasted, uploaded, or
+     otherwise supplied) and `career/resume/master_resume.md` doesn't
+     already exist, write it there as-is (creating the `career/resume/`
+     directory if needed) so it becomes the source-of-truth resume other
+     skills (`tailor-resume`) depend on.
 
 ## What to Capture
 

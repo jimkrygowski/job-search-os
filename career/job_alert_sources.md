@@ -5,8 +5,8 @@ List the email senders that deliver job alerts, and what to filter for.
 
 ## Example format
 
-- **Source name:** ZenSearch
-  **Sender pattern:** `from:example@zensearch.jobs`
+- **Source name:** Acme Job Alerts
+  **Sender pattern:** `from:alerts@acmejobalerts.example`
   **Lookback:** `newer_than:2d`
   **Filter for:** title/company/location/comp matching
   `career/trajectory.md` must-haves

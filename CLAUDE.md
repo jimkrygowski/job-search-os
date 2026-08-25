@@ -46,6 +46,7 @@ at the `bootstrap` skill rather than improvising a setup flow.
 ## Contacts
 
 Whenever you learn of a new contact for an opportunity — a name, title,
-or role in the process — add them to that opportunity's
-`opportunity/<Company>/<Role>/contacts.md`. Don't wait to be asked; this
-applies during any skill session, not just a dedicated one.
+role in the process, and email address, when known — add them to that
+opportunity's `opportunity/<Company>/<Role>/contacts.md`. Don't wait to
+be asked; this applies during any skill session, not just a dedicated
+one.

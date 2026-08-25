@@ -17,8 +17,9 @@ the specific JD — without inventing anything not in the master resume or
 Read `career/resume/master_resume.md`, `career/profile.md`, and the
 target opportunity's `jd.md`. If any of these don't exist, tell the user
 what's missing rather than improvising around the gap (a missing `jd.md`
-means `score-opportunity` hasn't been run yet; no master resume means
-`build-profile` hasn't produced one).
+means `score-opportunity` hasn't been run yet; no master resume means the
+user hasn't provided one yet via `build-profile`, or needs to add
+`career/resume/master_resume.md` directly).
 
 ## Resume
 
