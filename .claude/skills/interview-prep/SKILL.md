@@ -11,8 +11,11 @@ Produce a prep briefing ahead of a specific call or interview.
 
 ## Session Start
 
-Identify which opportunity and which stage of interview this is for.
-Read `state/opportunity/<Company>/<Role>/jd.md`, `notes.md`, `contacts.md`, and
+Identify which opportunity and which stage of interview this is for, and
+resolve its folder via
+`python3 tools/tracker.py opportunity-path "<Company>" "<Role>"` — never
+construct the path yourself from the typed Company/Role. Read `jd.md`,
+`notes.md`, and `contacts.md` from that folder, plus
 `state/career/trajectory.md`.
 
 ## Briefing Contents
@@ -33,5 +36,5 @@ Read `state/opportunity/<Company>/<Role>/jd.md`, `notes.md`, `contacts.md`, and
 ## Output
 
 Write the briefing into the chat response. If the user wants it saved,
-append it to `state/opportunity/<Company>/<Role>/notes.md` under an
+append it to the resolved opportunity folder's `notes.md` under an
 `## Interview Prep (<date>)` heading.

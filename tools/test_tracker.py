@@ -129,7 +129,7 @@ class TrackerCLITest(unittest.TestCase):
         closed = self.run_cli("list", "--closed")
         self.assertIn("Altana", closed.stdout)
 
-        notes = Path("state/opportunity/Altana/VP Engineering/notes.md").read_text()
+        notes = Path("state/opportunity/altana/vp_engineering/notes.md").read_text()
         self.assertIn("Role was put on hold", notes)
 
     def test_close_missing_row_fails(self):
@@ -194,6 +194,54 @@ class TrackerLockingTest(unittest.TestCase):
         with self.assertRaises(SystemExit):
             with tracker.locked(timeout=0.2):
                 pass
+
+
+class SlugifyTest(unittest.TestCase):
+    def test_lowercases_and_replaces_spaces(self):
+        self.assertEqual(tracker.slugify("VP Engineering"), "vp_engineering")
+
+    def test_collapses_runs_of_punctuation_and_whitespace(self):
+        self.assertEqual(tracker.slugify("VP,  Engineering!!"), "vp_engineering")
+
+    def test_inconsistent_spacing_and_casing_collide_on_purpose(self):
+        # This is the whole point: two skills typing the same role
+        # differently must still land in the same folder.
+        self.assertEqual(tracker.slugify("VP Engineering"), tracker.slugify("VP  Engineering"))
+        self.assertEqual(tracker.slugify("VP Engineering"), tracker.slugify("vp engineering"))
+
+    def test_strips_leading_and_trailing_punctuation(self):
+        self.assertEqual(tracker.slugify("  Acme, Inc.  "), "acme_inc")
+
+    def test_empty_or_all_punctuation_falls_back_to_unnamed(self):
+        self.assertEqual(tracker.slugify("   "), "unnamed")
+        self.assertEqual(tracker.slugify("---"), "unnamed")
+
+
+class OpportunityPathTest(unittest.TestCase):
+    def test_combines_slugified_company_and_role_under_state(self):
+        self.assertEqual(
+            tracker.opportunity_path("Bed | Bath & Beyond, Inc.", "VP Engineering"),
+            Path("state/opportunity/bed_bath_beyond_inc/vp_engineering"),
+        )
+
+    def test_cli_prints_the_same_path_the_library_function_computes(self):
+        tmpdir = tempfile.TemporaryDirectory()
+        cwd = os.getcwd()
+        os.chdir(tmpdir.name)
+        try:
+            result = subprocess.run(
+                [sys.executable, str(Path(cwd) / "tools" / "tracker.py"),
+                 "opportunity-path", "Ledgerline", "VP Engineering"],
+                capture_output=True, text=True,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(
+                result.stdout.strip(),
+                str(tracker.opportunity_path("Ledgerline", "VP Engineering")),
+            )
+        finally:
+            os.chdir(cwd)
+            tmpdir.cleanup()
 
 
 if __name__ == "__main__":
