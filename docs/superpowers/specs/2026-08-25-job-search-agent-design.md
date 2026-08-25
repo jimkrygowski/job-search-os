@@ -121,10 +121,17 @@ unsourced rather than blended in.
 
 New:
 
-- **`bootstrap`** — first-time-setup orchestrator. Checks whether
-  `career/profile.md` / `trajectory.md` already exist and resumes from
-  wherever the user left off rather than forcing a restart. Runs
-  `build-profile` then `define-trajectory` in sequence.
+- **`bootstrap`** — first-time-setup orchestrator. First step is a
+  preflight check: run `python3 --version` and confirm it's present (the
+  engine is deliberately stdlib-only — `tracker.py` and `gmail_extract.py`
+  need nothing beyond the interpreter itself, no pip packages). If Python
+  is missing, print platform-appropriate install instructions and stop —
+  installing software machine-wide is a hard-to-reverse, outside-the-repo
+  action, so this is a check-and-guide step, not an auto-installer. Once
+  the preflight passes, checks whether `career/profile.md` /
+  `trajectory.md` already exist and resumes from wherever the user left
+  off rather than forcing a restart, then runs `build-profile` then
+  `define-trajectory` in sequence.
 - **`build-profile`** — guided conversation to create/update
   `career/profile.md`, seeded from an existing resume if one exists.
   Covers career-to-date reflection: best/worst job, best/worst boss, and
