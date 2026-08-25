@@ -72,8 +72,8 @@ Score each active opportunity across:
 
 Three basic psychological needs; deprivation of any one predicts dissatisfaction even when compensation is high:
 - **Autonomy** — real agency over decisions; acting in accordance with values, not feeling controlled
-- **Competence** — doing what he's best at; challenges at the right level of difficulty
-- **Relatedness** — genuine connection with the people he works with and for
+- **Competence** — doing what they're best at; challenges at the right level of difficulty
+- **Relatedness** — genuine connection with the people they work with and for
 
 *Use when:* An opportunity scores well on compensation and scope but the user has a nagging sense something is wrong. Three questions: "Will you have real agency here?" / "Will this use what you're best at?" / "Do you actually connect with the people?"
 
