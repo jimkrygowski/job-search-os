@@ -21,7 +21,7 @@ class TrackerLibTest(unittest.TestCase):
         self._tmpdir.cleanup()
 
     def test_read_table_missing_file_returns_no_rows(self):
-        self.assertEqual(tracker.read_table(Path("tracker.md")), [])
+        self.assertEqual(tracker.read_table(tracker.ACTIVE_PATH), [])
 
     def test_write_then_read_round_trip(self):
         rows = [{
@@ -29,8 +29,8 @@ class TrackerLibTest(unittest.TestCase):
             "Last Activity": "2026-08-19", "Next Action": "Follow up",
             "Next Action Date": "2026-08-26",
         }]
-        tracker.write_table(Path("tracker.md"), rows, tracker.ACTIVE_TITLE)
-        self.assertEqual(tracker.read_table(Path("tracker.md")), rows)
+        tracker.write_table(tracker.ACTIVE_PATH, rows, tracker.ACTIVE_TITLE)
+        self.assertEqual(tracker.read_table(tracker.ACTIVE_PATH), rows)
 
     def test_round_trip_survives_pipe_and_comma_in_cell(self):
         rows = [{
@@ -38,8 +38,8 @@ class TrackerLibTest(unittest.TestCase):
             "Stage": "Identified", "Last Activity": "2026-08-20",
             "Next Action": "", "Next Action Date": "",
         }]
-        tracker.write_table(Path("tracker.md"), rows, tracker.ACTIVE_TITLE)
-        self.assertEqual(tracker.read_table(Path("tracker.md")), rows)
+        tracker.write_table(tracker.ACTIVE_PATH, rows, tracker.ACTIVE_TITLE)
+        self.assertEqual(tracker.read_table(tracker.ACTIVE_PATH), rows)
 
     def test_no_column_alignment_padding(self):
         rows = [
@@ -129,7 +129,7 @@ class TrackerCLITest(unittest.TestCase):
         closed = self.run_cli("list", "--closed")
         self.assertIn("Altana", closed.stdout)
 
-        notes = Path("opportunity/Altana/VP Engineering/notes.md").read_text()
+        notes = Path("state/opportunity/Altana/VP Engineering/notes.md").read_text()
         self.assertIn("Role was put on hold", notes)
 
     def test_close_missing_row_fails(self):
@@ -177,7 +177,7 @@ class TrackerLockingTest(unittest.TestCase):
         for r in results:
             self.assertEqual(r.returncode, 0, r.stderr)
 
-        rows = tracker.read_table(Path("tracker.md"))
+        rows = tracker.read_table(tracker.ACTIVE_PATH)
         self.assertEqual(len(rows), len(companies))
         for c in companies:
             row = tracker.find_row(rows, c, "Role")
@@ -189,6 +189,7 @@ class TrackerLockingTest(unittest.TestCase):
         self.assertFalse(tracker.LOCK_PATH.exists())
 
     def test_locked_times_out_when_lock_file_already_held(self):
+        tracker.LOCK_PATH.parent.mkdir(parents=True, exist_ok=True)
         tracker.LOCK_PATH.touch()
         with self.assertRaises(SystemExit):
             with tracker.locked(timeout=0.2):

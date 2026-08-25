@@ -1,25 +1,25 @@
 ---
 name: tailor-resume
-description: Use when a user wants a resume and/or cover letter tailored to a specific opportunity already in the pipeline. Reads career/resume/master_resume.md and the opportunity's jd.md, writes resume.md and cover_letter.md into that opportunity's folder.
+description: Use when a user wants a resume and/or cover letter tailored to a specific opportunity already in the pipeline. Reads state/career/resume/master_resume.md and the opportunity's jd.md, writes resume.md and cover_letter.md into that opportunity's folder.
 ---
 
 # Tailor Resume
 
 ## Purpose
 
-Produce `opportunity/<Company>/<Role>/resume.md` and
-`opportunity/<Company>/<Role>/cover_letter.md` from the master resume and
+Produce `state/opportunity/<Company>/<Role>/resume.md` and
+`state/opportunity/<Company>/<Role>/cover_letter.md` from the master resume and
 the specific JD — without inventing anything not in the master resume or
-`career/profile.md`.
+`state/career/profile.md`.
 
 ## Session Start
 
-Read `career/resume/master_resume.md`, `career/profile.md`, and the
+Read `state/career/resume/master_resume.md`, `state/career/profile.md`, and the
 target opportunity's `jd.md`. If any of these don't exist, tell the user
 what's missing rather than improvising around the gap (a missing `jd.md`
 means `score-opportunity` hasn't been run yet; no master resume means the
 user hasn't provided one yet via `build-profile`, or needs to add
-`career/resume/master_resume.md` directly).
+`state/career/resume/master_resume.md` directly).
 
 ## Resume
 
@@ -31,7 +31,7 @@ user hasn't provided one yet via `build-profile`, or needs to add
    say so to the user rather than papering over it — ask if there's
    relevant experience missing from the master resume, or flag it as a
    real gap.
-4. Write `opportunity/<Company>/<Role>/resume.md`. ATS-friendly: no
+4. Write `state/opportunity/<Company>/<Role>/resume.md`. ATS-friendly: no
    tables, no columns, no graphics.
 5. Include a brief keyword-gap note at the end of your chat response (not
    the file) — what the JD asks for that the tailored resume doesn't
@@ -39,7 +39,7 @@ user hasn't provided one yet via `build-profile`, or needs to add
 
 ## Cover Letter
 
-Write `opportunity/<Company>/<Role>/cover_letter.md`, connecting specific
+Write `state/opportunity/<Company>/<Role>/cover_letter.md`, connecting specific
 experience from the master resume to the company's stated needs in the
 JD. Ask the user if there's a specific angle they want emphasized before
 drafting.
@@ -47,6 +47,6 @@ drafting.
 ## Guardrails
 
 - Never invent experience, metrics, or accomplishments. Every claim must
-  trace to `master_resume.md`, `career/profile.md`, or something the user
+  trace to `state/career/resume/master_resume.md`, `state/career/profile.md`, or something the user
   says directly.
 - This skill never sends anything — it only writes files.

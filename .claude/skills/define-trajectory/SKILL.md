@@ -1,13 +1,13 @@
 ---
 name: define-trajectory
-description: Use when a user needs to define or revisit their target role and career direction — as part of first-time bootstrap, or any time real feedback (an interview outcome, a networking conversation, a "golden question" conversation) suggests their must-haves have changed. Builds or updates career/trajectory.md in the Mnookin Two-Pager format.
+description: Use when a user needs to define or revisit their target role and career direction — as part of first-time bootstrap, or any time real feedback (an interview outcome, a networking conversation, a "golden question" conversation) suggests their must-haves have changed. Builds or updates state/career/trajectory.md in the Mnookin Two-Pager format.
 ---
 
 # Define Trajectory
 
 ## Purpose
 
-Produce or update `career/trajectory.md` — the target-role definition
+Produce or update `state/career/trajectory.md` — the target-role definition
 used by `score-opportunity`, `career-coach`, and `interview-prep`. Shaped
 as a "Mnookin Two-Pager" (from *Never Search Alone*, Phyl Terry): a
 concise, honest pitch document, not an internal wishlist. It should be
@@ -15,12 +15,12 @@ something the user could actually hand to a recruiter or a contact.
 
 ## Session Start
 
-1. Check whether `career/trajectory.md` exists.
+1. Check whether `state/career/trajectory.md` exists.
    - **Doesn't exist → initial mode.** Build it from scratch.
    - **Exists → revisit mode.** Summarize it back to the user, ask what's
      changed. Update in place — don't rebuild from scratch. Update the
      `Last reviewed:` field when done, regardless of how much changed.
-2. Read `career/profile.md` first if it exists — trajectory should build
+2. Read `state/career/profile.md` first if it exists — trajectory should build
    on the patterns identified there, not ignore them.
 
 ## Sections (Mnookin Two-Pager shape)
@@ -32,7 +32,7 @@ something the user could actually hand to a recruiter or a contact.
 - **Must-nots** — dealbreakers.
 - **Short-term goal (next role)** — what the next role needs to be.
 - **Long-term goal (3-5 years)** — where this is heading.
-- **Strengths** — grounded in `career/profile.md`, not generic.
+- **Strengths** — grounded in `state/career/profile.md`, not generic.
 - **Weaknesses / stretch areas** — honest, not softened.
 
 ## Initial Mode — Conversation Guide
@@ -42,7 +42,7 @@ specificity — "good culture" is not a must-have, "reports to the CEO or
 founder, not another engineering exec" is.
 
 For the short-term goal, do an honest stretch assessment: given
-`career/profile.md`, is the target role a lateral move, a stretch, or a
+`state/career/profile.md`, is the target role a lateral move, a stretch, or a
 reach? Say so directly. If it's a stretch or reach, talk through how to
 position existing experience or what gap needs filling before or during
 the search.

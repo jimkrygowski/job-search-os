@@ -36,9 +36,18 @@ One repository, two zones:
   `.claude/commands/`, `tools/*.py`, root `CLAUDE.md`. Skills read personal
   facts from data files at runtime rather than embedding them, which is
   what makes the engine reusable by someone else in principle.
-- **Data** — personal, specific to whoever is running the search:
-  `career/`, `opportunity/<Company>/<Role>/`, `tracker.md`,
-  `tracker_closed.md`.
+- **Data** — personal, specific to whoever is running the search: all of
+  it lives under `state/` (`state/career/`,
+  `state/opportunity/<Company>/<Role>/`, `state/tracker.md`,
+  `state/tracker_closed.md`), and `state/` is gitignored in its entirety
+  — never part of the engine's own git history. That's what makes "the
+  engine is reusable by someone else in principle" actually true: a
+  `git pull` in this repo can never touch or conflict with anyone's
+  actual data, because the data was never tracked here to begin with.
+  (Added after the initial build, once it became clear co-locating data
+  paths at the repo root — even nominally separated by naming
+  convention — didn't structurally prevent them from ending up in this
+  repo's git history.)
 
 `CLAUDE.md` defines the persona once — direct, a peer and thought partner
 rather than a cheerleader, states only facts it can source, never sends
@@ -51,32 +60,37 @@ version won't need to).
 ```
 CLAUDE.md                        persona, guardrails, pointers to data files
 
-career/
-  profile.md                     candidate profile: bio, career history,
+state/                           gitignored in its entirety — never part
+                                  of this repo's git history
+  career/
+    profile.md                   candidate profile: bio, career history,
                                   reflections (built via `build-profile`)
-  trajectory.md                  Mnookin Two-Pager–shaped target-role
+    trajectory.md                Mnookin Two-Pager–shaped target-role
                                   definition (built/revisited via
                                   `define-trajectory`) — see §6
-  resume/
-    master_resume.md             comprehensive source-of-truth resume
+    job_alert_sources.md         copied from the engine's template on
+                                  first use, then filled in by the user
+    resume/
+      master_resume.md           comprehensive source-of-truth resume
 
-opportunity/<Company>/<Role>/
-  jd.md
-  contacts.md                    contacts + their roles
-  notes.md                       meeting outcomes, research, new info —
+  opportunity/<Company>/<Role>/
+    jd.md
+    contacts.md                  contacts + their roles
+    notes.md                     meeting outcomes, research, new info —
                                   entries carry source + date
-  resume.md                      tailored resume for this opportunity
-  cover_letter.md
-  transcripts/
+    resume.md                    tailored resume for this opportunity
+    cover_letter.md
+    transcripts/
 
-tracker.md                       active opportunities — single markdown
+  tracker.md                     active opportunities — single markdown
                                   table, tool-managed only
-tracker_closed.md                archived opportunities — kept out of
+  tracker_closed.md              archived opportunities — kept out of
                                   default reads/context
 
 tools/
   tracker.py                     add, update-status, list, close,
-                                  record-event
+                                  record-event — resolves paths under
+                                  state/, creating it on demand
   gmail_extract.py               carried over as-is
 
 .claude/
@@ -91,6 +105,8 @@ tools/
     interview-review/             new
     career-coach/                 preserved, updated (see §6)
     morning-scan/                 preserved, updated (see §6)
+                                   ships job_alert_sources.template.md,
+                                   copied into state/ on first use
   commands/
     summarize-call.md             preserved as-is (mechanical, no judgment
                                    call needed — fits a command, not a skill)
@@ -98,24 +114,25 @@ tools/
 
 ## 5. Data Model
 
-**`career/trajectory.md`** follows the Mnookin Two-Pager shape (Never
-Search Alone): what you love/hate doing, must-haves/must-nots, short- and
-long-term goals, strengths/weaknesses. It's written to double as a real
-shareable pitch document, not just internal notes. Carries a
+**`state/career/trajectory.md`** follows the Mnookin Two-Pager shape
+(Never Search Alone): what you love/hate doing, must-haves/must-nots,
+short- and long-term goals, strengths/weaknesses. It's written to double
+as a real shareable pitch document, not just internal notes. Carries a
 `Last reviewed: <date>` field used by the revisit trigger (§8).
 
-**`tracker.md`** / **`tracker_closed.md`** — one markdown table each,
-minimal pipe padding (no column-alignment padding, to keep git diffs
-quiet). Columns: Company, Role, Stage, Last Activity, Next Action, Next
-Action Date. `tracker.py` is the only writer of either file — full-file
-rewrite on every call, never a partial patch. `close` moves a row from
-`tracker.md` to `tracker_closed.md` and appends the closing reason to that
-opportunity's `notes.md`.
+**`state/tracker.md`** / **`state/tracker_closed.md`** — one markdown
+table each, minimal pipe padding (no column-alignment padding, to keep
+git diffs quiet). Columns: Company, Role, Stage, Last Activity, Next
+Action, Next Action Date. `tracker.py` is the only writer of either file
+— full-file rewrite on every call, never a partial patch, and it creates
+`state/` on demand if it doesn't exist yet. `close` moves a row from
+`tracker.md` to `tracker_closed.md` and appends the closing reason to
+that opportunity's `notes.md`.
 
-**`opportunity/<Company>/<Role>/notes.md`** — freeform, but entries carry a
-source and date, since guardrail #2 (no unsupported opinions) is enforced
-by convention here, not by tooling: an unsourced claim is visibly
-unsourced rather than blended in.
+**`state/opportunity/<Company>/<Role>/notes.md`** — freeform, but entries
+carry a source and date, since guardrail #2 (no unsupported opinions) is
+enforced by convention here, not by tooling: an unsourced claim is
+visibly unsourced rather than blended in.
 
 ## 6. Skills & Commands
 
@@ -128,12 +145,12 @@ New:
   is missing, print platform-appropriate install instructions and stop —
   installing software machine-wide is a hard-to-reverse, outside-the-repo
   action, so this is a check-and-guide step, not an auto-installer. Once
-  the preflight passes, checks whether `career/profile.md` /
+  the preflight passes, checks whether `state/career/profile.md` /
   `trajectory.md` already exist and resumes from wherever the user left
   off rather than forcing a restart, then runs `build-profile` then
   `define-trajectory` in sequence.
 - **`build-profile`** — guided conversation to create/update
-  `career/profile.md`, seeded from an existing resume if one exists.
+  `state/career/profile.md`, seeded from an existing resume if one exists.
   Covers career-to-date reflection: best/worst job, best/worst boss, and
   why.
 - **`define-trajectory`** — two modes on the same skill: **initial**
@@ -146,7 +163,7 @@ New:
   experience (guardrail #1).
 - **`score-opportunity`** — takes a pasted JD (or an existing opportunity),
   scores it against `trajectory.md`, creates/updates the
-  `opportunity/<Company>/<Role>/` folder, calls `tracker.py add`. Also
+  `state/opportunity/<Company>/<Role>/` folder, calls `tracker.py add`. Also
   supports re-scoring an existing opportunity.
 - **`company-research`** — researches a target company, writes cited
   findings to `notes.md`.
@@ -215,8 +232,9 @@ automation non-goal — nothing runs in the background):
 Two distinct kinds of persistence, not to be conflated:
 
 - **Pipeline/opportunity state** lives in the data files described above
-  (`tracker.md`, `opportunity/.../notes.md`, etc.) — this is search
-  content, versioned in the repo.
+  (`state/tracker.md`, `state/opportunity/.../notes.md`, etc.) — this is
+  search content, gitignored under `state/` and never versioned in the
+  engine's own repo (§3).
 - **User preferences** (how Jim likes to work, standing corrections,
   collaboration style) use Claude Code's existing project memory system —
   this is infrastructure that already exists and needs no new building,
@@ -227,11 +245,11 @@ Two distinct kinds of persistence, not to be conflated:
 Out of scope for this spec's implementation plan. Once the new system is
 built and validated against a couple of real opportunities, migrate live
 pipeline data from `~/code/job-search` (`companies/`, `applications.csv`,
-`career/`) into the new layout by hand, opportunity by opportunity, rather
-than a scripted bulk migration — the folder shape changed enough
-(`companies/<Company>` flat → `opportunity/<Company>/<Role>/`, CSV → two
-markdown tables) that a script would be more work than it saves for a
-pipeline of this size.
+`career/`) into `state/` by hand, opportunity by opportunity, rather than
+a scripted bulk migration — the folder shape changed enough
+(`companies/<Company>` flat → `state/opportunity/<Company>/<Role>/`, CSV
+→ two markdown tables, plus the new `state/` root itself) that a script
+would be more work than it saves for a pipeline of this size.
 
 ## 12. Testing & Validation
 
