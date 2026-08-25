@@ -208,7 +208,7 @@ automation non-goal — nothing runs in the background):
 |---|---|
 | Never invent experience on a resume | Instruction-level, in `tailor-resume` and `CLAUDE.md`. No technical gate exists for this. |
 | Never assert unsupported opinions | Instruction-level, plus the source+date convention in `notes.md` (§5) so unsourced claims are visibly unsourced. |
-| Never send correspondence autonomously | **Structural.** `.claude/settings.json` denies the Gmail send/reply/forward tools outright — only drafting tools stay allowed. The agent cannot send even if instructed to. |
+| Never send correspondence autonomously | **Structural for the Gmail tools specifically.** `.claude/settings.json` denies the Gmail send/reply/forward tools outright — only drafting tools stay allowed, and the agent cannot send through those tools even if instructed to. This does not cover every conceivable path to sending (e.g. browser automation reaching Gmail's web UI) — for anything outside the denied tools, this guardrail is instruction-level, the same as the other two. |
 
 ## 10. Memory & State
 
