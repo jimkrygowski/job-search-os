@@ -1,3 +1,4 @@
+import concurrent.futures
 import os
 import subprocess
 import sys
@@ -134,6 +135,64 @@ class TrackerCLITest(unittest.TestCase):
     def test_close_missing_row_fails(self):
         result = self.run_cli("close", "Nope", "Nowhere", "--reason", "n/a")
         self.assertNotEqual(result.returncode, 0)
+
+
+class TrackerLockingTest(unittest.TestCase):
+    def setUp(self):
+        self._cwd = os.getcwd()
+        self._tmpdir = tempfile.TemporaryDirectory()
+        os.chdir(self._tmpdir.name)
+        self.tracker_py = str(Path(self._cwd) / "tools" / "tracker.py")
+
+    def tearDown(self):
+        os.chdir(self._cwd)
+        self._tmpdir.cleanup()
+
+    def run_cli(self, *args):
+        return subprocess.run(
+            [sys.executable, self.tracker_py, *args],
+            capture_output=True, text=True,
+        )
+
+    def test_concurrent_record_event_calls_do_not_clobber_each_other(self):
+        # Reproduces the race a reviewer flagged: morning-scan runs tiers in
+        # parallel and can call record-event once per calendar event found.
+        # Without locking, concurrent read-modify-write cycles on tracker.md
+        # silently drop all but the last writer's update.
+        companies = [f"Company{i}" for i in range(8)]
+        for c in companies:
+            result = self.run_cli("add", c, "Role", "--stage", "Screen")
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+        def record(c):
+            return subprocess.run(
+                [sys.executable, self.tracker_py, "record-event", c, "Role",
+                 "--event", f"Interview for {c}", "--date", "2026-09-01"],
+                capture_output=True, text=True,
+            )
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(companies)) as pool:
+            results = list(pool.map(record, companies))
+
+        for r in results:
+            self.assertEqual(r.returncode, 0, r.stderr)
+
+        rows = tracker.read_table(Path("tracker.md"))
+        self.assertEqual(len(rows), len(companies))
+        for c in companies:
+            row = tracker.find_row(rows, c, "Role")
+            self.assertIsNotNone(row, f"{c} missing from tracker.md after concurrent writes")
+            self.assertEqual(row["Next Action"], f"Interview for {c}")
+
+    def test_lock_file_does_not_leak_after_normal_operation(self):
+        self.run_cli("add", "Altana", "VP Engineering", "--stage", "Screen")
+        self.assertFalse(tracker.LOCK_PATH.exists())
+
+    def test_locked_times_out_when_lock_file_already_held(self):
+        tracker.LOCK_PATH.touch()
+        with self.assertRaises(SystemExit):
+            with tracker.locked(timeout=0.2):
+                pass
 
 
 if __name__ == "__main__":

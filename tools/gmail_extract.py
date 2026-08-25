@@ -17,6 +17,8 @@ Examples:
     python3 gmail_extract.py thread.json
 """
 
+import email.utils
+import html
 import json
 import re
 import sys
@@ -24,30 +26,36 @@ import argparse
 from datetime import datetime, timezone
 
 
-QUOTE_PATTERNS = [
+# Patterns that unambiguously mark the start of quoted history on their own.
+UNAMBIGUOUS_QUOTE_PATTERNS = [
     r'^On .{10,} wrote:$',
     r'^-{3,}\s*(Original|Forwarded)\s+(Message|message)\s*-{3,}',
+]
+
+# Header-field lines (Outlook-style quoted blocks). A single line starting
+# with one of these is not enough on its own — a genuine message body can
+# start a line with "From: my perspective..." — so these only count as a
+# quote boundary when another header field follows within a couple of
+# lines, matching the shape of a real quoted-header block.
+HEADER_FIELD_PATTERNS = [
     r'^From:\s+',
     r'^Sent:\s+',
     r'^To:\s+',
     r'^Subject:\s+',
 ]
 
+BODY_FIELD_CANDIDATES = ['plaintextBody', 'plaintextbody', 'plainTextBody', 'textBody', 'text']
+HTML_FIELD_CANDIDATES = ['htmlBody', 'htmlbody', 'html']
 
-def strip_html(html):
-    html = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.DOTALL | re.IGNORECASE)
-    html = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL | re.IGNORECASE)
-    html = re.sub(r'<br\s*/?>', '\n', html, flags=re.IGNORECASE)
-    html = re.sub(r'</?(p|div|tr|li|h[1-6])[^>]*>', '\n', html, flags=re.IGNORECASE)
-    html = re.sub(r'<[^>]+>', '', html)
-    html = (html
-            .replace('&nbsp;', ' ')
-            .replace('&lt;', '<')
-            .replace('&gt;', '>')
-            .replace('&amp;', '&')
-            .replace('&#39;', "'")
-            .replace('&quot;', '"'))
-    lines = [l.strip() for l in html.splitlines()]
+
+def strip_html(raw_html):
+    raw_html = re.sub(r'<style[^>]*>.*?</style>', '', raw_html, flags=re.DOTALL | re.IGNORECASE)
+    raw_html = re.sub(r'<script[^>]*>.*?</script>', '', raw_html, flags=re.DOTALL | re.IGNORECASE)
+    raw_html = re.sub(r'<br\s*/?>', '\n', raw_html, flags=re.IGNORECASE)
+    raw_html = re.sub(r'</?(p|div|tr|li|h[1-6])[^>]*>', '\n', raw_html, flags=re.IGNORECASE)
+    raw_html = re.sub(r'<[^>]+>', '', raw_html)
+    raw_html = html.unescape(raw_html)
+    lines = [l.strip() for l in raw_html.splitlines()]
     lines = [l for l in lines if l]
     return '\n'.join(lines)
 
@@ -55,21 +63,54 @@ def strip_html(html):
 def strip_quoted(text):
     lines = text.splitlines()
     output = []
-    for line in lines:
-        stripped = line.strip()
-        if any(re.match(p, stripped) for p in QUOTE_PATTERNS):
+    i = 0
+    while i < len(lines):
+        stripped = lines[i].strip()
+        if any(re.match(p, stripped) for p in UNAMBIGUOUS_QUOTE_PATTERNS):
             break
+        if any(re.match(p, stripped) for p in HEADER_FIELD_PATTERNS):
+            window = [l.strip() for l in lines[i + 1:i + 3]]
+            if any(re.match(p, w) for w in window for p in HEADER_FIELD_PATTERNS):
+                break
         if stripped.startswith('>'):
+            i += 1
             continue
-        output.append(line)
+        output.append(lines[i])
+        i += 1
     return '\n'.join(output).strip()
 
 
 def parse_date(date_str):
+    """Parse a message date that may be ISO 8601 or RFC 2822 (the standard
+    email Date header format). Returns None only if neither format parses —
+    callers must not treat that as "very old", since silently excluding an
+    unparseable-but-recent message is the exact bug this tool exists to
+    prevent."""
+    if not date_str:
+        return None
     try:
         return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-    except Exception:
+    except (ValueError, TypeError):
+        pass
+    try:
+        return email.utils.parsedate_to_datetime(date_str)
+    except (ValueError, TypeError):
         return None
+
+
+def extract_body(msg):
+    """Returns (body_text, field_was_found). field_was_found lets callers
+    distinguish "we recognized a body field and it was empty" (genuinely
+    empty message) from "we didn't recognize any body field name" (likely
+    schema mismatch / extraction failure) — the two silently looked
+    identical before this fix."""
+    for key in BODY_FIELD_CANDIDATES:
+        if key in msg:
+            return msg[key] or '', True
+    for key in HTML_FIELD_CANDIDATES:
+        if key in msg:
+            return strip_html(msg[key] or ''), True
+    return '', False
 
 
 def format_message(msg):
@@ -77,12 +118,7 @@ def format_message(msg):
     date = msg.get('date', '')
     subject = msg.get('subject', '')
 
-    body = msg.get('plaintextBody') or msg.get('plaintextbody') or ''
-    if not body:
-        html = msg.get('htmlBody') or msg.get('htmlbody') or ''
-        if html:
-            body = strip_html(html)
-
+    body, field_found = extract_body(msg)
     body = strip_quoted(body)
 
     lines = [
@@ -92,7 +128,13 @@ def format_message(msg):
     if subject:
         lines.append(f"SUBJECT: {subject}")
     lines.append('-' * 60)
-    lines.append(body or '[no body]')
+    if body:
+        lines.append(body)
+    elif field_found:
+        lines.append('[no body]')
+    else:
+        lines.append('[no body — no recognized body field in source JSON; '
+                      'expected one of plaintextBody/htmlBody]')
     return '\n'.join(lines)
 
 
@@ -110,10 +152,22 @@ def main():
 
     if args.after:
         cutoff = datetime.fromisoformat(args.after).replace(tzinfo=timezone.utc)
-        messages = [m for m in messages if (parse_date(m.get('date', '')) or datetime.min.replace(tzinfo=timezone.utc)) > cutoff]
 
-    if args.latest:
-        messages = messages[-args.latest:]
+        def after_cutoff(msg):
+            parsed = parse_date(msg.get('date', ''))
+            if parsed is None:
+                # Unparseable date: fail open. Silently excluding a message
+                # we couldn't date is exactly the bug this tool exists to
+                # prevent — better to show an extra message than drop one.
+                return True
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=timezone.utc)
+            return parsed > cutoff
+
+        messages = [m for m in messages if after_cutoff(m)]
+
+    if args.latest is not None:
+        messages = messages[-args.latest:] if args.latest > 0 else []
 
     if not messages:
         print('No messages found matching criteria.')

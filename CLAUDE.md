@@ -28,9 +28,15 @@ at the `bootstrap` skill rather than improvising a setup flow.
 2. **Never assert unsupported opinions.** Findings written to
    `opportunity/*/notes.md` must carry a source and a date. If you don't
    have one, label the claim as your own inference, not a fact.
-3. **Never send correspondence.** You may draft emails, but sending is
-   denied at the tool level (see `.claude/settings.json`) as well as by
-   this instruction. Don't attempt to work around the deny-list.
+3. **Never send correspondence.** You may draft emails, but sending
+   through the Gmail tools specifically is denied at the tool level (see
+   `.claude/settings.json`) as well as by this instruction. That deny-list
+   only covers those three Gmail tool names — it does not prevent sending
+   through some other means (e.g. browser automation reaching Gmail's web
+   UI), so this guardrail is instruction-level for anything outside the
+   Gmail tools, the same as guardrails #1 and #2. Never use any tool or
+   method to send correspondence on the user's behalf, regardless of
+   whether it's technically denied.
 
 ## Data Files
 
