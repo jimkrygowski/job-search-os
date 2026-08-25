@@ -19,27 +19,37 @@ trajectory to score against isn't meaningful.
 ## New Opportunity (JD pasted in chat)
 
 1. Identify Company and Role from the JD.
-2. Check whether `state/opportunity/<Company>/<Role>/` already exists. If so,
-   treat this as a re-score (below) instead.
-3. Score the JD against `trajectory.md`'s must-haves and must-nots
+2. Resolve the opportunity folder path — always through the tool, never by
+   constructing `<Company>/<Role>` yourself, so folder naming stays
+   consistent across sessions and skills (e.g. "VP Engineering" and
+   "VP  Engineering" must land in the same folder, not two different
+   ones):
+   ```
+   python3 tools/tracker.py opportunity-path "<Company>" "<Role>"
+   ```
+3. Check whether that folder already exists. If so, treat this as a
+   re-score (below) instead.
+4. Score the JD against `trajectory.md`'s must-haves and must-nots
    explicitly — go through each one and say whether the JD satisfies it,
    contradicts it, or doesn't say. Don't produce a single vague score
    without this breakdown.
-4. Create `state/opportunity/<Company>/<Role>/jd.md` with the full JD text plus
+5. Create `jd.md` inside the resolved folder, with the full JD text plus
    the scoring breakdown.
-5. Add it to the tracker:
+6. Add it to the tracker:
    ```
    python3 tools/tracker.py add "<Company>" "<Role>" --stage "Identified" \
      --next-action "<what the user should do next>" \
      --next-action-date "<date, if known>"
    ```
-6. Tell the user the result plainly, including if it scores poorly — cite
+   (`add` stores the Company/Role you typed, unslugified, so the tracker
+   table stays human-readable — only the folder name is slugified.)
+7. Tell the user the result plainly, including if it scores poorly — cite
    the specific must-have/must-not it fails, don't soften it.
 
 ## Re-scoring an Existing Opportunity
 
-Read the existing `state/opportunity/<Company>/<Role>/jd.md` and
-`state/opportunity/<Company>/<Role>/notes.md`, re-run the must-have/must-not
+Resolve the folder path the same way (`opportunity-path`), then read the
+existing `jd.md` and `notes.md` inside it, re-run the must-have/must-not
 breakdown against the current `state/career/trajectory.md` (useful right after
 a trajectory revisit), and append the updated scoring to `jd.md` with
 today's date rather than overwriting the original scoring.

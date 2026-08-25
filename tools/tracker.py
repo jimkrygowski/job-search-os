@@ -8,6 +8,7 @@ markdown tables directly, to avoid corrupting pipeline state.
 import argparse
 import datetime
 import os
+import re
 import sys
 import time
 from contextlib import contextmanager
@@ -24,6 +25,24 @@ CLOSED_PATH = STATE_ROOT / "tracker_closed.md"
 LOCK_PATH = STATE_ROOT / ".tracker.lock"
 ACTIVE_TITLE = "Active Opportunities"
 CLOSED_TITLE = "Closed Opportunities"
+
+
+def slugify(text: str) -> str:
+    """Deterministic filesystem-safe slug for a Company or Role string.
+
+    Every skill that touches an opportunity folder resolves its path
+    through this function (via `opportunity_path` / the `opportunity-path`
+    CLI command) rather than slugifying independently in prose — that's
+    what keeps "VP Engineering" and "VP  Engineering" (or a different
+    skill's own guess at the transform) from silently creating two
+    different folders for the same opportunity.
+    """
+    slug = re.sub(r"[^a-zA-Z0-9]+", "_", text.strip()).strip("_").lower()
+    return slug or "unnamed"
+
+
+def opportunity_path(company: str, role: str) -> Path:
+    return STATE_ROOT / "opportunity" / slugify(company) / slugify(role)
 
 
 @contextmanager
@@ -129,8 +148,15 @@ def write_table(path: Path, rows: list[dict], title: str) -> None:
 
 
 def find_row(rows, company, role):
+    """Matches by slug, not raw string equality — so "VP Engineering" and
+    "VP  Engineering" are treated as the same opportunity here too, not
+    just when resolving the folder path. Without this, cmd_add's
+    duplicate check would let slug-collision variants through as two
+    separate active rows even though opportunity_path() resolves both to
+    the identical folder."""
+    target_company, target_role = slugify(company), slugify(role)
     for row in rows:
-        if row["Company"] == company and row["Role"] == role:
+        if slugify(row["Company"]) == target_company and slugify(row["Role"]) == target_role:
             return row
     return None
 
@@ -206,7 +232,7 @@ def cmd_close(args):
         closed_rows.append(row)
         write_table(CLOSED_PATH, closed_rows, CLOSED_TITLE)
 
-    notes_dir = STATE_ROOT / "opportunity" / args.company / args.role
+    notes_dir = opportunity_path(args.company, args.role)
     notes_dir.mkdir(parents=True, exist_ok=True)
     notes_path = notes_dir / "notes.md"
     with notes_path.open("a") as f:
@@ -221,6 +247,10 @@ def cmd_list(args):
     with locked():
         rows = read_table(path)
     print(serialize_table(rows, title))
+
+
+def cmd_opportunity_path(args):
+    print(opportunity_path(args.company, args.role))
 
 
 def build_parser():
@@ -261,6 +291,11 @@ def build_parser():
     p_list = sub.add_parser("list")
     p_list.add_argument("--closed", action="store_true")
     p_list.set_defaults(func=cmd_list)
+
+    p_path = sub.add_parser("opportunity-path")
+    p_path.add_argument("company")
+    p_path.add_argument("role")
+    p_path.set_defaults(func=cmd_opportunity_path)
 
     return parser
 

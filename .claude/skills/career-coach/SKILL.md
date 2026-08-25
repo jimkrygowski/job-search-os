@@ -23,7 +23,7 @@ The frameworks in this skill have a documented evidence base in `research.md`. C
 
 Before doing anything else:
 
-1. **Read the pipeline:** `state/tracker.md` (and `state/opportunity/<Company>/<Role>/notes.md` for any opportunity under discussion).
+1. **Read the pipeline:** `state/tracker.md` (and, for any opportunity under discussion, its `notes.md` — resolve the folder via `python3 tools/tracker.py opportunity-path "<Company>" "<Role>"` rather than constructing the path yourself).
 2. **Read `state/career/profile.md` and `state/career/trajectory.md`.** Check
    `trajectory.md`'s `Last reviewed:` date — if it's more than 6 weeks
    old, flag this to the user before going further and offer to run

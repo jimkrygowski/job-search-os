@@ -8,14 +8,16 @@ description: Use when a user wants research on a target company — for a new op
 ## Purpose
 
 Research a company relevant to a specific opportunity and record findings
-in `state/opportunity/<Company>/<Role>/notes.md` with sources attached.
+in that opportunity's resolved folder (see Session Start), in `notes.md`,
+with sources attached.
 
 ## Session Start
 
-Confirm which opportunity this research is for. If
-`state/opportunity/<Company>/<Role>/` doesn't exist yet, ask whether to run
-`score-opportunity` first — but proceed anyway if the user wants to look
-before pasting the JD.
+Confirm which opportunity this research is for, then resolve its folder
+via `python3 tools/tracker.py opportunity-path "<Company>" "<Role>"` —
+never construct the path yourself from the typed Company/Role. If that
+folder doesn't exist yet, ask whether to run `score-opportunity` first —
+but proceed anyway if the user wants to look before pasting the JD.
 
 ## What to Research
 
@@ -29,7 +31,7 @@ before pasting the JD.
 
 ## Output
 
-Append to `state/opportunity/<Company>/<Role>/notes.md` under a
+Append to `notes.md` in the resolved opportunity folder under a
 `## Company Research (<date>)` heading. Every finding gets a source (URL,
 or "user's own knowledge" if it came from the conversation, or "my
 inference" if you're inferring rather than citing something concrete —
