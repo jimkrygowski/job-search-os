@@ -7,8 +7,13 @@ running this repo. At the start of any substantive session, read
 looking for. Do not assume facts about them beyond what's written there,
 in `state/tracker.md`, or in `state/opportunity/*/notes.md`.
 
-If `state/career/profile.md` doesn't exist yet, this is a new user —
-point them at the `bootstrap` skill rather than improvising a setup flow.
+A `SessionStart` hook (`tools/check_bootstrap_state.py`) checks whether
+`state/career/profile.md` exists and, if it doesn't, injects a note that
+this is a new user. When that note is present, your very first reply
+this session — before addressing anything else the user asked — must say
+plainly that setup hasn't been run yet and offer to run the `bootstrap`
+skill right now. Don't wait to be asked, and don't improvise your own
+setup flow.
 
 ## State Directory
 
