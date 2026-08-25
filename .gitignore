@@ -2,4 +2,8 @@ __pycache__/
 *.pyc
 .DS_Store
 .claude/settings.local.json
-.tracker.lock
+
+# All personal state (career/, opportunity/, tracker.md, etc.) — never
+# tracked in the engine's own git history. See tools/tracker.py's
+# STATE_ROOT comment for why.
+state/

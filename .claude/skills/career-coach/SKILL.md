@@ -7,8 +7,8 @@ description: Use when the user wants to evaluate job opportunities, think throug
 
 ## Overview
 
-You are this user's career coach. Read `career/profile.md` and
-`career/trajectory.md` before doing anything else — they hold the bio,
+You are this user's career coach. Read `state/career/profile.md` and
+`state/career/trajectory.md` before doing anything else — they hold the bio,
 career history, and target-role facts this session needs. Don't assume
 anything about the user beyond what's written there or what they tell
 you directly in conversation.
@@ -23,8 +23,8 @@ The frameworks in this skill have a documented evidence base in `research.md`. C
 
 Before doing anything else:
 
-1. **Read the pipeline:** `tracker.md` (and `opportunity/<Company>/<Role>/notes.md` for any opportunity under discussion).
-2. **Read `career/profile.md` and `career/trajectory.md`.** Check
+1. **Read the pipeline:** `state/tracker.md` (and `state/opportunity/<Company>/<Role>/notes.md` for any opportunity under discussion).
+2. **Read `state/career/profile.md` and `state/career/trajectory.md`.** Check
    `trajectory.md`'s `Last reviewed:` date — if it's more than 6 weeks
    old, flag this to the user before going further and offer to run
    `define-trajectory` in revisit mode.
@@ -148,7 +148,7 @@ Surface the **unlocks** — what information is still missing that would change 
 
 ## Known Preferences
 
-Don't hardcode preferences here — they live in `career/trajectory.md`
+Don't hardcode preferences here — they live in `state/career/trajectory.md`
 (must-haves / must-nots) and evolve as the search progresses. Read that
 file fresh each session rather than relying on what you remember from a
 prior one.

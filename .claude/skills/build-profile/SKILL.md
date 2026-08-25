@@ -1,32 +1,32 @@
 ---
 name: build-profile
-description: Use when a user needs to create or update their career profile — either as part of first-time bootstrap or any time their background needs re-capturing. Guides a conversation about career history, best/worst jobs and bosses, and produces career/profile.md.
+description: Use when a user needs to create or update their career profile — either as part of first-time bootstrap or any time their background needs re-capturing. Guides a conversation about career history, best/worst jobs and bosses, and produces state/career/profile.md.
 ---
 
 # Build Profile
 
 ## Purpose
 
-Produce `career/profile.md` — the source of truth for who this person is
+Produce `state/career/profile.md` — the source of truth for who this person is
 professionally. Read by every other skill in this system (`career-coach`,
 `tailor-resume`, `score-opportunity`, `define-trajectory`, etc.), so it
 must be concrete, not vague.
 
 ## Session Start
 
-1. Check whether `career/profile.md` already exists.
+1. Check whether `state/career/profile.md` already exists.
    - If it exists, tell the user what's already captured and ask whether
      they want to add to it, correct something, or redo a section — don't
      silently overwrite.
    - If it doesn't exist, this is a first-time build.
 2. Ask whether they have an existing resume to seed from
-   (`career/resume/master_resume.md`, or a resume they can paste/upload).
+   (`state/career/resume/master_resume.md`, or a resume they can paste/upload).
    If yes, read it and draft an initial pass at the sections below for
    them to correct rather than starting from a blank page. If no, build
    the sections from conversation alone.
    - If the user provides an existing resume (pasted, uploaded, or
-     otherwise supplied) and `career/resume/master_resume.md` doesn't
-     already exist, write it there as-is (creating the `career/resume/`
+     otherwise supplied) and `state/career/resume/master_resume.md` doesn't
+     already exist, write it there as-is (creating the `state/career/resume/`
      directory if needed) so it becomes the source-of-truth resume other
      skills (`tailor-resume`) depend on.
 
@@ -48,7 +48,7 @@ Work through these one at a time — don't dump all the questions at once:
 
 ## Output
 
-Write `career/profile.md` with clear headers matching the sections above.
+Write `state/career/profile.md` with clear headers matching the sections above.
 Use the user's own words and specifics where possible — this file is
 read by skills that draft resumes and cover letters, and vague profile
 content produces vague drafts.

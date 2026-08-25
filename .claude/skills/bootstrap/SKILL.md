@@ -1,6 +1,6 @@
 ---
 name: bootstrap
-description: Use when a new user is setting up this system for the first time, or when career/profile.md and career/trajectory.md don't exist yet. Runs a Python preflight check, then build-profile, then define-trajectory in sequence.
+description: Use when a new user is setting up this system for the first time, or when state/career/profile.md and state/career/trajectory.md don't exist yet. Runs a Python preflight check, then build-profile, then define-trajectory in sequence.
 ---
 
 # Bootstrap
@@ -8,7 +8,7 @@ description: Use when a new user is setting up this system for the first time, o
 ## Purpose
 
 First-time setup orchestrator. Gets a new user from a fresh `git clone`
-to a working `career/profile.md` and `career/trajectory.md`.
+to a working `state/career/profile.md` and `state/career/trajectory.md`.
 
 ## Steps
 
@@ -28,18 +28,18 @@ to a working `career/profile.md` and `career/trajectory.md`.
    confirm Python is available, re-run the check before continuing.
 
 2. **Check existing state.**
-   - If `career/profile.md` and `career/trajectory.md` both already
+   - If `state/career/profile.md` and `state/career/trajectory.md` both already
      exist, tell the user setup already looks complete and ask if they
      want to revisit either one (hand off to `build-profile` or
      `define-trajectory` directly) rather than re-running bootstrap.
-   - If `career/profile.md` doesn't exist, continue to step 3.
-   - If `career/profile.md` exists but `career/trajectory.md` doesn't,
+   - If `state/career/profile.md` doesn't exist, continue to step 3.
+   - If `state/career/profile.md` exists but `state/career/trajectory.md` doesn't,
      skip to step 4.
 
 3. **Run `build-profile`.** Don't proceed to step 4 until
-   `career/profile.md` is written.
+   `state/career/profile.md` is written.
 
-4. **Run `define-trajectory`** (initial mode, since `career/trajectory.md`
+4. **Run `define-trajectory`** (initial mode, since `state/career/trajectory.md`
    doesn't exist yet).
 
 5. **Wrap up.** Tell the user what was created and point them at

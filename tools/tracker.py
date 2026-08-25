@@ -15,9 +15,13 @@ from pathlib import Path
 
 COLUMNS = ["Company", "Role", "Stage", "Last Activity", "Next Action", "Next Action Date"]
 
-ACTIVE_PATH = Path("tracker.md")
-CLOSED_PATH = Path("tracker_closed.md")
-LOCK_PATH = Path(".tracker.lock")
+# All personal state lives under state/, kept out of the engine's own git
+# history (state/ is gitignored) so an engine `git pull` can never touch
+# or conflict with a user's data.
+STATE_ROOT = Path("state")
+ACTIVE_PATH = STATE_ROOT / "tracker.md"
+CLOSED_PATH = STATE_ROOT / "tracker_closed.md"
+LOCK_PATH = STATE_ROOT / ".tracker.lock"
 ACTIVE_TITLE = "Active Opportunities"
 CLOSED_TITLE = "Closed Opportunities"
 
@@ -31,6 +35,7 @@ def locked(timeout: float = 10.0):
     one. Uses exclusive file creation (portable across platforms) rather
     than fcntl/msvcrt, to stay stdlib-only without a POSIX-only import.
     """
+    STATE_ROOT.mkdir(parents=True, exist_ok=True)
     start = time.monotonic()
     while True:
         try:
@@ -119,6 +124,7 @@ def read_table(path: Path) -> list[dict]:
 
 
 def write_table(path: Path, rows: list[dict], title: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(serialize_table(rows, title))
 
 
@@ -200,7 +206,7 @@ def cmd_close(args):
         closed_rows.append(row)
         write_table(CLOSED_PATH, closed_rows, CLOSED_TITLE)
 
-    notes_dir = Path("opportunity") / args.company / args.role
+    notes_dir = STATE_ROOT / "opportunity" / args.company / args.role
     notes_dir.mkdir(parents=True, exist_ok=True)
     notes_path = notes_dir / "notes.md"
     with notes_path.open("a") as f:
