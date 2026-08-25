@@ -57,12 +57,19 @@ create it and its subdirectories on demand.
 - `state/tracker.md` / `state/tracker_closed.md` — pipeline state.
   Managed only via `tools/tracker.py` — never hand-edit these files.
 - `state/opportunity/<Company>/<Role>/` — per-opportunity documents (JD,
-  contacts, notes, tailored resume/cover letter, transcripts)
+  contacts, notes, tailored resume/cover letter, transcripts). The folder
+  name is a slug of whatever Company/Role you typed (lowercased, spaces
+  and punctuation collapsed to underscores) — always resolve it with
+  `python3 tools/tracker.py opportunity-path "<Company>" "<Role>"` rather
+  than constructing `<Company>/<Role>` yourself, so the same opportunity
+  never ends up split across two differently-named folders. The tracker
+  table itself still stores Company/Role as typed, unslugified — only
+  the folder name is normalized.
 
 ## Contacts
 
 Whenever you learn of a new contact for an opportunity — a name, title,
-role in the process, and email address, when known — add them to that
-opportunity's `state/opportunity/<Company>/<Role>/contacts.md`. Don't
-wait to be asked; this applies during any skill session, not just a
-dedicated one.
+role in the process, and email address, when known — resolve that
+opportunity's folder (`opportunity-path`, above) and add them to its
+`contacts.md`. Don't wait to be asked; this applies during any skill
+session, not just a dedicated one.

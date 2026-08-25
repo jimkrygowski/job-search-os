@@ -12,9 +12,11 @@ state forward.
 
 ## Session Start
 
-Identify which opportunity this call was for. If the transcript needs
-cleaning up first (a raw recording, not yet summarized), run the
-`summarize-call` command on it first.
+Identify which opportunity this call was for, and resolve its folder via
+`python3 tools/tracker.py opportunity-path "<Company>" "<Role>"` — never
+construct the path yourself from the typed Company/Role. If the
+transcript needs cleaning up first (a raw recording, not yet summarized),
+run the `summarize-call` command on it first.
 
 ## Review Contents
 
@@ -31,11 +33,11 @@ cleaning up first (a raw recording, not yet summarized), run the
 
 ## Output
 
-1. Append the review under `## Interview Review (<date>)` in
-   `state/opportunity/<Company>/<Role>/notes.md`. Include a line noting
-   the source transcript, e.g. `Source: transcripts/<filename>`.
-2. Save the transcript itself to
-   `state/opportunity/<Company>/<Role>/transcripts/` if it isn't already there.
+1. Append the review under `## Interview Review (<date>)` in the resolved
+   opportunity folder's `notes.md`. Include a line noting the source
+   transcript, e.g. `Source: transcripts/<filename>`.
+2. Save the transcript itself to that folder's `transcripts/`
+   subdirectory if it isn't already there.
 3. Advance the tracker:
    ```
    python3 tools/tracker.py update-status "<Company>" "<Role>" \

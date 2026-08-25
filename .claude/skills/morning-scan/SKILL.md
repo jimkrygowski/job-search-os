@@ -25,10 +25,12 @@ ToolSearch: select:mcp__claude_ai_Gmail__search_threads,mcp__claude_ai_Gmail__ge
 
 ## Tier 1 — Pipeline Emails
 Build the contact list dynamically rather than using a fixed list: read
-`state/tracker.md` for active opportunities, then read each corresponding
-`state/opportunity/<Company>/<Role>/contacts.md` for that opportunity's known
-contact emails. Search for new messages from all of them in the last 24
-hours:
+`state/tracker.md` for active opportunities, then for each one resolve
+its folder via
+`python3 tools/tracker.py opportunity-path "<Company>" "<Role>"` (never
+construct the path yourself from the Company/Role text in the tracker
+row) and read that folder's `contacts.md` for known contact emails.
+Search for new messages from all of them in the last 24 hours:
 
 ```
 from:(<contact1> OR <contact2> OR ...) newer_than:1d

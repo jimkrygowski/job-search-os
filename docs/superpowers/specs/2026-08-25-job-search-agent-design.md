@@ -196,6 +196,16 @@ CLI, no server, no dependencies beyond the standard library. Subcommands:
   `tracker_closed.md`, appends the reason to that opportunity's `notes.md`
 - `record-event <company> <role> --event ... --date ...` — used by
   `morning-scan` to persist calendar-derived updates
+- `opportunity-path <company> <role>` — prints the canonical, slugified
+  opportunity folder path (lowercased, punctuation/whitespace collapsed
+  to underscores). Every skill that reads or writes into an
+  `state/opportunity/<Company>/<Role>/` folder resolves it through this
+  command rather than constructing the path from typed text itself —
+  otherwise two skills (or two sessions) typing the same role slightly
+  differently ("VP Engineering" vs "VP  Engineering") would silently
+  create two different folders for what's meant to be one opportunity.
+  The tracker table still stores Company/Role as typed, unslugified —
+  only the folder name is normalized.
 
 Every write is a full-file rewrite of the target table, parsed and
 re-serialized, never a line-level patch — this plus "the CLI is the only

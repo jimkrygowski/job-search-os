@@ -12,7 +12,11 @@ Summarize a job search call transcript and save the notes to the right place.
    - Explicit next steps and who owns them
    - Any surprises, red flags, or things that shifted the user's stance
 
-3. **Write the call notes file** to `state/opportunity/<Company>/<Role>/transcripts/<Contact>_Call_<YYYY-MM-DD>.md` using this structure:
+3. **Write the call notes file.** Resolve the opportunity folder via
+   `python3 tools/tracker.py opportunity-path "<Company>" "<Role>"` —
+   never construct the path yourself from the Company/Role text — then
+   write to `<resolved folder>/transcripts/<Contact>_Call_<YYYY-MM-DD>.md`
+   using this structure:
    - Header: date, attendees, duration
    - Key takeaways (bullet list, most important things first)
    - What the user learned (about company, role, team, comp, process)
@@ -27,8 +31,8 @@ Summarize a job search call transcript and save the notes to the right place.
      --stage "<stage>" --next-action "<next action>" \
      --next-action-date "<date, if known>"
    ```
-   Add a one-line summary to `state/opportunity/<Company>/<Role>/notes.md` as
-   well — the tracker row itself stays to short scalar fields.
+   Add a one-line summary to the resolved opportunity folder's `notes.md`
+   as well — the tracker row itself stays to short scalar fields.
 
 5. **Ask the user** if there are follow-up emails to draft or prep docs to update based on what came out of the call.
 
