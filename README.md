@@ -83,6 +83,6 @@ Then, in a Claude Code session in this directory, just say you want to get start
 
 ## About me
 
-Jim Krygowski — engineering executive, Boston MA. 25+ years building and scaling engineering organizations, most recently at the VP Engineering / Senior Director level, with a track record spanning large established orgs and growth-stage companies. Currently looking for the next CTO, VP Engineering, or Senior Director role where the problem is genuinely hard.
+Jim Krygowski — engineering executive, Boston MA. 20+ years building and scaling engineering organizations, most recently at the VP Engineering / Senior Director level, with a track record spanning large established orgs and growth-stage companies. Currently looking for the next CTO, VP Engineering, or Senior Director role where the problem is genuinely hard.
 
 [linkedin.com/in/jimkrygowski](https://linkedin.com/in/jimkrygowski)
