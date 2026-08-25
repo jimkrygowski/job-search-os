@@ -32,7 +32,8 @@ cleaning up first (a raw recording, not yet summarized), run the
 ## Output
 
 1. Append the review under `## Interview Review (<date>)` in
-   `opportunity/<Company>/<Role>/notes.md`.
+   `opportunity/<Company>/<Role>/notes.md`. Include a line noting
+   the source transcript, e.g. `Source: transcripts/<filename>`.
 2. Save the transcript itself to
    `opportunity/<Company>/<Role>/transcripts/` if it isn't already there.
 3. Advance the tracker:
