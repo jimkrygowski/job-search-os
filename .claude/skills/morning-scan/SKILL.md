@@ -54,9 +54,19 @@ then tell the user it needs real sources filled in before this tier can
 do anything useful, and skip Tier 2 for this run.
 
 Otherwise, read `state/career/job_alert_sources.md` for the configured
-sources and run each in parallel with Tier 1. For each source, extract
-job listings (title, company, location, comp) and flag any that match
-the must-haves in `state/career/trajectory.md`. Skip the rest.
+sources and run each in parallel with Tier 1. **Always pass
+`includeTrash: true` on these `search_threads` calls.** Confirmed
+2026-08-27: job alert digests can land in Trash (a filter or routine
+cleanup may move them there), and `search_threads` excludes Trash by
+default — the default query silently skips trashed digests entirely,
+including same-day ones. `get_thread` cannot read trashed messages
+(permission error); if a match is in Trash, rely on the `search_threads`
+snippet for content, and if that's insufficient, tell the user the
+message is trashed and ask them to restore it.
+
+For each source, extract job listings (title, company, location, comp)
+and flag any that match the must-haves in `state/career/trajectory.md`.
+Skip the rest.
 
 ## Tier 3 — Calendar
 List events from today through end of the week. For any event that's a
