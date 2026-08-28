@@ -75,10 +75,48 @@ class ParseCriteriaTest(unittest.TestCase):
             goal["text"], "Title: Director+, ideally Head of Engineering or VPE."
         )
 
-    def test_missing_section_is_skipped_without_error(self):
+    def test_missing_required_section_raises(self):
+        # A section this tool depends on can't silently vanish -- render()'s
+        # missing-criteria check only sees the criteria that made it out of
+        # parse_criteria(), so a heading it fails to find must be a loud
+        # error here, not a quietly shorter criteria list.
         text = TRAJECTORY.replace("## Short-Term Goal (Next Role)", "## Renamed")
+        with self.assertRaises(ValueError) as ctx:
+            score_table.parse_criteria(text)
+        self.assertIn("Short-Term Goal (Next Role)", str(ctx.exception))
+
+    def test_heading_match_is_case_insensitive_and_whitespace_tolerant(self):
+        # define-trajectory/SKILL.md documents these section names in a
+        # different case ("Must-haves", "Short-term goal (next role)") than
+        # the literal headings in a built trajectory.md -- matching must
+        # tolerate that instead of silently dropping the section.
+        text = TRAJECTORY.replace("## Must-Haves", "##   must-haves")
         criteria = score_table.parse_criteria(text)
-        self.assertFalse(any(c["id"] == "short-term-goal" for c in criteria))
+        self.assertTrue(any(c["category"] == "Must-Have" for c in criteria))
+
+    def test_bullets_section_with_no_recognized_bullet_markers_raises(self):
+        text = TRAJECTORY.replace(
+            "- Direct line to the C-level: reports to the CEO, CTO, or CDTO-tier exec —\n"
+            "  title alone isn't the real test.\n"
+            "- Comp floor: $280K base",
+            "Reports to the CEO. Comp floor is $280K base.",
+        )
+        with self.assertRaises(ValueError) as ctx:
+            score_table.parse_criteria(text)
+        self.assertIn("Must-Haves", str(ctx.exception))
+
+    def test_recognizes_asterisk_and_plus_bullet_markers(self):
+        text = TRAJECTORY.replace(
+            "- Direct line to the C-level: reports to the CEO, CTO, or CDTO-tier exec —\n"
+            "  title alone isn't the real test.\n"
+            "- Comp floor: $280K base",
+            "* Reports to the CEO\n+ Comp floor: $280K base",
+        )
+        criteria = score_table.parse_criteria(text)
+        must_haves = [c for c in criteria if c["category"] == "Must-Have"]
+        self.assertEqual(
+            [c["text"] for c in must_haves], ["Reports to the CEO", "Comp floor: $280K base"]
+        )
 
 
 class RenderTableTest(unittest.TestCase):
@@ -146,6 +184,19 @@ class RenderTableTest(unittest.TestCase):
         table = score_table.render_table(criteria, scores)
         self.assertIn("Reports to CEO \\| CTO", table)
         self.assertIn("Fits A \\| B", table)
+
+    def test_non_dict_score_entry_raises_value_error_not_attribute_error(self):
+        scores = ["must-have-1", {"id": "must-not-1", "score": "Fails", "rationale": ""}]
+        with self.assertRaises(ValueError):
+            score_table.render_table(self.criteria, scores)
+
+    def test_non_string_rationale_raises_value_error_not_attribute_error(self):
+        scores = [
+            {"id": "must-have-1", "score": "Meets", "rationale": 5},
+            {"id": "must-not-1", "score": "Fails", "rationale": ""},
+        ]
+        with self.assertRaises(ValueError):
+            score_table.render_table(self.criteria, scores)
 
 
 class ScoreTableCLITest(unittest.TestCase):
