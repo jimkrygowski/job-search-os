@@ -80,7 +80,10 @@ Agreement Without Giving In*. Houghton Mifflin (3rd ed. with Bruce Patton,
 Penguin, 2011). Originated at the Harvard Negotiation Project. Empirically
 tested by Pinkley, R.L., Neale, M.A., & Bennett, R.J. (1994). The
 impact of alternatives to settlement in dyadic negotiation. *Organizational
-Behavior and Human Decision Processes*, 57(1), 97–116.
+Behavior and Human Decision Processes*, 57(1), 97–116. Extended by
+Pinkley, R.L. (1995). Impact of knowledge regarding alternatives to
+settlement in dyadic negotiations: Whose knowledge counts? *Journal of
+Applied Psychology*, 80(3), 403–417.
 
 **Evidence quality: Moderate-High.** BATNA itself is a conceptual/practitioner
 framework, not an empirical finding — *Getting to Yes* is a practitioner
@@ -97,10 +100,14 @@ negotiation research:
   and *knowledge* of the counterpart's BATNA specifically, predict
   individual and joint negotiation outcomes (e.g., White, Valley, Bazerman,
   Neale & Peck, 1994, and later work building on Galinsky & Mussweiler,
-  2001, above). Pinkley's follow-up work also found that when negotiators
-  know only their *own* BATNA and not the counterpart's, the outcome
-  advantage from a strong BATNA weakens — the leverage comes partly from
-  the other side perceiving it, not merely from possessing it.
+  2001, above). Pinkley's 1995 follow-up work (cited above) also found
+  that the personal-gain advantage of holding a strong BATNA accrues
+  mainly when *both* negotiators are aware of it — when only the
+  BATNA-holder knows their own alternative and the counterpart doesn't,
+  that personal-gain advantage weakens substantially, though joint gain
+  and integrative trade-offs still rise when the BATNA-holder themself is
+  aware of it. The leverage comes partly from the other side perceiving
+  the alternative, not merely from possessing it.
 
 **Known limitations:**
 - The original *Getting to Yes* text is not itself a scientific study;
@@ -194,12 +201,17 @@ an independently validated finding.
 
 **Source:** Walton, R.E. & McKersie, R.B. (1965). *A Behavioral Theory of
 Labor Negotiations*. McGraw-Hill — originated the distributive/integrative
-distinction. Operationalized experimentally by Pruitt, D.G. (multiple
-studies from the 1980s, e.g. Pruitt, D.G. & Lewis, S.A., 1975, Development
-of integrative solutions in bilateral negotiation, *Journal of Personality
-and Social Psychology*, 31(4), 621–633) using a three-issue negotiation
-task with Peter Carnevale. Popularized for practitioners in Malhotra, D. &
-Bazerman, M.H. (2007). *Negotiation Genius*. Bantam.
+distinction. Operationalized experimentally by Pruitt, D.G. across
+multiple studies spanning the 1970s and 1980s, e.g. Pruitt, D.G. & Lewis,
+S.A. (1975), Development of integrative solutions in bilateral
+negotiation, *Journal of Personality and Social Psychology*, 31(4),
+621–633, using a three-issue negotiation task. (An earlier pass of this
+document attributed that 1975 study to a "three-issue negotiation task
+with Peter Carnevale" — this is incorrect and has been removed: the 1975
+paper's co-author was Steven Lewis, not Carnevale; Peter Carnevale is a
+different, later Pruitt collaborator, e.g. Pruitt & Carnevale, 1993.)
+Popularized for practitioners in Malhotra, D. & Bazerman, M.H. (2007).
+*Negotiation Genius*. Bantam.
 
 **Evidence quality: Moderate-High for the underlying mechanism, Low-Moderate
 for the popular practitioner packaging.** The core empirical finding —
@@ -325,12 +337,25 @@ ask" as settled fact.
   two survey waves — e.g. roughly 990–1,435 for the first-job cohort and
   roughly 1,939–2,000 for the alumni cohort, depending on the source —
   which this document was not able to fully reconcile without reading the
-  paper's own methods section; the percentages themselves were consistent
-  across every source checked.) Notably, the pay gap persisted in this
-  same population despite equal or higher negotiation rates among women,
-  which the researchers attribute to structural factors (career
-  trajectory, promotion access) rather than individual negotiation
-  behavior.
+  paper's own methods section; the percentages themselves were re-verified
+  directly against the journal's own abstract page and UC Berkeley Haas's
+  research summary for this finalization pass and were consistent across
+  every source checked, including a third independent source — Harvard
+  Law School's Program on Negotiation — cross-checked during this pass.)
+  Notably, the pay gap persisted in this same population despite equal or
+  higher negotiation rates among women — but the paper's actual headline
+  mechanism for that is **differential rejection, not structural
+  factors**: the only gender difference the alumni survey found was that
+  more women than men reported attempting to negotiate, *and* more women
+  than men reported being turned down when they did. The paper's own
+  framing is that a gender difference in negotiation propensity cannot
+  account for the persisting pay gap in this population — the gap traces
+  to how negotiation requests are received (women's asks being rejected
+  more often), not to whether or how often women ask. (An earlier pass of
+  this document attributed the persisting gap to "structural factors
+  (career trajectory, promotion access)" — this finalization pass could
+  not verify that framing against the paper and corrects it to the
+  differential-rejection mechanism the source actually reports.)
 - Separately, research on negotiation "backlash" more broadly (the idea
   that assertive negotiating behavior is judged more harshly in women) is
   an area with documented replication concerns in the broader social
@@ -387,7 +412,10 @@ Exploding offers can blow up in more than one way. *Decision Analysis*,
 11(3), 171–188.
 
 **Evidence quality: Moderate-High for the general time-pressure effect;
-Lower/mixed for exploding-offer-specific outcomes.**
+Moderate for exploding-offer-specific outcomes — Lau et al. (2014) is
+real behavioral-experimental evidence for a specific reciprocation
+mechanism, though a field-measured retention/turnover statistic remains
+unsourced.**
 
 - Stuhlmacher et al.'s 1998 meta-analysis found time pressure reliably
   produces faster concessions, lower demands, and a higher likelihood of
@@ -411,25 +439,40 @@ Lower/mixed for exploding-offer-specific outcomes.**
   the discloser's own deadline, not one imposed on them by a counterpart.
 - On "exploding offers" specifically (an offer with an artificially short
   fuse, e.g. "this expires in 24 hours"): Lau et al. (2014) is a
-  quantitative decision-analysis paper modeling how exploding offers can
-  backfire on the *offering* party by inducing premature, low-information
-  acceptance/rejection decisions that don't serve either side well; this
-  is decision-theoretic modeling, not a field study of real recruiting
-  outcomes. Beyond this, most of what's written on exploding job offers
-  specifically is practitioner/HR-trade commentary (e.g., that exploding
-  offers correlate with poor early retention and candidate distrust) — no
-  rigorous field study quantifying employee turnover after an exploding
-  offer was found in this research pass; treat that specific "leads to
-  turnover" claim as plausible practitioner consensus, not as an
-  established statistic, and do not cite a specific turnover percentage
-  without a verifiable source.
+  **behavioral experimental** paper (not a formal/decision-theoretic
+  model) — across multiple experiments, proposers chose between issuing
+  an exploding offer or an extended one, and responders reacted under
+  each condition. Proposers who issued exploding offers ended up
+  substantially worse off, and — this is the corrected mechanism; an
+  earlier pass of this document mischaracterized it — that loss arises
+  primarily from **negative reciprocation by responders after they accept
+  an exploding offer**, not from responders making a rushed,
+  low-information accept/reject decision in the moment. In other words,
+  the harm to the offering party shows up *after* acceptance, through the
+  responder retaliating (e.g., reduced cooperation) once they're in the
+  relationship, not primarily through the responder picking badly at the
+  moment of decision. Beyond Lau et al., most of what's written on
+  exploding job offers specifically is practitioner/HR-trade commentary
+  (e.g., that exploding offers correlate with poor early retention and
+  candidate distrust). Lau et al.'s negative-reciprocation finding *is*
+  direct experimental evidence for something adjacent to that
+  distrust/retention claim — it demonstrates a real, causal mechanism by
+  which an exploding offer damages the relationship after acceptance —
+  but it does not measure employee turnover or retention as a field
+  statistic. No rigorous field study quantifying actual post-hire
+  turnover after an exploding offer was found in this research pass;
+  treat a specific "leads to X% higher turnover" claim as still unsourced
+  practitioner consensus, distinct from the reciprocation/distrust
+  mechanism itself, which now has real experimental backing via Lau et
+  al. — do not conflate the two, and do not cite a specific turnover
+  percentage without a verifiable source.
 
 **Known limitations:**
-- Almost all of this evidence comes from lab/simulation studies (or, for
-  Lau et al., a formal model) rather than field studies of real job-offer
-  negotiations under real exploding deadlines — external validity to a
-  candidate facing a real 48-hour offer deadline is inferred, not directly
-  tested.
+- Almost all of this evidence, including Lau et al.'s exploding-offer
+  experiments, comes from lab/simulation studies rather than field
+  studies of real job-offer negotiations under real exploding deadlines —
+  external validity to a candidate facing a real 48-hour offer deadline
+  is inferred, not directly tested.
 - The Moore (2004) finding about revealing one's own deadline is easy to
   over-extend; it does not say anything about how a candidate should react
   to a deadline unilaterally *imposed by the employer*, which is the more
@@ -442,9 +485,12 @@ short deadline as a pressure tactic with a well-documented general effect
 literature), and should coach a firm, calm response (e.g., politely asking
 for a brief, specific extension and stating why) as consistent with the
 finding that pressure tactics work less well against a firm counterpart.
-Avoid stating a specific turnover-rate or retention statistic tied to
-exploding offers, since no rigorously sourced figure was found for that
-specific claim.
+Where relevant, it's fair to tell a user that exploding offers carry a
+documented downside for the *employer* too (Lau et al.'s reciprocation
+finding) — this is useful context for a user deciding how hard to push
+back on one, but avoid stating a specific turnover-rate or retention
+statistic tied to exploding offers, since no rigorously sourced field
+figure was found for that specific claim.
 
 ---
 
@@ -524,15 +570,34 @@ implements `option_value.py`'s exit-probability-haircut defaults (spec
 §7, step 3), that this is the single weakest-evidence subsection in this
 file. If a flat default is needed, something in the neighborhood of the
 convergence across sources — roughly 60–75% of VC-backed positions
-returning nothing or less than invested capital to preferred, which likely
-understates the true zero-payout rate for *common* once the preference
-stack is accounted for — is a defensible order-of-magnitude anchor, but it
-should be presented to the user as a rough, unvalidated heuristic, not a
-precise probability, and it should not be silently differentiated by
-stage (early private / late private / public) since no source here
-supports doing so credibly. A future implementer who wants real
-stage-differentiated numbers should treat that as open research, not
-something already established by this document.
+returning nothing or less than invested capital to preferred — is a
+defensible order-of-magnitude anchor. **Caution — double-counting risk:**
+that 60–75% figure is already a *preferred*-level outcome, i.e. it
+already partially reflects preference-stack subordination baked into the
+underlying fund-return data (a position "returning nothing or less than
+invested capital to preferred" is itself downstream of the preference
+stack). Spec §7 applies this as an independent exit-probability haircut
+(step 3) *in addition to* a separate preference-stack haircut (step 2) —
+feeding a preferred-level failure rate into the exit-probability step
+while also subordinating common separately risks double-counting the same
+subordination effect twice. Bucket 2's design needs to account for this
+overlap explicitly rather than stacking both haircuts naively. Beyond
+that risk, this figure should be presented to the user as a rough,
+unvalidated heuristic, not a precise probability, and it should not be
+silently differentiated by stage (early private / late private / public)
+since no source here supports doing so credibly. A future implementer who
+wants real stage-differentiated numbers should treat that as open
+research, not something already established by this document.
+
+**Undisclosed conflict with the design spec:** this document's conclusion
+— no source found here supports a stage-differentiated exit-rate default
+— conflicts with spec §7 step 3's call for "fixed, disclosed default
+rates by company stage (public / late-stage private / early-stage
+private)." That tension needs to be resolved explicitly when Bucket 2
+(`option_value.py`) is designed, not silently papered over here: either
+someone finds a credible stage-differentiated source this pass didn't, or
+the spec's step 3 needs to be revisited to use a flat (or
+explicitly-unvalidated, stage-blind) default instead.
 
 ---
 
@@ -630,6 +695,19 @@ figure to hardcode. The 1x-non-participating market-standard finding above
 is useful context for explaining terms to a user, but it describes single
 rounds, not the cumulative stack that actually determines the common
 stockholder's outcome.
+
+**Undisclosed conflict with the design spec:** this document's conclusion
+— that the preference-stack haircut should be an explicit placeholder
+requiring user confirmation, not a silently-applied default — conflicts
+with spec §7 step 2's call for the haircut to be "applied as a disclosed
+default, overridable if the user knows the actual preference terms." That
+tension needs to be resolved explicitly when Bucket 2 (`option_value.py`)
+is designed, not silently papered over here: no source found in this
+research pass supports a credible generic "typical stack as % of
+valuation" number to serve as that default, so step 2's design either
+needs a different fallback (e.g. requiring the user to supply the figure
+before proceeding) or an explicit, clearly-labeled placeholder value that
+is not presented to the user as a real disclosed default.
 
 ---
 
@@ -809,19 +887,40 @@ explicitly skeptical of the highest figures.**
   its methodology is misleading.
 
 **How to use correctly:** For `option_value.py`'s time-value/illiquidity
-discount default (spec §7, step 4), a range in roughly the **20–30%**
-region is a defensible, well-precedented starting point — it's close to
-where most of the more carefully controlled empirical estimates (Bajaj et
-al.'s 7–28% range depending on control; option-pricing estimates at
-1–2 year horizons and moderate volatility, ~17–25%) and the commonly
-cited restricted-stock range (20–35%) overlap. But this must be presented
-to the user, and documented in the tool, as an explicit rough default
-with a defensible range spanning roughly 10–40%+ depending on the
-company's actual expected time-to-liquidity and volatility — not a
-precise, validated figure. Where possible, the tool should let time
-horizon and volatility inputs move the estimate (consistent with the
-option-pricing approach) rather than silently applying one flat constant
-regardless of the user's actual situation.
+discount default (spec §7, step 4), be honest that the literature does
+**not** converge on a point estimate. The underlying studies span a
+genuinely wide, unresolved range — roughly **7% (Bajaj et al.'s
+*controlled* marketability-only estimate, after removing selection bias
+and other confounds) up to 40%+** (pre-IPO transaction studies and
+Longstaff's option-pricing bounds at longer horizons/higher volatility),
+depending heavily on methodology, holding-period assumption, and
+volatility. A default in roughly the **20–30%** region is a defensible
+**judgment call that sits within that range**, not a figure where
+multiple independent studies converge on the same number. In particular,
+do not justify 20–30% by citing "Bajaj et al.'s 7–28% range depending on
+control" as if both ends were still live support — the 28.13% figure is
+Bajaj et al.'s *raw, uncontrolled* discount, and the subsection above
+already explains why that number is the less credible one (it doesn't
+isolate marketability from firm-selection effects); their actual
+controlled estimate is 7.23%. Reintroducing the higher, uncontrolled
+number here would contradict what this document already established
+about it. Longstaff's option-pricing figures (roughly 17%–66%+ depending
+on horizon and volatility) are explicit **upper bounds** under an
+unrealistic perfect-timing assumption, not typical-case estimates —
+actual discounts should be lower than those bounds, consistent with what
+the subsection above already says. One factor that cuts *against*
+understating the discount, however: several of the underlying studies
+anchor to 1–2 year holding-period horizons (e.g. the moderate-volatility
+option-pricing estimates cited above), while a typical startup's actual
+time-to-liquidity — time from a given equity grant to an eventual IPO or
+acquisition — often runs considerably longer than that in practice. A
+longer real-world horizon pushes the option-pricing-derived bound higher,
+not lower, so a 20–30% default should not be treated as conservative on
+that basis alone; if anything it may understate the illiquidity discount
+for a company with a long expected time-to-liquidity. Where possible, the
+tool should let time horizon and volatility inputs move the estimate
+(consistent with the option-pricing approach) rather than silently
+applying one flat constant regardless of the user's actual situation.
 
 ---
 
