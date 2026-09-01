@@ -47,7 +47,7 @@ work through decades of negotiation-specific lab and field studies.
   offer without the relational cost negotiators fear, because the range's
   low end signals reasonableness while the high end still anchors.
 
-**Known limitations / boundary conditions:**
+**Known limitations:**
 - The first-mover advantage weakens or disappears when the other party has
   strong independent knowledge of the zone of possible agreement (ZOPA) —
   e.g., a recruiter who negotiates this role constantly and knows the
@@ -216,18 +216,33 @@ primary research source.
   better for both than issue-by-issue haggling. Traced to Froman, L.A. &
   Cohen, M.D. (1970). Compromise and logroll: Comparing the efficiency of
   two bargaining processes. *Behavioral Science*, 15(2), 180–183, and
-  built on experimentally by Pruitt.
-  Thompson, L. (2003) also
-  reports a logrolling-procedure formalization for practical multi-issue
-  negotiation training (*Group Decision and Negotiation*).
-- Multiple Equivalent Simultaneous Offers (MESO): a technique (associated
-  with Leigh Thompson's negotiation research program, e.g. Thompson, L. &
-  Leonardelli, G., 2004 discussions of the negotiator's dilemma) where a
-  negotiator proposes several different packages of equal value to
-  themselves at once and lets the counterpart pick — this reveals
-  counterpart priorities without a back-and-forth, and research finds
-  MESO offers are more likely to be accepted and leave counterparts more
-  satisfied with the deal than an equivalent single point offer.
+  built on experimentally by Pruitt. A logrolling-procedure formalization
+  for practical multi-issue negotiation training was also published in
+  *Group Decision and Negotiation* — this document's earlier research pass
+  attributed it to Thompson, L. (2003), but this finalization pass could
+  not independently confirm that attribution. The closest verifiable match
+  found under that title is Tajima, M. & Fraser, N.M. (2001). Logrolling
+  Procedure for Multi-Issue Negotiation. *Group Decision and Negotiation*,
+  10(3), 217–235 — a different author/year than originally cited. Treat
+  the specific authorship of this supplementary citation as unverified
+  rather than re-confirmed; it does not affect the primary Froman & Cohen
+  / Pruitt sourcing above, which this pass found no reason to doubt.
+- Multiple Equivalent Simultaneous Offers (MESO): a technique for
+  proposing several different packages of equal value to the offerer at
+  once and letting the counterpart pick — this reveals counterpart
+  priorities without a back-and-forth. Empirically tested by Leonardelli,
+  G.J., Gu, J., McRuer, G., Medvec, V.H., & Galinsky, A.D. (2019).
+  Multiple equivalent simultaneous offers (MESOs) reduce the negotiator
+  dilemma: How a choice of first offers increases economic and relational
+  outcomes. *Organizational Behavior and Human Decision Processes*, 152,
+  64–83, across six experiments: MESOs produced stronger anchors, greater
+  joint value, and left recipients more satisfied and more likely to view
+  the offerer as cooperative than an equivalent single point offer. (An
+  earlier research pass cited this concept to "Thompson, L. & Leonardelli,
+  G., 2004 discussions of the negotiator's dilemma" without a paper title;
+  this finalization pass could not confirm that specific citation and
+  replaces it with the verified 2019 study above, which directly tests the
+  claim.)
 
 **Known limitations:**
 - Requires that the two sides actually have *different* priorities across
@@ -381,8 +396,10 @@ Lower/mixed for exploding-offer-specific outcomes.**
   was stronger for simpler negotiations and near deadlines, and weaker
   when the counterpart used a tough, inflexible strategy — meaning
   pressure tactics are somewhat self-defeating against a firm response.
-  A related mechanism, reported in follow-up work (Stuhlmacher & Champagne,
-  2000, *Group Decision and Negotiation*, 9(6), 471–491), is that time
+  A related mechanism, reported in follow-up work — Stuhlmacher, A.F. &
+  Champagne, M.V. (2000). The impact of time pressure and information on
+  negotiation process and decisions. *Group Decision and Negotiation*,
+  9(6), 471–491 — is that time
   pressure reduces systematic information processing (higher need for
   cognitive closure), which is consistent with why rushed decisions under
   a deadline tend to be worse ones.
@@ -523,12 +540,16 @@ something already established by this document.
 
 **Source:** National Venture Capital Association (NVCA), Model Legal
 Documents / Model Term Sheet, nvca.org (industry-standard template used
-across U.S. venture financings). Cooley LLP, *Venture Financing Report*
-(quarterly series; Q1 2026 edition checked directly, cooley.com) — an
-aggregated survey of deal terms across Cooley's own venture financing
+across U.S. venture financings; individual model documents on nvca.org
+each carry their own revision date rather than one series-wide version —
+e.g. the Certificate of Incorporation and Stock Purchase Agreement show
+"Updated October 2025," the Voting Agreement "Updated June 2026," as of
+this finalization pass in September 2026). Cooley LLP, *Venture Financing
+Report* (quarterly series; Q1 2026 edition checked directly, cooley.com) —
+an aggregated survey of deal terms across Cooley's own venture financing
 practice. The Holloway Guide to Venture Capital, "Liquidation Preference,"
-holloway.com — practitioner reference explaining preference-stack
-mechanics.
+holloway.com, edition 1.1.4, updated September 15, 2023 — practitioner
+reference explaining preference-stack mechanics.
 
 **Evidence quality: High for the mechanism and for current market-standard
 single-round terms; unverified for cross-round stacking base rates.**
@@ -617,10 +638,15 @@ stockholder's outcome.
 **Source:** Moon, C. (2020, February 13). "16 Things to Know About the
 409A Valuation." *Andreessen Horowitz (a16z)*, a16z.com. AICPA,
 *Valuation of Privately-Held-Company Equity Securities Issued as
-Compensation* (Accounting and Valuation Guide / Practice Aid) — the
-technical valuation-methodology document (option-pricing method,
-probability-weighted expected return method, current value method)
-industry-standard 409A appraisers work from. Underlying statutory basis:
+Compensation* (Accounting and Valuation Guide / Practice Aid), 2013
+revision (the last full revision as of this finalization pass; a working
+draft of an updated edition was released by AICPA's Financial Reporting
+Executive Committee for public comment in December 2025, with comments
+due June 1, 2026, but was not a finalized, citable edition as of this
+research) — the technical valuation-methodology document (option-pricing
+method, probability-weighted expected return method, current value
+method) industry-standard 409A appraisers work from. Underlying statutory
+basis:
 Internal Revenue Code §409A (enacted as part of the American Jobs
 Creation Act of 2004, post-Enron), which requires an independent,
 defensible fair-market-value determination for private-company stock
