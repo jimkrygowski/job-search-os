@@ -589,10 +589,11 @@ single-round terms; unverified for cross-round stacking base rates.**
   use 1x non-participating preferred, as of 2023) could not be
   independently verified — Carta's site returned an access error to
   direct fetching — so it is not cited as a primary claim above, only
-  noted here as an unverified secondary data point roughly consistent
-  with Cooley's much higher figure (the discrepancy may reflect different
-  denominators — Series A only vs. all rounds — or different report
-  vintages).
+  noted here as an unverified secondary data point. It is notably lower
+  than Cooley's figure (96.4%/98.2%, above) — an unresolved ~26–28
+  percentage-point gap, possibly due to different denominators (Series A
+  only vs. all rounds) or different report vintages, that could not be
+  reconciled in this research pass.
 
 **How to use correctly:** For `option_value.py`'s preference-stack haircut
 default (spec §7, step 2), the mechanically correct input is the
