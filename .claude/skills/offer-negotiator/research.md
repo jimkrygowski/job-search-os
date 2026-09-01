@@ -429,3 +429,460 @@ Avoid stating a specific turnover-rate or retention statistic tied to
 exploding offers, since no rigorously sourced figure was found for that
 specific claim.
 
+---
+
+## Equity & Comp Mechanics
+
+### Startup Exit-Rate Base Rates by Stage
+
+**Source:** Correlation Ventures proprietary deal database, reported via
+two independent intermediary sources presenting different cuts of what
+appears to be overlapping data: Bruce Booth (partner, Atlas Venture),
+"Correlation's Fresh Look At Venture Capital Returns," *LifeSciVC*,
+November 18, 2013 (analysis of 7,976 realized VC financings, 2003–2012,
+exit-year basis); and Seth Levine (partner, Foundry Group), "Venture
+Outcomes are Even More Skewed Than You Think," *VC Adventure*, August
+2014 (analysis of 21,640 financings, 2004–2013, financing-level return
+multiples). Also: Hassan, K., Varadan, M., & Zeisberger, C. (2020).
+[Institutional Investor op-ed] citing a related Correlation Ventures
+figure (0.4% of deals return 50x+). Cross-referenced against CB Insights,
+*Why Startups Fail* research / startup post-mortem database (483
+post-mortems tracked; 2024 update analyzed 431 VC-backed companies that
+shut down since 2023), cbinsights.com.
+
+**Evidence quality: Low-Moderate, and this is the weakest-sourced
+subsection in this document — read the limitations below before treating
+any number here as a default.** These are the best publicly available
+proxies found, not a direct answer to the question asked.
+
+- Booth's write-up of the Correlation Ventures dataset (7,976 financings,
+  2003–2012): 39% of deals went out of business (zero return), 29% exited
+  for less than invested capital, 32% returned a positive multiple (>1x).
+- Levine's write-up of a different cut of Correlation Ventures data
+  (21,640 financings, 2004–2013, at the individual-financing level rather
+  than the company level): 65% of financings failed to return 1x capital,
+  only 10% returned 5x or more, only 4% returned 10x or more.
+- CB Insights' post-mortem tracking: roughly "3 out of 4" (75%) of
+  venture-backed startups fail — a company-shutdown statistic drawn from
+  CB Insights' own curated database of startups whose failure became
+  public and documented, not an audited census of all VC-backed
+  companies.
+- These figures are not reconcilable into one clean number: the 39%/65%/
+  75% figures each measure something different (company disposition vs.
+  financing-level return multiple vs. self-selected shutdown tracking)
+  over different, overlapping windows, using an undisclosed, proprietary
+  methodology (Correlation Ventures is a VC firm, not an independent
+  academic or regulatory data source, and its full dataset/methodology
+  has not been independently peer-reviewed).
+
+**Known limitations:**
+- **None of these sources break results out by financing stage**
+  (early-stage private vs. late-stage private vs. public) in the way this
+  subsection was asked to research. No credible source doing that specific
+  stage-by-stage breakdown was found in this research pass — several
+  vendor/blog aggregator pages (not cited here) present stage-by-stage
+  "probability of exit" tables, but their methodology and underlying data
+  source could not be verified as credible, so they are omitted rather
+  than cited.
+- **None of these sources directly measure whether *common* stockholders
+  received a payout**, which is the thing that actually matters for an
+  option-value estimate. "Company went out of business" (Correlation's
+  39%, CB Insights' 75%) is a reasonable proxy for a zero-payout outcome,
+  but a company can also have a real, positive-dollar acquisition and
+  still leave common stockholders with nothing if the sale price doesn't
+  clear the liquidation preference stack (see the next subsection) — none
+  of these datasets report that distinction, so "the company didn't fail"
+  is not the same claim as "common stock got paid."
+- The underlying data is dated (Correlation's cuts run through 2013;
+  CB Insights' post-mortem sample is more current but self-selected)
+  relative to the 2021–2023 VC funding boom-and-correction, which several
+  practitioner sources argue shifted base rates without, as far as this
+  research found, a comparably rigorous re-study.
+- Both Correlation Ventures citations are secondary (partner blog posts
+  summarizing a VC firm's proprietary numbers), not the underlying
+  dataset or a primary published study.
+
+**How to use correctly:** Be explicit with the user, and with whoever
+implements `option_value.py`'s exit-probability-haircut defaults (spec
+§7, step 3), that this is the single weakest-evidence subsection in this
+file. If a flat default is needed, something in the neighborhood of the
+convergence across sources — roughly 60–75% of VC-backed positions
+returning nothing or less than invested capital to preferred, which likely
+understates the true zero-payout rate for *common* once the preference
+stack is accounted for — is a defensible order-of-magnitude anchor, but it
+should be presented to the user as a rough, unvalidated heuristic, not a
+precise probability, and it should not be silently differentiated by
+stage (early private / late private / public) since no source here
+supports doing so credibly. A future implementer who wants real
+stage-differentiated numbers should treat that as open research, not
+something already established by this document.
+
+---
+
+### Liquidation Preferences & the Preference Stack
+
+**Source:** National Venture Capital Association (NVCA), Model Legal
+Documents / Model Term Sheet, nvca.org (industry-standard template used
+across U.S. venture financings). Cooley LLP, *Venture Financing Report*
+(quarterly series; Q1 2026 edition checked directly, cooley.com) — an
+aggregated survey of deal terms across Cooley's own venture financing
+practice. The Holloway Guide to Venture Capital, "Liquidation Preference,"
+holloway.com — practitioner reference explaining preference-stack
+mechanics.
+
+**Evidence quality: High for the mechanism and for current market-standard
+single-round terms; unverified for cross-round stacking base rates.**
+
+- **The mechanism** is uncontested, well-documented corporate-finance/
+  venture-law mechanics, codified in the NVCA's standard model documents
+  used across the industry: a liquidation preference is a contractual
+  right for preferred stockholders to be paid a specified amount before
+  any proceeds go to common stockholders in a liquidity event. Under a
+  **1x non-participating** structure (the current market standard — see
+  below), preferred holders receive the *greater of* their liquidation
+  preference or their as-converted pro-rata common share — a choice
+  between the two, not both. Under a **participating** structure,
+  preferred holders receive their preference *and then also* share
+  pro-rata in the remaining proceeds alongside common ("double-dipping"),
+  which can severely reduce what's left for common and option holders in
+  a moderate-value exit.
+- **Stacking across rounds:** each financing round typically creates its
+  own class of preferred stock with its own liquidation preference. Per
+  the Holloway Guide, the order in which these classes get paid (the
+  "preference stack") is set contractually and varies by deal — it can be
+  *pari passu* (all preferred classes rank equally and split available
+  proceeds pro rata if insufficient to pay everyone in full) or a
+  strict seniority order, sometimes structured "last money in, first
+  out" (the most recent round's investors are paid before earlier
+  rounds'). The practical effect for common and option holders is that
+  the relevant floor below which they get nothing is the **sum of all
+  outstanding preferences across every round**, not just the most recent
+  round — a company that raised $150M in total preferred capital across
+  five rounds needs an exit well above that combined figure before common
+  sees meaningful value, even if every individual round used
+  founder-friendly 1x non-participating terms.
+- **Current market-standard terms (single round):** Cooley's Q1 2026
+  Venture Financing Report found 98.2% of deals had a 1x liquidation
+  preference and 96.4% used nonparticipating preferred stock; prior
+  2025 quarters in the same series showed comparable figures (95–98%
+  for 1x, 96–97% for nonparticipating). This confirms that participating
+  preferred and above-1x multiples are currently rare in individual
+  rounds, at least among the deals Cooley's practice sees.
+
+**Known limitations:**
+- Cooley's data reflects deals worked by one (large, prominent) law firm's
+  own venture practice, which skews toward well-lawyered, VC-heavy-market
+  deals — it is not a random sample of all financings, and smaller or
+  less-institutional rounds may look different.
+- "Individual rounds are founder-friendly" does not imply the aggregate
+  preference stack is small — stacking is precisely the mechanism by which
+  several individually reasonable-looking rounds combine into a large
+  cumulative floor. This document did not find a credible, cited base
+  rate for "typical aggregate preference stack as a percentage of a
+  company's most recent valuation" — that figure is company-specific and
+  should be treated as unknown rather than estimated from a generic
+  constant.
+- Whether stacking is pari passu or strict-seniority is deal-specific;
+  no source found here gives an industry-wide base rate for how often
+  each structure is used.
+- A Carta figure surfaced in search results (~70% of Series A financings
+  use 1x non-participating preferred, as of 2023) could not be
+  independently verified — Carta's site returned an access error to
+  direct fetching — so it is not cited as a primary claim above, only
+  noted here as an unverified secondary data point roughly consistent
+  with Cooley's much higher figure (the discrepancy may reflect different
+  denominators — Series A only vs. all rounds — or different report
+  vintages).
+
+**How to use correctly:** For `option_value.py`'s preference-stack haircut
+default (spec §7, step 2), the mechanically correct input is the
+**total contractual liquidation preference outstanding across all
+preferred rounds for the specific company**, not a generic "typical %"
+haircut inferred from market surveys — this is company-specific
+information (from a cap table or data room) that a generic constant
+cannot substitute for. If the tool needs a fallback when that data isn't
+available, it should be treated as an explicit placeholder requiring user
+confirmation, not a silently-applied default, since no authoritative
+source here gives a credible "typical aggregate stack as % of valuation"
+figure to hardcode. The 1x-non-participating market-standard finding above
+is useful context for explaining terms to a user, but it describes single
+rounds, not the cumulative stack that actually determines the common
+stockholder's outcome.
+
+---
+
+### 409A Valuation vs. Preferred Price Gap
+
+**Source:** Moon, C. (2020, February 13). "16 Things to Know About the
+409A Valuation." *Andreessen Horowitz (a16z)*, a16z.com. AICPA,
+*Valuation of Privately-Held-Company Equity Securities Issued as
+Compensation* (Accounting and Valuation Guide / Practice Aid) — the
+technical valuation-methodology document (option-pricing method,
+probability-weighted expected return method, current value method)
+industry-standard 409A appraisers work from. Underlying statutory basis:
+Internal Revenue Code §409A (enacted as part of the American Jobs
+Creation Act of 2004, post-Enron), which requires an independent,
+defensible fair-market-value determination for private-company stock
+used to set option strike prices.
+
+**Evidence quality: Moderate-High for the mechanism; Low for any specific
+numeric ratio — and the best source found here explicitly warns against
+citing one.**
+
+- **Why the gap exists (mechanism):** a 409A valuation determines the
+  fair market value of *common* stock specifically, for use as an ISO/NSO
+  strike price. Under the option-pricing method described in the AICPA
+  Practice Aid, common stock is modeled as a call option on the company's
+  total equity value, struck at the point where the outstanding
+  liquidation preference stack (see previous subsection) is exhausted —
+  because common is legally subordinate to preferred and shares in
+  liquidity risk. A 409A valuation that is lower than what sophisticated
+  investors just paid for preferred stock in the same round is therefore
+  not an accounting trick or an arbitrary "discount" — it is the
+  mathematically expected result of common's contractual subordination
+  (no liquidation preference, no anti-dilution or other protective
+  rights) plus its illiquidity, correctly modeled.
+- **How much lower in practice — the honest gap:** Moon's a16z article
+  explicitly and directly debunks the commonly repeated rule of thumb that
+  common FMV runs "10–20% of the most recent preferred round," stating
+  "only in rare instances is a privately-held company's common stock FMV
+  legitimately 10–20% of the value [of preferred]," and that there is no
+  reliable universal ratio — the real number depends on each company's
+  specific capital structure (size of the preference stack relative to
+  current value), stage/proximity to a likely exit, and volatility.
+  Several vendor/marketing sites publish specific stage-by-stage ratio
+  tables (e.g., claiming ~10–30% at seed narrowing to ~45–70% at late
+  stage) but this research could not verify those figures against any
+  primary or rigorously sourced practitioner document, and the credible
+  source found (a16z) explicitly warns against exactly this kind of
+  simplified lookup table. Those vendor figures are deliberately **not**
+  cited above as findings — they read as unsupported marketing content
+  dressed up as a benchmark.
+
+**Known limitations:**
+- No credible, verifiable numeric ratio or range was found for "how much
+  lower, on average, is 409A vs. preferred price" — this is the honest
+  gap the task brief asked to flag explicitly rather than paper over. The
+  best available source (a16z) argues that any single ratio is
+  misleading.
+- 409A valuations are refreshed periodically (typically ~annually or
+  after a material event, not continuously), so the observed "gap" at any
+  moment reflects a valuation that may already be stale relative to the
+  company's current trajectory.
+- The AICPA Practice Aid is a technical methodology reference, not itself
+  a source of empirical "typical ratio" statistics.
+
+**How to use correctly:** Explain the mechanism clearly and accurately —
+strike price is deliberately lower than what preferred investors paid,
+and that's the correct result of common's subordination, not a red flag
+by itself. For `option_value.py`, do **not** hardcode a "typical ratio by
+stage" default — that is precisely the kind of unsupported constant this
+research pass could not substantiate, and the one credible source found
+warns explicitly against it. If a numeric estimate is genuinely needed,
+prefer deriving it from the same residual-claim mechanics already used
+for the preference-stack and DLOM subsections (i.e., compute common's
+value as a residual after the preference stack, then apply an illiquidity
+discount) rather than looking up a stage-based ratio table.
+
+---
+
+### Discount for Lack of Marketability (DLOM)
+
+**Source:** Damodaran, A. (2005, July). *Marketability and Value:
+Measuring the Illiquidity Discount* [Working paper]. Stern School of
+Business, New York University. pages.stern.nyu.edu (fetched and read
+directly). Primary studies synthesized within it: Maher, J.M. (1976).
+Discounts for Lack of Marketability for Closely Held Business Interests.
+*Taxes*, 54, 562–571. Silber, W.L. (1991). Discounts on Restricted Stock:
+The Impact of Illiquidity on Stock Prices. *Financial Analysts Journal*,
+47, 60–64. Johnson, B.A. (1999). Quantitative Support for Discounts for
+Lack of Marketability. *Business Valuation Review*, 16, 152–155. Wruck,
+K.H. (1989). Equity Ownership Concentration and Firm Value: Evidence from
+Private Equity Financings. *Journal of Financial Economics*, 23, 3–28.
+Hertzel, M. & Smith, R.L. (1993). Market Discounts and Shareholder Gains
+from Placing Equity Privately. *Journal of Finance*, 48, 459–486. Bajaj,
+M., Dennis, D.J., Ferris, S.P., & Sarin, A. (2001). Firm Value and
+Marketability Discounts. *Journal of Corporate Law*, 27. Emory, J.
+(1996), reported in Pratt, S., Reilly, R., & Schwiehs, R.P. (1997).
+*Valuing a Business: The Analysis and Appraisal of Closely Held
+Companies*. McGraw-Hill. Longstaff, F.A. (1995). How Much Can
+Marketability Affect Security Values? *Journal of Finance*, 50,
+1767–1774.
+
+**Evidence quality: High for the existence and rough order of magnitude of
+an illiquidity discount as a real, mainstream finance concept; Moderate at
+best for any single point estimate — the studies genuinely disagree by a
+wide margin depending on methodology, and Damodaran's own synthesis is
+explicitly skeptical of the highest figures.**
+
+- **Restricted stock studies** (SEC Rule 144 private placements by
+  already-public companies, compared to the same company's freely
+  tradable stock at the same time): Maher (1976, 4 mutual funds,
+  1969–73) found an average discount of 35.43%. Silber (1991,
+  1981–88) found a median discount of 33.75%, larger for smaller/less
+  healthy firms and larger blocks. Other studies broadly converge on
+  30–35%; Johnson (1999) found a smaller ~20% discount. Damodaran flags
+  these as based on small samples spread over long periods with
+  substantial standard errors, and subject to selection bias — firms
+  that make restricted placements tend to be smaller and riskier than
+  the typical firm, and the buyers of restricted stock may be providing
+  other services to the company for which the discount is partial
+  compensation, not pure payment for illiquidity.
+- **Controlled comparisons isolating the pure marketability effect**
+  (restricted vs. registered private placements, to net out
+  confounds like firm risk and buyer services): Wruck (1989) found only
+  a 17.6% average / 10.4% median difference between restricted and
+  registered placements. Hertzel & Smith (1993, 106 placements,
+  1980–87) found a 13.26% median discount across all private placements,
+  with restricted stock discounted 13.5 percentage points more than
+  registered stock. Bajaj et al. (2001, 88 placements, 1990–97) found
+  median discounts of 9.85% (registered) vs. 28.13% (restricted), but
+  after controlling for differences across the issuing firms, attributed
+  only **7.23%** specifically to marketability — a materially smaller
+  number than the raw restricted-stock studies imply, once selection
+  bias is controlled for.
+- **Pre-IPO transaction studies** (private trades in the months/years
+  before a company's IPO, compared to the IPO price): Emory (1996) found
+  an average ~45% discount for trades in the 5 months pre-IPO. Willamette
+  Associates extended this to trades up to 3 years pre-IPO (adjusted for
+  P/E changes) and found discounts ranging 32–75%. Damodaran is
+  explicitly skeptical of these: "It is difficult to see why an investor
+  would be willing to accept a 40% discount on estimated value if an
+  initial public offering is forthcoming. It seems likely that what these
+  studies conclude is a marketability discount is reflective of other
+  factors" (e.g., information asymmetry, control, selection).
+- **Option-pricing / theoretical upper bound** (Longstaff 1995,
+  formalized in Damodaran's Figure 3): models the value of marketability
+  as a look-back option held by a perfect market timer, giving explicit
+  **upper bounds** that scale with both the trading-restriction period
+  and volatility. At 20% annualized volatility: ≈17% for a 1-year
+  restriction, ≈25% for 2 years, ≈41% for 5 years. At 30% volatility:
+  ≈26% (1 year), ≈39% (2 years), ≈66% (5 years). Damodaran stresses these
+  are explicit *upper bounds* under an unrealistic perfect-timing
+  assumption — actual discounts should be lower.
+
+**Known limitations:**
+- No source found here studies privately-held venture-backed startup
+  common stock specifically — the underlying studies are drawn from
+  already-public-company restricted stock, private placements, and
+  pre-IPO trades. Startup 409A practice draws on this same body of
+  literature (via the AICPA Practice Aid, see previous subsection) by
+  analogy rather than through startup-specific empirical studies.
+- The size of the discount is explicitly and heavily dependent on
+  assumed holding period and volatility (per the option-pricing
+  approach) — there is no single defensible constant independent of
+  those inputs.
+- The underlying primary studies are old (1970s–1990s); this synthesis
+  paper itself dates to 2005. No comparably rigorous, more recent
+  re-study of restricted-stock or pre-IPO discounts was found in this
+  research pass.
+- The estimates vary enormously by methodology — from 7.23% (Bajaj et
+  al.'s controlled estimate) to 66%+ (Longstaff's upper bound at high
+  volatility and a long horizon) — so citing any single number without
+  its methodology is misleading.
+
+**How to use correctly:** For `option_value.py`'s time-value/illiquidity
+discount default (spec §7, step 4), a range in roughly the **20–30%**
+region is a defensible, well-precedented starting point — it's close to
+where most of the more carefully controlled empirical estimates (Bajaj et
+al.'s 7–28% range depending on control; option-pricing estimates at
+1–2 year horizons and moderate volatility, ~17–25%) and the commonly
+cited restricted-stock range (20–35%) overlap. But this must be presented
+to the user, and documented in the tool, as an explicit rough default
+with a defensible range spanning roughly 10–40%+ depending on the
+company's actual expected time-to-liquidity and volatility — not a
+precise, validated figure. Where possible, the tool should let time
+horizon and volatility inputs move the estimate (consistent with the
+option-pricing approach) rather than silently applying one flat constant
+regardless of the user's actual situation.
+
+---
+
+### ISO vs. NSO Tax Treatment and AMT (flagged, not modeled)
+
+**Source:** National Center for Employee Ownership (NCEO), "Stock Options
+and the Alternative Minimum Tax (AMT)," nceo.org/articles (fetched and
+read directly; no individual author or date given on the page). Cross-
+referenced against the underlying statute: Internal Revenue Code §422
+(incentive stock option qualification and statutory holding-period
+requirements), §56(b)(3) (ISO exercise spread as an Alternative Minimum
+Tax preference item), and §83 (general rule that a nonqualified stock
+option's exercise spread is ordinary compensation income).
+
+**Evidence quality: High.** This subsection describes settled, uncontested
+U.S. federal tax mechanism (Internal Revenue Code provisions), not a
+contested empirical research finding — the "evidence quality" question
+here is about whether the mechanism is accurately described, not about
+weighing conflicting studies. NCEO is a long-established nonprofit
+research/education organization focused specifically on employee
+ownership and equity compensation, and its description of the mechanism
+matches the underlying statutory sections.
+
+**The mechanism (explanatory only — no personal tax computation):**
+
+- **NSOs (nonqualified/nonstatutory stock options):** at exercise, the
+  spread between fair market value and the exercise (strike) price is,
+  under IRC §83, immediately treated as ordinary compensation income —
+  subject to income and payroll tax withholding, reported on the
+  employee's W-2 the same as a cash bonus. At a later sale, only further
+  appreciation since exercise is treated as a capital gain (short- or
+  long-term depending on the holding period measured from the exercise
+  date). This is a single, immediate, and certain tax event at exercise.
+- **ISOs (incentive stock options):** if granted under a qualifying plan
+  and specific IRC §422 holding-period requirements are met — shares held
+  at least two years from the grant date *and* at least one year from the
+  exercise date before sale (a "qualifying disposition") — the employee
+  owes **no regular income tax at exercise at all**, and the entire gain
+  from strike price to eventual sale price is taxed as a long-term
+  capital gain only when sold. However, the exercise-time spread (FMV at
+  exercise minus strike price) is not simply tax-free — under IRC
+  §56(b)(3) it becomes an Alternative Minimum Tax "preference item,"
+  added back into a separate, parallel tax calculation the taxpayer must
+  also run for that tax year. If the resulting AMT liability exceeds
+  regular tax liability, the taxpayer owes the higher AMT amount instead
+  of (in addition to, in effect) their regular tax.
+- **Why this creates real risk:** because the AMT preference item is
+  based on the *spread at exercise* — a paper gain — a person can exercise
+  ISOs in a private, illiquid company, owe real cash AMT that same tax
+  year on stock they cannot sell (there is no market for private-company
+  common stock to raise the cash), and if the company's value later falls
+  before any liquidity event, they may have paid real tax on a gain that
+  no longer exists by the time they could actually realize it. (NCEO
+  notes that excess AMT paid generally becomes a "minimum tax credit"
+  that can offset regular tax liability in future years — a partial, not
+  full or immediate, mitigant.)
+- **Disqualifying dispositions:** if ISO shares are sold before the
+  two-year/one-year holding requirements are met, the position reverts
+  largely to NSO-like ordinary-income treatment on some or all of the
+  spread instead of the preferential capital-gains treatment.
+- **The core one-line contrast:** NSOs create a smaller, certain,
+  immediate tax bill at exercise; ISOs can create zero regular tax at
+  exercise but expose the holder to AMT risk precisely because the gain
+  being taxed is on stock that, for a private company, cannot yet be sold
+  to cover that tax.
+
+**Known limitations:**
+- AMT exemption amounts, phase-out thresholds, and rates are set by
+  statute and adjusted (sometimes by legislation, sometimes by inflation
+  indexing) essentially every year — none are cited here as durable
+  facts, and none should be hardcoded anywhere in this skill.
+- The actual AMT impact for any individual depends on their full tax
+  picture (other income, filing status, state of residence, other AMT
+  preference items) — this is inherently a personal calculation, not a
+  general fact this document can responsibly state.
+- State tax treatment of ISOs and AMT varies by state (e.g., California
+  has its own, separately calculated AMT regime) and is out of scope
+  here entirely.
+
+**How to use correctly: this subsection is explanatory only.** Per the
+design spec (§2/§7), `option_value.py` must not compute a user's AMT
+liability, estimated tax owed, or any other personalized tax outcome —
+v1 of this skill is pre-tax only. The correct use of this research is to
+give the skill accurate language to explain *why* an ISO exercise
+decision carries AMT risk and how that risk mechanically differs from an
+NSO exercise, so it can flag the issue and prompt the user to model their
+specific numbers with a qualified tax advisor or CPA — not to estimate or
+recommend a number itself. Do not let this subsection's content expand,
+in the skill's actual runtime behavior, into per-user tax estimation or
+recommendation of any kind.
+
