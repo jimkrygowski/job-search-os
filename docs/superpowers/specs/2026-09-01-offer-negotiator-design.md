@@ -1,0 +1,208 @@
+# Offer Negotiator — Design
+
+Status: approved by Jim, pending final spec review before implementation
+planning.
+
+## 1. Purpose
+
+Make the user a confident, literate negotiator across the full arc of
+compensation conversations in a job search — not a single "counter with $X"
+calculator. Two goals, in the user's own words:
+
+- **Tactical empowerment** — the right words for the first comp
+  conversation, a real plan for a counter-negotiation, the confidence to
+  ask the right questions and take the right stance.
+- **Package literacy** — understanding what base, variable, and equity
+  actually represent, and how to trade between them, since most engineers
+  undervalue how little most option grants are really worth and most
+  hiring managers are trained to oversell that value.
+
+## 2. Non-Goals
+
+- **Not a single-number calculator.** The skill doesn't try to tell the
+  user "the" right counter number — it grounds them in real data and
+  tactics so they can reason to one.
+- **Not a duplicate of `career-coach`.** The final accept/decline call is
+  explicitly `career-coach`'s job (see §6.4) — `offer-negotiator` feeds it
+  grounded comp facts, it doesn't re-decide fit.
+- **No live market-data scraping.** No dependency on an unofficial
+  levels.fyi API or scraper. Comp benchmarks are best-effort, cited,
+  dated research — same rigor `company-research` already applies to
+  company facts — not a guaranteed live feed.
+- **No personal tax modeling in v1.** Equity valuation stays pre-tax, with
+  an explicit disclaimer to consult a tax advisor for ISO/AMT exposure.
+  Collecting and reasoning about personal income/state tax data is out of
+  scope.
+
+## 3. Architecture
+
+One new skill, one new tool, one new standing state artifact — consistent
+with the existing engine/data split (`CLAUDE.md`, README "Built like
+software, not a prompt"):
+
+- `.claude/skills/offer-negotiator/SKILL.md` — single, mode-aware skill
+  (same pattern as `score-opportunity`), covering all four negotiation
+  moments (§6). Rejected splitting into one skill per moment (fragments
+  state — moment #2's equity breakdown feeds moment #3's counter
+  strategy directly) and rejected a separate "comp philosophy setup"
+  skill (unlike `build-profile`/`define-trajectory`, comp-philosophy
+  setup is small and only ever feeds this one skill).
+- `.claude/skills/offer-negotiator/research.md` — evidence-graded review
+  of salary-negotiation tactics and equity/comp mechanics, same pattern
+  as `career-coach/research.md`.
+- `tools/option_value.py` + `tools/test_option_value.py` — deterministic
+  equity valuation calculator, same shape as `tools/score_table.py`
+  (stdlib only, argparse subcommands, tested). See §7.
+- `state/career/comp_target.md` — new standing artifact: walk-away
+  minimums, cash/equity/benefits priority, equity risk tolerance,
+  deal-breakers. Analogous to `trajectory.md`. Exact fields are decided
+  when that bucket is built, not in this doc.
+
+## 4. Bootstrap Integration
+
+`comp_target.md` setup becomes an explicit step in `bootstrap`, not a lazy
+first-use prompt:
+
+- `bootstrap/SKILL.md` gets a new step 5 (after `define-trajectory`,
+  before wrap-up): invoke `offer-negotiator` in its setup mode to build
+  `comp_target.md`.
+- `bootstrap`'s "check existing state" step gains a third condition:
+  profile + trajectory exist but `comp_target.md` doesn't → go straight
+  to the setup-mode call instead of restarting the full flow.
+
+## 5. Retroactive Upgrade Path (existing installs)
+
+This repo is public; users who already ran `bootstrap` before this
+feature existed have `profile.md`/`trajectory.md` but no `comp_target.md`.
+They need a way to discover the new capability without a hard gate:
+
+- `tools/check_bootstrap_state.py` gains a second condition alongside the
+  existing new-user check: if `profile.md` and `trajectory.md` both exist
+  but `comp_target.md` doesn't, inject a **soft, non-blocking** note —
+  distinct in urgency from the new-user hard gate. Wording conveys "you're
+  missing a capability," not "you must comply": e.g. *"comp_target.md
+  doesn't exist yet — offer-negotiator (comp coaching/benchmarking) won't
+  be able to ground its advice in your actual walk-away numbers until
+  it's set up. Mention this and offer to set it up, but address whatever
+  the user asked first."*
+- No new "already told them" state needed — the note stops firing
+  naturally once `comp_target.md` exists, same mechanism as the existing
+  new-user check.
+- `CLAUDE.md` gets a short paragraph documenting this behavior, parallel
+  to the existing paragraph documenting the new-user hook.
+
+## 6. The Four Moments
+
+All four live in one `SKILL.md`, dispatched by context (what the user
+says, or an explicit ask if ambiguous). Every market-data claim carries a
+source and date — applying `CLAUDE.md` guardrail #2, not a new guardrail.
+
+### 6.1 First-contact prep
+
+No market data required beyond what's knowable from the JD/conversation
+(role, level, geo). Output is tactical: how to answer "what are your comp
+expectations" without anchoring low, deflection language, when to give a
+range vs. decline to answer. Grounded in `research.md` tactics.
+
+### 6.2 Offer breakdown
+
+Offer numbers (base/bonus/equity/benefits) come from the user (pasted
+offer letter or verbal recap), saved to that opportunity's `notes.md`.
+Market context comes from best-effort cited research (`WebSearch`/
+`WebFetch`) — every benchmark sourced and dated, none asserted without a
+source. Equity is run through `option_value.py` (§7) rather than valued
+at face value.
+
+### 6.3 Counter-negotiation planning
+
+Synthesizes §6.2's breakdown, `comp_target.md`'s walk-away numbers, and
+`research.md` tactics into a specific talking-points script for that
+opportunity, written to its `notes.md`.
+
+### 6.4 Final accept/decline — hands off to `career-coach`
+
+`career-coach` already scores "Compensation & upside" as one of five
+dimensions in its Evaluation Template (`career-coach/SKILL.md`) alongside
+role scope, growth trajectory, cultural fit, and problem fit — it's not
+comp-only, and it already reads `notes.md` per its existing Session Start
+Protocol. So `offer-negotiator` does **not** run its own decision session
+at this moment. Instead it:
+
+1. Ensures the opportunity's `notes.md` has a clear, sourced comp summary
+   (offer breakdown + `option_value.py` output + fit against
+   `comp_target.md`) — already produced by §6.2/§6.3, not new work.
+2. Explicitly invokes `career-coach` for that opportunity's full decision
+   session — same in-session hand-off pattern `bootstrap` uses for
+   `build-profile`/`define-trajectory`.
+
+Zero changes required to `career-coach.md` itself — the integration point
+(the "Compensation & upside" row) already exists.
+
+## 7. `option_value.py` — Equity Valuation
+
+Real problem: private-company equity has no market price. A model that
+outputs one confident dollar figure is false precision. The tool computes
+a **transparent range with separately labeled adjustments**, not a single
+blended discount — each one visible and overridable so the tool teaches,
+not just outputs a number:
+
+1. **Face value** — shares × (quoted price − strike), as naively presented
+   by the company.
+2. **Preference-stack / common-vs-preferred haircut** — the quoted "last
+   round" price is what *preferred* investors paid; common stock (what
+   options convert to) sits behind the liquidation preference stack and
+   is worth less, sometimes zero in a modest exit. Applied as a disclosed
+   default, overridable if the user knows the actual preference terms.
+3. **Exit-probability haircut** — most venture-backed companies never
+   return value to common stockholders. Fixed, disclosed default rates by
+   company stage (public / late-stage private / early-stage private),
+   user-overridable per call. (Real cited base rates go in `research.md`
+   when that bucket is built — this design doc doesn't assert specific
+   percentages.)
+4. **Time-value discount** — illiquid startup equity warrants a higher
+   discount rate than public-market investments, given undiversifiable,
+   concentrated risk and multi-year uncertain time-to-liquidity.
+
+Also flagged, not modeled: exercise cost and tax timing (ISO/AMT exposure
+can trigger real cash tax liability on paper gains before any liquidity
+event) — surfaced as a disclaimer, not computed, per §2.
+
+Output shows every stage of the adjustment and why, then compares the
+risk-adjusted range against the cash-now alternative — cash is certain,
+liquid, and immediately realized; equity is a subordinated, time-delayed,
+probability-weighted claim contingent on vesting, an exit occurring, and
+that exit clearing the preference stack with room left for common.
+
+Mirrors `score_table.py`: stdlib only, argparse subcommands, called by the
+skill rather than freehand-computed by the LLM — this is real financial
+math, not something that should be non-deterministic session to session.
+
+## 8. Guardrails
+
+No new guardrails. Existing `CLAUDE.md` guardrails apply directly:
+
+- #1 (never invent experience) → never invent comp facts; offer numbers
+  come only from what the user provides.
+- #2 (never assert unsupported opinion) → every market benchmark and
+  equity-valuation default carries a source/rationale and, where
+  applicable, a date.
+
+## 9. Testing & Validation
+
+- `option_value.py` gets a stdlib `unittest` suite
+  (`test_option_value.py`) covering the adjustment math and edge cases:
+  zero/negative strike spread (underwater options), public-company case
+  (no preference-stack or exit-probability haircut applies), and
+  user-overridden defaults.
+- The skill itself (prose/conversation across the four moments) is not
+  unit-tested, consistent with `interview-prep`/`company-research` today.
+
+## 10. Open Items for Implementation Buckets
+
+Deliberately left for the bucket that builds them, not resolved here:
+
+- Exact field list and conversation shape for `comp_target.md` setup.
+- Specific cited exit-probability and preference-stack default figures
+  (requires real research, feeds `research.md` and `option_value.py`'s
+  defaults).
+- `research.md`'s full evidence review of negotiation tactics.
