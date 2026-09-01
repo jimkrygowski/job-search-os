@@ -265,9 +265,13 @@ hurt to ask. *Organizational Behavior and Human Decision Processes*,
 103(1), 84–103. Contested/updated by: Mazei, J., Hüffmeier, J., Freund,
 P.A., et al. (2015). A meta-analysis on gender differences in negotiation
 outcomes and their moderators. *Psychological Bulletin*, 141(1), 85–104.
-And: Kray, L., Kennedy, J.A., & Lee, M. (2024) survey-based study
-reported via Harvard's Program on Negotiation, on MBA graduates' current
-negotiation initiation rates.
+And: Kray, L.J., Kennedy, J.A., & Lee, M. (2024). Now, Women Do Ask: A
+Call to Update Beliefs about the Gender Pay Gap. *Academy of Management
+Discoveries*, 10(1), 7–33. DOI: 10.5465/amd.2022.0021. (Published online
+August 15, 2023; formal issue year 2024.) Re-verified directly against
+the journal's own page (journals.aom.org) and UC Berkeley Haas's research
+summary (haas.berkeley.edu/ibsi) for this fix — not just secondary
+reporting.
 
 **Evidence quality: Contested — treat with real caution.** This is
 explicitly one of the more high-profile areas of negotiation research
@@ -293,16 +297,25 @@ ask" as settled fact.
   rather than themselves. This is an important qualifier: the "gap" is not
   a fixed trait difference, it is heavily moderated by preparation and
   information, both of which a negotiation-prep skill can directly affect.
-- A 2024 survey-based study (Kray, Kennedy & Lee, reported via Harvard's
-  PON, original publication in *Academy of Management Discoveries*) of
-  nearly 1,000 MBA graduates found women now negotiate salary and
-  promotions at rates equal to or exceeding men's (e.g., 54% of women vs.
-  44% of men negotiated salary in one cohort surveyed) — directly
-  complicating the original "women don't ask" framing two decades later.
-  Notably, the pay gap persisted in this same sample despite equal or
-  higher negotiation rates among women, which the researchers attribute to
-  structural factors (career trajectory, promotion access) rather than
-  individual negotiation behavior.
+- Kray, Kennedy & Lee (2024, *Academy of Management Discoveries* —
+  full citation above) surveyed graduates of a top U.S. MBA program about
+  whether they negotiated their first post-MBA salary, plus a second,
+  larger survey of alumni about negotiating promotions/compensation more
+  broadly. They found women now negotiate salary at rates equal to or
+  exceeding men's — 54% of women vs. 44% of men negotiated salary in the
+  first-job cohort, and 64% of women vs. 59% of men negotiated a promotion
+  or compensation in the alumni cohort — directly complicating the
+  original "women don't ask" framing two decades later. (Secondary
+  reporting on this paper gives slightly different sample sizes for the
+  two survey waves — e.g. roughly 990–1,435 for the first-job cohort and
+  roughly 1,939–2,000 for the alumni cohort, depending on the source —
+  which this document was not able to fully reconcile without reading the
+  paper's own methods section; the percentages themselves were consistent
+  across every source checked.) Notably, the pay gap persisted in this
+  same population despite equal or higher negotiation rates among women,
+  which the researchers attribute to structural factors (career
+  trajectory, promotion access) rather than individual negotiation
+  behavior.
 - Separately, research on negotiation "backlash" more broadly (the idea
   that assertive negotiating behavior is judged more harshly in women) is
   an area with documented replication concerns in the broader social
