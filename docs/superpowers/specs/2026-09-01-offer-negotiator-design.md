@@ -178,9 +178,14 @@ not just outputs a number:
    `public` (no haircut, a real market price exists), and a generic
    `private` fallback (the old flat aggregate rate) for when the
    specific stage genuinely isn't known. All tiers remain
-   user-overridable per call. Series B/C/D+ share the same ~50% rate,
-   grounded in Mattermark's explicitly stated "halves and continues to
-   halve" pattern — not a fabricated extension, a directly cited one.
+   user-overridable per call. **Series B/C/D+ rates revised once more,
+   2026-09-02:** a fourth source (Carta, "The Startup Class of 2018
+   Where Are They Now," 2024) gave real, derivable per-transition rates
+   that disagree with Mattermark's older "halves" pattern for these
+   later stages — 72%/82%/82% fail vs. Mattermark's ~50%. Per the
+   user's explicit direction, the design now uses the more pessimistic,
+   more recent Carta-derived figures rather than Mattermark's, an owned
+   conservative choice documented in `research.md`, not an averaging.
 4. **Time-value discount** — illiquid startup equity warrants a higher
    discount rate than public-market investments, given undiversifiable,
    concentrated risk and multi-year uncertain time-to-liquidity. Public
