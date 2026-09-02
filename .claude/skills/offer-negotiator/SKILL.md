@@ -1,6 +1,6 @@
 ---
 name: offer-negotiator
-description: Use when a user needs help with compensation — defining or revisiting their target (walk-away numbers, BATNA, target/ask range, comp priorities) as part of first-time bootstrap, prepping talking points for an early comp conversation before any offer exists, or breaking down an actual offer's numbers (base/bonus/equity/benefits) against market data and running equity through option_value.py. Builds or updates state/career/comp_target.md, produces first-contact negotiation talking points, or writes a sourced offer breakdown to that opportunity's notes.md.
+description: Use when a user needs help with compensation — defining or revisiting their target (walk-away numbers, BATNA, target/ask range, comp priorities) as part of first-time bootstrap, prepping talking points for an early comp conversation before any offer exists, breaking down an actual offer's numbers (base/bonus/equity/benefits) against market data and running equity through option_value.py, or planning a specific counter-negotiation script once an offer is broken down. Builds or updates state/career/comp_target.md, produces first-contact negotiation talking points, writes a sourced offer breakdown, or writes a counter-negotiation plan to that opportunity's notes.md.
 ---
 
 # Offer Negotiator
@@ -10,18 +10,25 @@ description: Use when a user needs help with compensation — defining or revisi
 Helps a user navigate compensation across their job search: building and
 revisiting their standing compensation target (Setup Mode), prepping
 talking points for an early comp conversation before any offer exists
-(First-Contact Prep), and breaking down an actual offer's numbers against
-sourced market data and a real equity valuation (Offer Breakdown).
-Grounded throughout in a real BATNA, `research.md`'s evidence-graded
-negotiation tactics, and `option_value.py`'s deterministic equity math —
-never in invented numbers or generic scripts.
+(First-Contact Prep), breaking down an actual offer's numbers against
+sourced market data and a real equity valuation (Offer Breakdown), and
+turning that breakdown into a specific counter-negotiation script
+(Counter-Negotiation Planning). Grounded throughout in a real BATNA,
+`research.md`'s evidence-graded negotiation tactics, and
+`option_value.py`'s deterministic equity math — never in invented numbers
+or generic scripts.
 
 ## Session Start
 
 1. Determine which moment this session is:
-   - If the user has an actual offer in hand — numbers to break down
-     (base/bonus/equity/benefits) → **Offer Breakdown**. Skip the rest of
-     this section and go straight to that section below.
+   - If the user has an actual offer in hand, determine what they want to
+     do with it:
+     - Break its numbers down (base/bonus/equity/benefits) against
+       market data → **Offer Breakdown**. Skip the rest of this section
+       and go straight to that section below.
+     - Plan how to counter or negotiate it → **Counter-Negotiation
+       Planning**. Skip the rest of this section and go straight to that
+       section below.
    - If the user has an upcoming conversation where they expect to be
      asked about comp expectations and doesn't have an offer in hand yet
      (a recruiter screen, an early call) → **First-Contact Prep**. Skip
@@ -240,6 +247,71 @@ Write the breakdown to the resolved opportunity's `notes.md` under a
 the sourced market context, and `option_value.py`'s full output
 (including its caveats) for the equity component.
 
+## Counter-Negotiation Planning
+
+Synthesizes an offer's breakdown, `state/career/comp_target.md`'s
+walk-away numbers and priorities, and `research.md`'s negotiation
+tactics into a specific talking-points script for countering a real
+offer — not a generic "always counter 10-15%" template.
+
+Read only `research.md`'s "Integrative (Multi-Issue) Negotiation",
+"Gender and Framing Effects in Salary Negotiation", and "Deadline and
+Pressure Tactics" subsections (see the moment index near the top of that
+file) — skip the rest.
+
+### Session Start
+
+1. Confirm which opportunity this is for, then resolve its folder via
+   `python3 tools/tracker.py opportunity-path "<Company>" "<Role>"` —
+   never construct the path yourself.
+2. Read that folder's `notes.md`, specifically its most recent
+   `## Offer Breakdown (<date>)` section. If none exists, offer to run
+   Offer Breakdown first, or ask the user for the offer numbers directly
+   — never fabricate numbers to skip this step.
+3. Read `state/career/comp_target.md` if it exists, for the target/ask
+   range, walk-away minimums, and cash/equity/benefits priority.
+
+If `state/career/comp_target.md` doesn't exist yet, mention that Setup Mode would ground this plan in real numbers rather than whatever the user states in the moment — but proceed with what the user gives directly in conversation, don't block on it.
+
+### What to Produce
+
+1. **Package framing across dimensions** — per `research.md`'s
+   Integrative (Multi-Issue) Negotiation findings: don't negotiate base
+   salary in isolation. Use `comp_target.md`'s cash/equity/benefits
+   priority (or ask for one directly if it's missing) to identify which
+   dimensions the user actually weights higher, and build trade language
+   from that (e.g. "flexible on start date for a larger signing bonus")
+   rather than sequential single-issue haggling.
+2. **The specific counter number**, grounded in `comp_target.md`'s
+   target/ask range and the Offer Breakdown's numbers (including
+   `option_value.py`'s equity valuation, not the company's face-value
+   figure) — never invent a number the user hasn't grounded in one of
+   those two sources or their own stated conversation.
+3. **Deadline/pressure handling**, if the offer carries a short fuse —
+   per `research.md`'s Deadline and Pressure Tactics findings: name an
+   artificially short deadline as a pressure tactic, and coach a firm,
+   calm response (asking for a brief, specific extension and stating
+   why) rather than rushing a concession. Where relevant, it's fair to
+   note that exploding offers carry a documented downside for the
+   employer too (a reciprocation effect after acceptance) — but never
+   cite a specific turnover-rate or retention statistic for exploding
+   offers, since `research.md` found no rigorously sourced field figure
+   for that claim.
+4. **If the user raises a concern about being judged for negotiating
+   assertively** — per `research.md`'s Gender and Framing Effects
+   findings: take the concern seriously, it has real experimental
+   grounding. Framing the ask with a stated, market-data-backed rationale
+   is consistent with what that research suggests reduces backlash risk
+   — but never assert that gender predicts how someone should negotiate
+   as a general rule.
+
+### Output
+
+Write the counter-negotiation script to the resolved opportunity's
+`notes.md` under a `## Counter-Negotiation Plan (<date>)` heading: the
+specific ask, the package trade-offs, and how to handle any pressure
+tactics present in the offer.
+
 ## Guardrails
 
 - Never invent a BATNA, a competing offer, or a timeline the user hasn't
@@ -253,3 +325,10 @@ the sourced market context, and `option_value.py`'s full output
 - Never invent offer numbers, market benchmarks, or valuation figures in
   Offer Breakdown that the user, a cited source, or `option_value.py`
   itself didn't produce.
+- Never invent a counter number or trade-off in Counter-Negotiation
+  Planning that the user hasn't grounded in `comp_target.md`, the Offer
+  Breakdown, or their own stated conversation.
+- Never assert that gender predicts how someone should negotiate, and
+  never cite an unsourced statistic (e.g. a specific turnover rate) for
+  exploding-offer consequences — per `research.md`'s explicit cautions on
+  both.
