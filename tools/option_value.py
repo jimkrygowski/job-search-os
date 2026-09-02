@@ -168,8 +168,8 @@ def compute_exit_probability_range(value, company_stage,
     _validate_rate(failure_rate_low, "override_low")
     _validate_rate(failure_rate_high, "override_high")
     return {
-        "low": round(value * (1 - failure_rate_high), 1),
-        "high": round(value * (1 - failure_rate_low), 1),
+        "low": value * (1 - failure_rate_high),
+        "high": value * (1 - failure_rate_low),
         "failure_rate_low": failure_rate_low,
         "failure_rate_high": failure_rate_high,
     }

@@ -105,7 +105,7 @@ class ComputeExitProbabilityRangeTest(unittest.TestCase):
     def test_seed_default_range(self):
         # failure rate range 0.52-0.69 (CB Insights to Mattermark)
         result = option_value.compute_exit_probability_range(1000.0, "seed")
-        self.assertEqual(result["low"], 310.0)
+        self.assertAlmostEqual(result["low"], 310.0)
         self.assertEqual(result["high"], 480.0)
         self.assertEqual(result["failure_rate_low"], 0.52)
         self.assertEqual(result["failure_rate_high"], 0.69)
@@ -113,7 +113,7 @@ class ComputeExitProbabilityRangeTest(unittest.TestCase):
     def test_series_a_default_range(self):
         # failure rate range 0.37-0.85 (CB Insights to Carta worst vintage)
         result = option_value.compute_exit_probability_range(1000.0, "series_a")
-        self.assertEqual(result["low"], 150.0)
+        self.assertAlmostEqual(result["low"], 150.0)
         self.assertEqual(result["high"], 630.0)
         self.assertEqual(result["failure_rate_low"], 0.37)
         self.assertEqual(result["failure_rate_high"], 0.85)
@@ -130,16 +130,16 @@ class ComputeExitProbabilityRangeTest(unittest.TestCase):
     def test_series_c_default_range(self):
         # failure rate 0.82 (Carta "Class of 2018" cascade, derived)
         result = option_value.compute_exit_probability_range(1000.0, "series_c")
-        self.assertEqual(result["low"], 180.0)
-        self.assertEqual(result["high"], 180.0)
+        self.assertAlmostEqual(result["low"], 180.0)
+        self.assertAlmostEqual(result["high"], 180.0)
         self.assertEqual(result["failure_rate_low"], 0.82)
         self.assertEqual(result["failure_rate_high"], 0.82)
 
     def test_series_d_plus_default_range_holds_flat_at_series_c_rate(self):
         # no transition data exists past Series D+; holds flat at 0.82
         result = option_value.compute_exit_probability_range(1000.0, "series_d_plus")
-        self.assertEqual(result["low"], 180.0)
-        self.assertEqual(result["high"], 180.0)
+        self.assertAlmostEqual(result["low"], 180.0)
+        self.assertAlmostEqual(result["high"], 180.0)
         self.assertEqual(result["failure_rate_low"], 0.82)
         self.assertEqual(result["failure_rate_high"], 0.82)
 
