@@ -218,9 +218,12 @@ def _interpolate_1d(x, xs, ys):
 
 def compute_dynamic_dlom(time_to_liquidity_years, volatility):
     """DLOM interpolated from the Longstaff (1995) grid cited in
-    research.md#dlom. Clamps time and volatility to the cited range
-    (1-5 years, 20-30% volatility) rather than extrapolating beyond
-    verified data points."""
+    research.md#dlom. This function linearly interpolates between those
+    already-cited data points -- it does not re-derive Longstaff's
+    actual closed-form option-pricing formula, which this tool does not
+    attempt to reimplement. Clamps time and volatility to the cited
+    range (1-5 years, 20-30% volatility) rather than extrapolating
+    beyond verified data points."""
     dlom_at_vol_low = _interpolate_1d(
         time_to_liquidity_years, LONGSTAFF_GRID_YEARS, LONGSTAFF_DLOM_AT_VOL_LOW)
     dlom_at_vol_high = _interpolate_1d(
