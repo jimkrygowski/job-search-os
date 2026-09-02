@@ -164,6 +164,18 @@ def _validate_rate(rate, name):
         raise ValueError(f"{name} must be between 0 and 1, got {rate!r}")
 
 
+def _validate_range_order(low, high, low_name, high_name):
+    """Guards against an inverted low/high pair -- e.g. a caller passing
+    override_low=0.9, override_high=0.1 by mistake. low/high here name
+    the *rate* pair (optimistic vs. pessimistic), not the output value
+    range they produce, which is why this check can't just compare the
+    already-computed output dict's "low"/"high" keys after the fact."""
+    if low > high:
+        raise ValueError(
+            f"{low_name} ({low!r}) cannot exceed {high_name} ({high!r})"
+        )
+
+
 def compute_exit_probability_range(value, company_stage,
                                      override_low=None, override_high=None):
     """Applies the exit-probability haircut as a range. 'public' passes
@@ -182,6 +194,7 @@ def compute_exit_probability_range(value, company_stage,
     failure_rate_high = default_high if override_high is None else override_high
     _validate_rate(failure_rate_low, "override_low")
     _validate_rate(failure_rate_high, "override_high")
+    _validate_range_order(failure_rate_low, failure_rate_high, "override_low", "override_high")
     return {
         "low": value * (1 - failure_rate_high),
         "high": value * (1 - failure_rate_low),
@@ -281,6 +294,7 @@ def compute_dlom_range(value_low, value_high, company_stage,
         dlom_high = DLOM_HIGH if override_high is None else override_high
         _validate_rate(dlom_low, "override_low")
         _validate_rate(dlom_high, "override_high")
+        _validate_range_order(dlom_low, dlom_high, "override_low", "override_high")
         return {
             "low": value_low * (1 - dlom_high),
             "high": value_high * (1 - dlom_low),

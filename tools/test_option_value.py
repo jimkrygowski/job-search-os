@@ -177,6 +177,25 @@ class ComputeExitProbabilityRangeTest(unittest.TestCase):
                 1000.0, "private", override_high=-0.1,
             )
 
+    def test_inverted_override_rates_raises(self):
+        # override_low is meant to be the optimistic (lower) failure rate
+        # and override_high the pessimistic (higher) one -- swapping them
+        # would silently produce a value range where "low" > "high".
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_exit_probability_range(
+                1000.0, "private", override_low=0.9, override_high=0.1,
+            )
+        self.assertIn("override_low", str(ctx.exception))
+        self.assertIn("override_high", str(ctx.exception))
+
+    def test_override_rates_equal_is_allowed(self):
+        # a point estimate (low == high) is a legitimate, non-inverted case
+        result = option_value.compute_exit_probability_range(
+            1000.0, "private", override_low=0.5, override_high=0.5,
+        )
+        self.assertEqual(result["low"], 500.0)
+        self.assertEqual(result["high"], 500.0)
+
 
 class ComputeDynamicDlomTest(unittest.TestCase):
     def test_exact_grid_point_20_percent_vol_2_years(self):
@@ -273,6 +292,17 @@ class ComputeDlomRangeTest(unittest.TestCase):
             option_value.compute_dlom_range(
                 250.0, 400.0, "private", override_high=2.0,
             )
+
+    def test_inverted_override_rates_raises(self):
+        # dlom_low is meant to be the optimistic (lower) discount and
+        # dlom_high the pessimistic (higher) one -- swapping them would
+        # silently produce a value range where "low" > "high".
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_dlom_range(
+                250.0, 400.0, "private", override_low=0.9, override_high=0.1,
+            )
+        self.assertIn("override_low", str(ctx.exception))
+        self.assertIn("override_high", str(ctx.exception))
 
 
 class ComputeValuationTest(unittest.TestCase):
