@@ -175,8 +175,21 @@ not just outputs a number:
 4. **Time-value discount** — illiquid startup equity warrants a higher
    discount rate than public-market investments, given undiversifiable,
    concentrated risk and multi-year uncertain time-to-liquidity. Public
-   companies get no discount (liquid); private companies get the default
-   range cited in `research.md`, user-overridable.
+   companies get no discount (liquid). **For private companies, two
+   modes:** when the user supplies a time-to-liquidity estimate and a
+   volatility assumption, the discount is computed dynamically by
+   interpolating the Longstaff (1995) option-pricing grid `research.md`
+   already cites (concrete points at 1/2/5-year holding periods and
+   20%/30% volatility) — clamped to that cited range, never extrapolated
+   beyond it. When those inputs aren't supplied, it falls back to the
+   flat default range cited in `research.md`. Either way, user-overridable.
+   This dynamic mode was added 2026-09-02 after independently
+   re-verifying (fresh research, prompted by two external AI chats
+   proposing unsourced stage-differentiated tables) that no credible
+   source supports stage-tiered exit-probability or DLOM constants — but
+   that the already-cited Longstaff grid supported a real, grounded
+   dynamic calculation the original flat-band design was leaving on the
+   table.
 
 Also flagged, not modeled: exercise cost and tax timing (ISO/AMT exposure
 can trigger real cash tax liability on paper gains before any liquidity
