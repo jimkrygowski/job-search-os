@@ -28,20 +28,26 @@ to a working `state/career/profile.md` and `state/career/trajectory.md`.
    confirm Python is available, re-run the check before continuing.
 
 2. **Check existing state.**
-   - If `state/career/profile.md` and `state/career/trajectory.md` both already
-     exist, tell the user setup already looks complete and ask if they
-     want to revisit either one (hand off to `build-profile` or
-     `define-trajectory` directly) rather than re-running bootstrap.
+   - If `state/career/profile.md`, `state/career/trajectory.md`, and
+     `state/career/comp_target.md` all already exist, tell the user setup
+     already looks complete and ask if they want to revisit any of them
+     (hand off to `build-profile`, `define-trajectory`, or
+     `offer-negotiator` directly) rather than re-running bootstrap.
    - If `state/career/profile.md` doesn't exist, continue to step 3.
-   - If `state/career/profile.md` exists but `state/career/trajectory.md` doesn't,
-     skip to step 4.
+   - If `state/career/profile.md` exists but `state/career/trajectory.md`
+     doesn't, skip to step 4.
+   - If `state/career/profile.md` and `state/career/trajectory.md` both
+     exist but `state/career/comp_target.md` doesn't, skip to step 5.
 
 3. **Run `build-profile`.** Don't proceed to step 4 until
    `state/career/profile.md` is written.
 
-4. **Run `define-trajectory`** (initial mode, since `state/career/trajectory.md`
-   doesn't exist yet).
+4. **Run `define-trajectory`** (initial mode, since
+   `state/career/trajectory.md` doesn't exist yet).
 
-5. **Wrap up.** Tell the user what was created and point them at
+5. **Run `offer-negotiator`** (initial mode, since
+   `state/career/comp_target.md` doesn't exist yet).
+
+6. **Wrap up.** Tell the user what was created and point them at
    `score-opportunity` as the natural next step — pasting in a JD to
    evaluate.
