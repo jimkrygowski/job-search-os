@@ -1,31 +1,43 @@
 ---
 name: offer-negotiator
-description: Use when a user needs to define or revisit their compensation target — walk-away numbers grounded in a real BATNA, cash/equity/benefits priorities, equity risk tolerance, and deal-breakers — as part of first-time bootstrap or any time their situation changes (a competing offer, a job-search runway change, negotiation feedback). Builds or updates state/career/comp_target.md.
+description: Use when a user needs help with compensation — defining or revisiting their target (walk-away numbers, BATNA, target/ask range, comp priorities) as part of first-time bootstrap, or prepping talking points for an early comp conversation before any offer exists. Builds or updates state/career/comp_target.md, or produces first-contact negotiation talking points.
 ---
 
 # Offer Negotiator
 
 ## Purpose
 
-Produce or update `state/career/comp_target.md` — the standing record of
-this person's walk-away numbers, compensation-component priorities, and
-deal-breakers. Grounded in a real BATNA (Best Alternative to a Negotiated
-Agreement) rather than an aspirational figure, so later negotiation
-sessions and `career-coach`'s final accept/decline call have something
-concrete to reason against, not just a wish.
+Helps a user navigate compensation across their job search: building and
+revisiting their standing compensation target (Setup Mode), and prepping
+talking points for an early comp conversation before any offer exists
+(First-Contact Prep). Grounded throughout in a real BATNA and
+`research.md`'s evidence-graded negotiation tactics, never in invented
+numbers or generic scripts.
 
 ## Session Start
 
-1. Check whether `state/career/comp_target.md` exists.
+1. Determine which moment this session is:
+   - If `state/career/comp_target.md` doesn't exist, or the user
+     explicitly wants to define/revisit their walk-away numbers, target
+     range, comp priorities, or deal-breakers → **Setup Mode**. Continue
+     with step 2 below.
+   - If the user has an upcoming conversation where they expect to be
+     asked about comp expectations and doesn't have an offer in hand yet
+     (a recruiter screen, an early call) → **First-Contact Prep**. Skip
+     the rest of this section and go straight to that section below.
+   - If it's ambiguous which the user wants, ask directly rather than
+     guessing.
+2. (Setup Mode only) Check whether `state/career/comp_target.md` exists.
    - **Doesn't exist → initial mode.** Build it from scratch.
    - **Exists → revisit mode.** Summarize it back to the user, ask what's
      changed. Update in place — don't rebuild from scratch. Update the
      `Last reviewed:` field when done, regardless of how much changed.
-2. Read `state/career/trajectory.md` if it exists — its "Comp floor"
-   must-have, if one is stated there, is a starting anchor for the more
-   granular numbers this file captures, not a substitute for them.
+3. (Setup Mode only) Read `state/career/trajectory.md` if it exists — its
+   "Comp floor" must-have, if one is stated there, is a starting anchor
+   for the more granular numbers this file captures, not a substitute for
+   them.
 
-## Sections
+## Setup Mode — Sections
 
 - **Last reviewed:** `<date>`
 - **BATNA (walk-away alternative)** — the real, concrete alternative that
@@ -52,7 +64,7 @@ concrete to reason against, not just a wish.
   discussion outright (e.g. no severance, no acceleration on change of
   control, an equity-only offer), independent of the headline number.
 
-## Initial Mode — Conversation Guide
+## Setup Mode — Initial Conversation Guide
 
 Ask one at a time, in the order above.
 
@@ -82,7 +94,7 @@ and exit probability are priced in — how much of an offer is the user
 comfortable having riding on that uncertain outcome versus locked in as
 cash?
 
-## Revisit Mode — Conversation Guide
+## Setup Mode — Revisit Conversation Guide
 
 Ask what prompted the revisit — a new offer in hand, a changed financial
 situation, feedback from a negotiation that didn't land — or say what you
@@ -91,6 +103,54 @@ where something might have changed — don't re-litigate settled sections.
 BATNA is the section most likely to be stale — always confirm it's still
 accurate before relying on it later in the same session.
 
+## First-Contact Prep
+
+Tactical prep for an early comp conversation — a recruiter screen or
+first call — before any offer exists. No market-data research needed:
+this moment works entirely from the JD/conversation (role, level, geo)
+and, if it exists, `state/career/comp_target.md`.
+
+Read only `research.md`'s "Anchoring & First Offers", "BATNA", and
+"Deflecting Salary History / Expectation Questions" subsections (see the
+moment index near the top of that file) — skip the rest.
+
+### Session Start
+
+1. Identify the role/level/geo context — from the JD if one's been
+   scored (`python3 tools/tracker.py opportunity-path "<Company>" "<Role>"`
+   to resolve the folder and read `jd.md`), or from what the user
+   describes in conversation if no opportunity has been created yet.
+2. Read `state/career/comp_target.md` if it exists, for the target/ask
+   range and walk-away minimums — this moment should ground any number it
+   suggests in that file, not invent one.
+
+### What to Produce
+
+1. **How to answer "what are your comp expectations."** Per
+   `research.md`'s Anchoring & First Offers findings: if the user has a
+   real target range (from `comp_target.md` or credible public comp
+   data) and the counterpart likely doesn't have better information than
+   they do, coach them to give a specific, well-justified number first —
+   not a round one, and not silence. If they don't yet know the role's
+   real band, or the counterpart clearly has better market visibility
+   (e.g. an in-house recruiter), coach deflection instead.
+2. **Deflection language**, when deflection is the right play — per
+   `research.md`'s Deflecting Salary History / Expectation Questions
+   findings: redirect to role fit and the employer's budgeted range
+   before naming a number, without being evasive to the point of
+   damaging rapport.
+3. **When to give a range vs. decline to answer** — tie this explicitly
+   back to whether the user has real market information (from
+   `comp_target.md`) and how much leverage they'd give up by naming a
+   number too early, per the BATNA and Anchoring findings above.
+
+### Output
+
+Deliver the talking points directly in the chat response. If there's a
+resolved opportunity folder for this conversation and the user wants it
+saved, append it to that opportunity's `notes.md` under a
+`## First-Contact Prep (<date>)` heading.
+
 ## Guardrails
 
 - Never invent a BATNA, a competing offer, or a timeline the user hasn't
@@ -98,3 +158,6 @@ accurate before relying on it later in the same session.
   leverage can blow up a real negotiation.
 - Don't silently overwrite in revisit mode — confirm changes before
   writing.
+- Never assert a target/ask number in First-Contact Prep that isn't
+  grounded in `comp_target.md` or the user's own conversation — this
+  moment coaches how to use a number, it doesn't invent one.
