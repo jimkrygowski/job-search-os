@@ -393,6 +393,88 @@ class ComputeValuationTest(unittest.TestCase):
         self.assertEqual(result["cash_vs_equity_high"], 776.0)
 
 
+    def test_public_company_with_preference_stack_still_passes_through_unchanged(self):
+        # Regression test: public companies must ignore preference_stack/
+        # fully_diluted_shares entirely -- a real market price already
+        # exists, so there's no meaningful preference-stack question.
+        # face_value = 1000 * (5.00 - 2.00) = 3000.0, unhaircut.
+        result = option_value.compute_valuation({
+            "shares": 1000,
+            "strike_price": 2.00,
+            "quoted_price": 5.00,
+            "company_stage": "public",
+            "preference_stack": 2_000_000,
+            "fully_diluted_shares": 1_000_000,
+        })
+        self.assertEqual(result["final_range"]["low"], 3000.0)
+        self.assertEqual(result["final_range"]["high"], 3000.0)
+        self.assertFalse(result["preference_adjustment"]["applied"])
+        self.assertIsNone(result["preference_adjustment"]["adjusted_value"])
+        self.assertIsNone(result["preference_adjustment"]["guidance"])
+
+    def test_negative_shares_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "shares": -1000, "strike_price": 2.00, "quoted_price": 5.00,
+                "company_stage": "public",
+            })
+        self.assertIn("shares", str(ctx.exception))
+
+    def test_negative_strike_price_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "shares": 1000, "strike_price": -2.00, "quoted_price": 5.00,
+                "company_stage": "public",
+            })
+        self.assertIn("strike_price", str(ctx.exception))
+
+    def test_negative_quoted_price_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "shares": 1000, "strike_price": 2.00, "quoted_price": -5.00,
+                "company_stage": "public",
+            })
+        self.assertIn("quoted_price", str(ctx.exception))
+
+    def test_no_caveats_by_default(self):
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "private",
+        })
+        self.assertEqual(result["caveats"], [])
+
+    def test_generic_private_stage_with_applied_preference_adjustment_adds_caveat(self):
+        # Double-counting caveat should fire only for the generic
+        # "private" fallback tier combined with an applied preference
+        # adjustment -- not for specific stage tiers, and not when the
+        # preference adjustment wasn't applied.
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "private",
+            "preference_stack": 2_000_000, "fully_diluted_shares": 1_000_000,
+        })
+        self.assertEqual(len(result["caveats"]), 1)
+        self.assertIn("subordination", result["caveats"][0].lower())
+
+    def test_specific_stage_tier_with_applied_preference_adjustment_has_no_caveat(self):
+        # series_b is a specific stage tier, not the generic fallback --
+        # the double-counting caveat should NOT fire here even though the
+        # preference adjustment is applied.
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "series_b",
+            "preference_stack": 2_000_000, "fully_diluted_shares": 1_000_000,
+        })
+        self.assertEqual(result["caveats"], [])
+
+    def test_generic_private_stage_without_preference_adjustment_has_no_caveat(self):
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "private",
+        })
+        self.assertEqual(result["caveats"], [])
+
+
 class OptionValueCLITest(unittest.TestCase):
     def setUp(self):
         self.script = str(Path(__file__).parent / "option_value.py")
@@ -423,6 +505,17 @@ class OptionValueCLITest(unittest.TestCase):
         result = self.run_cli("compute", input_text='{"shares": 1000}')
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("strike_price", result.stderr)
+
+    def test_compute_command_non_numeric_input_fails_cleanly(self):
+        # Regression test: non-numeric JSON values (e.g. shares as a
+        # string) used to raise an uncaught TypeError deep in the
+        # arithmetic instead of a clean CLI error.
+        result = self.run_cli("compute", input_text=(
+            '{"shares": "1000", "strike_price": 2.00, "quoted_price": 5.00, '
+            '"company_stage": "public"}'
+        ))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("Traceback", result.stderr)
 
 
 if __name__ == "__main__":

@@ -135,9 +135,12 @@ SERIES_D_PLUS_FAILURE_RATE = SERIES_C_FAILURE_RATE
 # this generic tier's underlying data reflects return-to-preferred
 # outcomes, the same subordination effect compute_preference_adjustment
 # already models above. Applying both to the same valuation risks
-# discounting that effect twice. The seed/series_a/series_b/series_c/
-# series_d_plus tiers below are sourced from next-round-graduation data
-# instead and don't carry this same risk.
+# discounting that effect twice. Per research.md, this caution applies
+# regardless of which tier is used, but it carries this risk most
+# directly for this generic fallback tier; the seed/series_a/series_b/
+# series_c/series_d_plus tiers above are sourced from next-round-
+# graduation data instead -- a different mechanism, though not one
+# research.md declares entirely free of the same risk.
 GENERIC_PRIVATE_FAILURE_RATE_LOW = 0.60
 GENERIC_PRIVATE_FAILURE_RATE_HIGH = 0.75
 
@@ -222,6 +225,12 @@ def _interpolate_1d(x, xs, ys):
         if xs[i] <= x <= xs[i + 1]:
             weight = (x - xs[i]) / (xs[i + 1] - xs[i])
             return ys[i] + weight * (ys[i + 1] - ys[i])
+    # Defense-in-depth: unreachable with the current fixed 3-point,
+    # sorted Longstaff grid (the clamps above and the loop's bracket
+    # search together cover the full [xs[0], xs[-1]] range), but a
+    # future change to the grid (e.g. unsorted or empty xs) should fail
+    # loud-ish rather than silently returning None.
+    return ys[-1]
 
 
 def compute_dynamic_dlom(time_to_liquidity_years, volatility):
@@ -231,7 +240,14 @@ def compute_dynamic_dlom(time_to_liquidity_years, volatility):
     actual closed-form option-pricing formula, which this tool does not
     attempt to reimplement. Clamps time and volatility to the cited
     range (1-5 years, 20-30% volatility) rather than extrapolating
-    beyond verified data points."""
+    beyond verified data points.
+
+    Per research.md#dlom, the Longstaff grid values are explicit upper
+    bounds under an unrealistic perfect-timing assumption, not central
+    estimates -- actual discounts should be lower. Treat this function's
+    result as potentially conservative (i.e., possibly higher than a
+    more realistic discount would be), not a best-guess point estimate.
+    """
     dlom_at_vol_low = _interpolate_1d(
         time_to_liquidity_years, LONGSTAFF_GRID_YEARS, LONGSTAFF_DLOM_AT_VOL_LOW)
     dlom_at_vol_high = _interpolate_1d(
@@ -248,7 +264,13 @@ def compute_dlom_range(value_low, value_high, company_stage,
     Precedence: public companies pass through unchanged (liquid) ->
     an explicit override wins next -> a dynamic Longstaff-grid
     interpolation when time_to_liquidity_years and volatility are both
-    given -> the flat default band from research.md#dlom otherwise."""
+    given -> the flat default band from research.md#dlom otherwise.
+
+    A *partial* override (only override_low or only override_high
+    supplied) still wins this precedence entirely for this call: the
+    missing side falls back to the flat default (DLOM_LOW/DLOM_HIGH),
+    and time_to_liquidity_years/volatility are silently ignored even if
+    also supplied -- they are never blended with a partial override."""
     _validate_stage(company_stage)
     if company_stage == "public":
         return {"low": value_low, "high": value_high,
@@ -296,6 +318,19 @@ def compute_valuation(inputs):
     volatility, dlom_override ({'low', 'high'}), cash_alternative (all
     optional). See compute_dlom_range for how time_to_liquidity_years/
     volatility vs. dlom_override vs. neither are prioritized.
+
+    The returned dict always includes a 'caveats' key (a list of plain-
+    language warning strings, empty by default) so callers reading only
+    this JSON -- not this module's source comments -- still see any
+    known risk in how the figures combine. Currently the only condition
+    that populates it is the generic 'private' stage combined with an
+    applied preference-stack adjustment (see the double-counting caution
+    above GENERIC_PRIVATE_FAILURE_RATE_LOW/HIGH).
+
+    'public' company_stage passes face_value through unchanged at every
+    stage -- including skipping the preference-stack computation
+    entirely -- since a real market price already exists and there's no
+    meaningful preference-stack question for freely-traded common stock.
     """
     missing = [k for k in REQUIRED_KEYS if k not in inputs]
     if missing:
@@ -306,15 +341,48 @@ def compute_valuation(inputs):
     quoted_price = inputs["quoted_price"]
     company_stage = inputs["company_stage"]
 
+    if shares < 0:
+        raise ValueError(f"shares cannot be negative, got {shares!r}")
+    if strike_price < 0:
+        raise ValueError(f"strike_price cannot be negative, got {strike_price!r}")
+    if quoted_price < 0:
+        raise ValueError(f"quoted_price cannot be negative, got {quoted_price!r}")
+
     face_value = compute_face_value(shares, strike_price, quoted_price)
 
-    preference = compute_preference_adjustment(
-        shares, strike_price, quoted_price,
-        preference_stack=inputs.get("preference_stack"),
-        fully_diluted_shares=inputs.get("fully_diluted_shares"),
+    if company_stage == "public":
+        # A real market price already exists -- there's no meaningful
+        # preference-stack question for common stock that trades freely.
+        # Skip the real computation entirely rather than letting a
+        # supplied preference_stack/fully_diluted_shares silently apply
+        # a nonsensical haircut to a public company.
+        preference = {
+            "applied": False,
+            "adjusted_value": None,
+            "common_price": None,
+            "guidance": None,
+        }
+    else:
+        preference = compute_preference_adjustment(
+            shares, strike_price, quoted_price,
+            preference_stack=inputs.get("preference_stack"),
+            fully_diluted_shares=inputs.get("fully_diluted_shares"),
+        )
+
+    base_for_exit = face_value if company_stage == "public" else (
+        preference["adjusted_value"] if preference["applied"] else face_value
     )
 
-    base_for_exit = preference["adjusted_value"] if preference["applied"] else face_value
+    caveats = []
+    if company_stage == "private" and preference["applied"]:
+        caveats.append(
+            "The generic 'private' exit-probability rate is sourced from "
+            "return-to-preferred data, which may already partially "
+            "reflect the same subordination effect the preference-stack "
+            "adjustment above has applied -- treat the combination as a "
+            "rough, potentially conservative-biased estimate, not a "
+            "precise figure."
+        )
 
     exit_override = inputs.get("exit_probability_override") or {}
     exit_range = compute_exit_probability_range(
@@ -337,6 +405,7 @@ def compute_valuation(inputs):
         "preference_adjustment": preference,
         "exit_probability_range": exit_range,
         "final_range": final_range,
+        "caveats": caveats,
     }
 
     cash_alternative = inputs.get("cash_alternative")
@@ -356,7 +425,7 @@ def cmd_compute(args):
         sys.exit(1)
     try:
         result = compute_valuation(inputs)
-    except (KeyError, ValueError) as e:
+    except (KeyError, ValueError, TypeError) as e:
         print(str(e), file=sys.stderr)
         sys.exit(1)
     print(json.dumps(result, indent=2))
