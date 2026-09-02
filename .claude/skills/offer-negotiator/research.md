@@ -450,92 +450,135 @@ figure was found for that specific claim.
 
 **Source:** Correlation Ventures proprietary deal database, reported via
 Booth (2013) and Levine (2014); cross-referenced against CB Insights'
-startup post-mortem database.
+startup post-mortem database and CB Insights' "The Venture Capital
+Funnel" (2018); Mattermark/Rowley (2016); Carta (Peter Walker, 2026, two
+posts).
 [Full citation →](research-source.md#exit-rate-base-rates)
 
-**Evidence quality: Low-Moderate, and this is the weakest-sourced
-subsection in this document — read the limitations below before treating
-any number here as a default.** These are the best publicly available
-proxies found, not a direct answer to the question asked.
+**Evidence quality: Moderate for stage-to-stage graduation rates (real,
+named, dated primary sources, cross-validated across independent
+datasets); Low-Moderate for the aggregate all-stages figure (methodology
+disagreements, dated, not stage-specific).** A 2026-09-02 research pass
+(prompted by a user push-back that treating a Series A and a Series D
+company identically was indefensible, and after independently rejecting
+several fabricated or unattributed stage tables from other sources — see
+"Rejected sources" below) found real per-stage graduation-rate data that
+the original research pass missed.
 
-- Booth's write-up of the Correlation Ventures dataset (7,976 financings,
-  2003–2012): 39% of deals went out of business (zero return), 29% exited
-  for less than invested capital, 32% returned a positive multiple (>1x).
-- Levine's write-up of a different cut of Correlation Ventures data
-  (21,640 financings, 2004–2013, at the individual-financing level rather
-  than the company level): 65% of financings failed to return 1x capital,
-  only 10% returned 5x or more, only 4% returned 10x or more.
-- CB Insights' post-mortem tracking: roughly "3 out of 4" (75%) of
-  venture-backed startups fail — a company-shutdown statistic drawn from
-  CB Insights' own curated database of startups whose failure became
-  public and documented, not an audited census of all VC-backed
-  companies.
-- These figures are not reconcilable into one clean number: the 39%/65%/
-  75% figures each measure something different (company disposition vs.
-  financing-level return multiple vs. self-selected shutdown tracking)
-  over different, overlapping windows, using an undisclosed, proprietary
-  methodology (Correlation Ventures is a VC firm, not an independent
-  academic or regulatory data source, and its full dataset/methodology
-  has not been independently peer-reviewed).
+- **CB Insights, "The Venture Capital Funnel"** (cbinsights.com/research/
+  venture-capital-funnel-2/, published Sept 6, 2018; cohort of 1,119 US
+  tech companies that raised seed funding 2008–2010, tracked through Aug
+  31, 2018): 48% of companies graduated Seed→Series A (52% did not);
+  63% of Series A companies graduated to Series B (37% did not);
+  cumulative Seed→4th round (~Series C) was 15%. No percentage given past
+  the 4th round — only "declining percentages at each subsequent stage,"
+  with no number attached.
+- **Mattermark/Rowley (2016)**, an independent dataset (2,011 US
+  software companies that raised seed 2009–2012, using Mattermark/
+  Crunchbase/AngelList data, tracking each company's terminal round
+  raised): 31% graduated Seed→Series A (69% did not) — a real,
+  independent data point, lower than CB Insights' 48%, consistent with
+  this document's broader finding that outcomes vary substantially by
+  cohort/vintage rather than contradicting it. Critically, this source
+  states directly: *"the number of startups that raise a Series B halves
+  and continues to halve in a stepwise function through Series F and
+  beyond."* This is a real, named, dated, explicitly stated pattern — not
+  a table this document is inferring.
+- **Independent cross-validation of the "halving" pattern:** CB Insights'
+  own numbers imply the same thing without any input from Mattermark.
+  Cumulative Seed→B (derived: 0.48 × 0.63 ≈ 30.2%) versus CB Insights'
+  own stated cumulative Seed→4th-round (15%) gives an implied Series
+  B→C graduation rate of 15/30.2 ≈ 50% — matching Mattermark's stated
+  halving pattern almost exactly, from an entirely different dataset,
+  methodology, and research organization. Two independent sources
+  converging on the same ~50% figure for the same transition is real
+  evidence, not a coincidence this document is stretching.
+- **Carta (Peter Walker, Head of Insights), "Series A to Series B Is the
+  Hardest Startup Leap"** (Feb 25, 2026; cohort of 10,562 US startups
+  that raised a Series A 2018–2025): graduation rate to Series B swings
+  hard by vintage year — ~40% for 2020-vintage companies (2-year
+  window), ~10–12% for 2022-vintage, ~20% for 2024-vintage improving.
+  States "about half" of Series As graduate to B "in a strong cohort."
+  This is a *shorter observation window* (1–2 years) than CB Insights'
+  full-history tracking, so it likely overstates ultimate failure
+  somewhat (some companies graduate later than the window captures) —
+  but it's real, current (2026), and shows genuine downside risk in a
+  weak macro environment that a single historical average would hide.
+- **Carta (Peter Walker), "What Is a Good Seed to Series A Graduation
+  Rate"** (Mar 18, 2026): benchmarks graduation-to-Series-A by time
+  elapsed since seed — Year 1: 5%/10%/20% (low/med/high); Year 2:
+  15%/25%/35%; Year 3: 20%/35%/45% — explicitly caveated that "the macro
+  matters" as much as the stage itself.
+- **Rejected sources during this pass** (documented so this gap in the
+  record doesn't get re-litigated): a synthetic 6-tier exit-rate/DLOM
+  table from an external AI chat, with no real citations and numbers too
+  uniform across 18 data points to be genuine; a second AI chat's
+  "correction" that included a fabricated hybrid citation ("CB Insights
+  Startup Genome / Cohort Study" — these are two real, unrelated
+  organizations spliced together) and a misdated Correlation Ventures
+  citation; a fractional-CFO marketing blog (zabella.net) whose
+  stage-by-stage table had zero source attribution despite name-dropping
+  real firms nearby; an internet-circulating "80% Series C failure rate"
+  traced to a personal Medium blog styled as a journal, treated
+  skeptically even by threads discussing it. None of these are used
+  anywhere in this document.
+- Booth's and Levine's original Correlation Ventures figures (all-stage
+  aggregate, not stage-specific): 39% of deals went out of business
+  (Booth), 65% of financings failed to return 1x capital (Levine), CB
+  Insights' separate "3 out of 4" (75%) post-mortem figure. These three
+  don't reconcile into one number (different methodologies, different
+  windows) and remain useful only as a generic fallback for when a
+  specific funding stage isn't known — see "How to use correctly."
 
 **Known limitations:**
-- **None of these sources break results out by financing stage**
-  (early-stage private vs. late-stage private vs. public). No credible
-  source doing that specific stage-by-stage breakdown was found — several
-  vendor/blog aggregator pages (not cited here) present stage-by-stage
-  "probability of exit" tables, but their methodology and underlying data
-  source could not be verified as credible, so they are omitted rather
-  than cited.
+- **Still no data past Series C/4th round with a real percentage
+  attached** — Mattermark's "continues to halve... through Series F and
+  beyond" is a real, explicitly stated pattern, not a fabricated
+  extrapolation, but it's a qualitative pattern applied identically
+  round over round, not independently re-measured at each later stage.
+- **Time-windowed vs. eventual-outcome methodologies don't mix
+  cleanly.** CB Insights and Mattermark measure eventual/terminal
+  outcomes (tracked for years); Carta's vintage-cohort figures are
+  measured within a fixed 1–2 year window. This document keeps them
+  separate rather than blending them into one synthetic number.
 - **None of these sources directly measure whether *common* stockholders
-  received a payout**, which is the thing that actually matters for an
-  option-value estimate. "Company went out of business" (Correlation's
-  39%, CB Insights' 75%) is a reasonable proxy for a zero-payout outcome,
-  but a company can also have a real, positive-dollar acquisition and
-  still leave common stockholders with nothing if the sale price doesn't
-  clear the liquidation preference stack (see the next subsection) — none
-  of these datasets report that distinction, so "the company didn't fail"
-  is not the same claim as "common stock got paid."
-- The underlying data is dated (Correlation's cuts run through 2013;
-  CB Insights' post-mortem sample is more current but self-selected)
-  relative to the 2021–2023 VC funding boom-and-correction, which several
-  practitioner sources argue shifted base rates without, as far as this
-  research found, a comparably rigorous re-study.
-- Both Correlation Ventures citations are secondary (partner blog posts
-  summarizing a VC firm's proprietary numbers), not the underlying
-  dataset or a primary published study.
+  received a payout** — "didn't graduate to the next round" is not the
+  same claim as "common stock got zero." CB Insights states 67% of its
+  full cohort ended up either dead *or* self-sustaining-but-non-venture-
+  scale — a non-graduating company isn't necessarily a worthless one for
+  common holders, and a graduating one isn't guaranteed to clear the
+  preference stack either (see the next subsection). This document uses
+  next-round graduation failure as a proxy for stage risk, not a direct
+  measurement of common-stockholder outcomes.
+- Booth's and Levine's aggregate Correlation Ventures figures remain
+  dated (through 2013) and are secondary (partner blog posts, not the
+  underlying dataset).
 
-**How to use correctly:** Be explicit with the user, and with whoever
-implements `option_value.py`'s exit-probability-haircut defaults (spec
-§7, step 3), that this is the single weakest-evidence subsection in this
-file. If a flat default is needed, something in the neighborhood of the
-convergence across sources — roughly 60–75% of VC-backed positions
-returning nothing or less than invested capital to preferred — is a
-defensible order-of-magnitude anchor. **Caution — double-counting risk:**
-that 60–75% figure is already a *preferred*-level outcome, i.e. it
-already partially reflects preference-stack subordination baked into the
-underlying fund-return data (a position "returning nothing or less than
-invested capital to preferred" is itself downstream of the preference
-stack). Spec §7 applies this as an independent exit-probability haircut
-(step 3) *in addition to* a separate preference-stack haircut (step 2) —
-feeding a preferred-level failure rate into the exit-probability step
-while also subordinating common separately risks double-counting the same
-subordination effect twice. Bucket 2's design needs to account for this
-overlap explicitly rather than stacking both haircuts naively. Beyond
-that risk, this figure should be presented to the user as a rough,
-unvalidated heuristic, not a precise probability, and it should not be
-silently differentiated by stage (early private / late private / public)
-since no source here supports doing so credibly. A future implementer who
-wants real stage-differentiated numbers should treat that as open
-research, not something already established by this document.
+**How to use correctly:** For `option_value.py`'s exit-probability-
+haircut defaults (spec §7, step 3), use a specific stage tier when the
+user's company stage is known — real, sourced, per-stage figures now
+exist:
 
-**Conflict with the design spec (needs resolution in Bucket 2):** no
-source found here supports a stage-differentiated exit-rate default,
-which conflicts with spec §7 step 3's call for "fixed, disclosed default
-rates by company stage (public / late-stage private / early-stage
-private)." That tension needs to be resolved explicitly when Bucket 2
-(`option_value.py`) is designed: either a credible stage-differentiated
-source needs to be found, or the spec's step 3 needs to be revisited to
-use a flat (or explicitly-unvalidated, stage-blind) default instead.
+| Stage tier | Failure-rate range | Source |
+|---|---|---|
+| Seed (→ Series A) | 52%–69% | CB Insights (52%) to Mattermark (69%) — two independent cohorts |
+| Series A (→ Series B) | 37%–85% | CB Insights eventual outcome (37%) to Carta's worst observed vintage, short window (~85%, conservatively rounded down from the raw ~88-90%) |
+| Series B (→ Series C) | ~50% | Mattermark's stated halving pattern, cross-validated via CB Insights' own cumulative arithmetic |
+| Series C (→ Series D) | ~50% | Same Mattermark pattern, explicitly stated to continue |
+| Series D+ (→ later) | ~50% | Same Mattermark pattern, explicitly stated to continue "through Series F and beyond" |
+
+When the specific stage isn't known, fall back to the generic all-stage
+aggregate (roughly 60–75%, per Booth/Levine/CB Insights above) rather
+than guessing a stage. **Caution — double-counting risk, regardless of
+which tier is used:** several of the underlying figures (particularly
+the generic aggregate) are downstream of fund-return data that already
+partially reflects preference-stack subordination. Spec §7 applies the
+exit-probability haircut (step 3) *in addition to* a separate
+preference-stack haircut (step 2) — feeding a preferred-level or
+company-disposition failure rate into the exit-probability step while
+also subordinating common separately risks double-counting the same
+effect. `option_value.py`'s design needs to account for this overlap
+explicitly rather than stacking both haircuts naively.
 
 ---
 

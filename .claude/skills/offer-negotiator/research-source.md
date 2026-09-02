@@ -140,6 +140,30 @@ figure (0.4% of deals return 50x+). Cross-referenced against CB Insights,
 post-mortems tracked; 2024 update analyzed 431 VC-backed companies that
 shut down since 2023), cbinsights.com.
 
+**Stage-differentiated sources, added 2026-09-02:**
+
+CB Insights, "The Venture Capital Funnel," cbinsights.com/research/
+venture-capital-funnel-2/, published September 6, 2018 (incorporating
+earlier March 2017 and December 2015 versions of the same analysis).
+Cohort: 1,119 US tech companies that raised seed funding 2008–2010,
+tracked through August 31, 2018.
+
+Rowley, J.D. (2016, September 28). "The Startup Funding Graduation Rate
+Is Surprisingly Low." *Mattermark*, mattermark.com/startup-graduation-
+rate-surprisingly-low/. Cohort: 2,011 US-based software companies that
+raised seed rounds January 1, 2009–December 31, 2012, using Mattermark/
+Crunchbase/AngelList data, tracking each company's terminal (highest)
+round raised.
+
+Walker, P. (2026, February 25). "Series A to Series B Is the Hardest
+Startup Leap." *Carta*, carta.com/data/linkedin-series-a-to-series-b-
+graduation-hard/. Peter Walker is Carta's Head of Insights. Cohort:
+10,562 US startups that raised a Series A 2018–2025.
+
+Walker, P. (2026, March 18). "What Is a Good Seed to Series A Graduation
+Rate." *Carta*, carta.com/data/linkedin-seed-to-series-a-graduation-
+rates/.
+
 ---
 
 <a id="liquidation-preferences"></a>

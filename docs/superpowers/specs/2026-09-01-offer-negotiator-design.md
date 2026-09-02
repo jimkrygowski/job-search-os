@@ -163,15 +163,24 @@ not just outputs a number:
    raised across all rounds, preference terms, fully-diluted share count)
    so the user can go get the real figure.
 3. **Exit-probability haircut** — most venture-backed companies never
-   return value to common stockholders. **Revised to two tiers, not
-   three:** public companies get no exit-probability haircut (a real
-   market price exists, the question is moot); private companies get one
-   flat, disclosed default rate (cited in `research.md`), user-overridable
-   per call. `research.md` found no source that credibly differentiates
-   early-stage from late-stage private — inventing that split would
-   assert a number no source supports, so it's collapsed to public vs.
-   private rather than the three-way stage split originally proposed
-   here.
+   return value to common stockholders. **Revised again, 2026-09-02, to
+   real stage tiers backed by actual sourced data:** the initial design
+   called for three stage tiers; Bucket 1's research found no source
+   supporting that split and it was collapsed to public/private only;
+   further digging (prompted by the user correctly objecting that
+   treating a Series A and a Series D company identically was
+   indefensible) found real, named, dated, cross-validated per-stage
+   graduation-rate data — CB Insights' "The Venture Capital Funnel"
+   (2018), Mattermark/Rowley (2016), and two 2026 Carta posts (Peter
+   Walker). The tool now supports five real private-stage tiers (seed,
+   series_a, series_b, series_c, series_d_plus — see `research.md`'s
+   "How to use correctly" table for the exact rates and sourcing),
+   `public` (no haircut, a real market price exists), and a generic
+   `private` fallback (the old flat aggregate rate) for when the
+   specific stage genuinely isn't known. All tiers remain
+   user-overridable per call. Series B/C/D+ share the same ~50% rate,
+   grounded in Mattermark's explicitly stated "halves and continues to
+   halve" pattern — not a fabricated extension, a directly cited one.
 4. **Time-value discount** — illiquid startup equity warrants a higher
    discount rate than public-market investments, given undiversifiable,
    concentrated risk and multi-year uncertain time-to-liquidity. Public
