@@ -28,6 +28,7 @@ class CheckBootstrapStateTest(unittest.TestCase):
         result = self.run_hook()
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
+        self.assertEqual(payload["hookSpecificOutput"]["hookEventName"], "SessionStart")
         context = payload["hookSpecificOutput"]["additionalContext"]
         self.assertIn("bootstrap", context)
         self.assertIn("new user", context)
@@ -38,6 +39,7 @@ class CheckBootstrapStateTest(unittest.TestCase):
         (career_dir / "trajectory.md").write_text("x")
         result = self.run_hook()
         payload = json.loads(result.stdout)
+        self.assertEqual(payload["hookSpecificOutput"]["hookEventName"], "SessionStart")
         self.assertIn("new user", payload["hookSpecificOutput"]["additionalContext"])
 
     def test_profile_only_emits_nothing(self):
@@ -56,6 +58,7 @@ class CheckBootstrapStateTest(unittest.TestCase):
         result = self.run_hook()
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
+        self.assertEqual(payload["hookSpecificOutput"]["hookEventName"], "SessionStart")
         context = payload["hookSpecificOutput"]["additionalContext"]
         self.assertIn("comp_target.md", context)
         self.assertIn("offer-negotiator", context)

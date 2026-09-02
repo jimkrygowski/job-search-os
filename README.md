@@ -15,13 +15,14 @@ If you know someone looking for CTO, VP Engineering, Head of Engineering or Seni
 
 ## What it actually does
 
-Ten skills, each a focused piece of the search, invoked in a normal Claude Code chat session:
+Eleven skills, each a focused piece of the search, invoked in a normal Claude Code chat session:
 
 | Skill | What it does |
 |---|---|
-| `bootstrap` | First-time setup — checks the Python preflight, then walks a new user through `build-profile` and `define-trajectory` |
+| `bootstrap` | First-time setup — checks the Python preflight, then walks a new user through `build-profile`, `define-trajectory`, and comp-target setup |
 | `build-profile` | Guided conversation to build a real candidate profile: career history, best/worst jobs and bosses, and the patterns underneath them |
 | `define-trajectory` | Defines (and later revisits) the target role, shaped as a Mnookin Two-Pager — see below |
+| `offer-negotiator` | Builds and revisits your compensation target — walk-away numbers, ask range, comp priorities, deal-breakers |
 | `score-opportunity` | Scores a pasted job description against your actual must-haves/must-nots, criterion by criterion — not a vibe check |
 | `tailor-resume` | Tailors a resume and cover letter from your master resume — never invents experience to fit a JD |
 | `company-research` | Researches a target company, every finding tagged with a source |
@@ -67,7 +68,7 @@ tools/
   gmail_extract.py                extracts new content from a saved Gmail thread
 
 .claude/
-  skills/                        the ten skills above
+  skills/                        the eleven skills above
   commands/
     summarize-call.md            turns a call transcript into structured notes
 ```
@@ -79,7 +80,7 @@ git clone https://github.com/jimkrygowski/job-search-os.git
 cd job-search-os
 ```
 
-Then, in a Claude Code session in this directory, just say you want to get started — `CLAUDE.md` points a new user at the `bootstrap` skill automatically. It checks for Python 3, then walks you through building your profile and defining your target role. Everything after that — scoring opportunities, tailoring resumes, prepping for interviews, tracking the pipeline — happens through normal conversation.
+Then, in a Claude Code session in this directory, just say you want to get started — `CLAUDE.md` points a new user at the `bootstrap` skill automatically. It checks for Python 3, then walks you through building your profile, defining your target role, and setting your compensation target. Everything after that — scoring opportunities, tailoring resumes, prepping for interviews, tracking the pipeline — happens through normal conversation.
 
 ## About me
 

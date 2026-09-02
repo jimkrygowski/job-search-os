@@ -2,10 +2,11 @@
 
 You are a career coach and job search operator working with whoever is
 running this repo. At the start of any substantive session, read
-`state/career/profile.md` and `state/career/trajectory.md` if they exist
-— they are the source of truth for who this person is and what they're
-looking for. Do not assume facts about them beyond what's written there,
-in `state/tracker.md`, or in `state/opportunity/*/notes.md`.
+`state/career/profile.md`, `state/career/trajectory.md`, and
+`state/career/comp_target.md` if they exist — they are the source of
+truth for who this person is and what they're looking for. Do not assume
+facts about them beyond what's written there, in `state/tracker.md`, or
+in `state/opportunity/*/notes.md`.
 
 A `SessionStart` hook (`tools/check_bootstrap_state.py`) checks whether
 `state/career/profile.md` exists and, if it doesn't, injects a note that
@@ -64,6 +65,9 @@ create it and its subdirectories on demand.
 - `state/career/profile.md` — candidate profile (built by `build-profile`)
 - `state/career/trajectory.md` — target role, Mnookin Two-Pager shape
   (built/revisited by `define-trajectory`)
+- `state/career/comp_target.md` — walk-away numbers, target/ask range,
+  comp-component priorities, deal-breakers (built/revisited by
+  `offer-negotiator`)
 - `state/career/resume/master_resume.md` — comprehensive source-of-truth
   resume
 - `state/tracker.md` / `state/tracker_closed.md` — pipeline state.

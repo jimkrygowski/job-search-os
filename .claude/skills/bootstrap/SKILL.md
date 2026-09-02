@@ -1,6 +1,6 @@
 ---
 name: bootstrap
-description: Use when a new user is setting up this system for the first time, or when state/career/profile.md and state/career/trajectory.md don't exist yet. Runs a Python preflight check, then build-profile, then define-trajectory in sequence.
+description: Use when a new user is setting up this system for the first time, or when state/career/profile.md, state/career/trajectory.md, or state/career/comp_target.md don't exist yet. Runs a Python preflight check, then build-profile, then define-trajectory, then offer-negotiator's setup mode, in sequence.
 ---
 
 # Bootstrap
@@ -8,7 +8,8 @@ description: Use when a new user is setting up this system for the first time, o
 ## Purpose
 
 First-time setup orchestrator. Gets a new user from a fresh `git clone`
-to a working `state/career/profile.md` and `state/career/trajectory.md`.
+to a working `state/career/profile.md`, `state/career/trajectory.md`, and
+`state/career/comp_target.md`.
 
 ## Steps
 

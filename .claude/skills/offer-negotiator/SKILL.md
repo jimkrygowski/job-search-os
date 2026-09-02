@@ -33,6 +33,13 @@ concrete to reason against, not just a wish.
   numbers, if any), a firm timeline on a current job, or an honest
   estimate of how long they can search without an offer. Not an
   aspirational number. See `research.md`.
+- **Target / ask range** — the specific number or range to actually lead
+  with in a first-contact or counter conversation, distinct from the
+  walk-away floor below. Per `research.md`'s Anchoring & First Offers
+  research, a specific, well-justified number anchors more strongly than
+  a round one or waiting to be anchored first — this is what later
+  negotiation-moment sessions pull from when giving a number. See
+  `research.md`.
 - **Walk-away minimums** — base-salary floor and total-comp floor, below
   which the user declines regardless of how the rest of the package looks.
 - **Cash / equity / benefits priority** — how they'd trade between the
@@ -56,6 +63,12 @@ shapes what their walk-away number should honestly be. If they have no
 current offer and no real timeline pressure, say so plainly rather than
 inventing one — "I need a job in 3 months" only counts as BATNA if it's
 true.
+
+For the target/ask range, keep it clearly distinct from the walk-away
+minimum below — the target is the ambitious, well-justified number to
+lead with, not the number they'd merely accept. Per `research.md`, a
+specific figure lands harder than a round one, so push for precision
+over a vague band.
 
 For walk-away minimums, check consistency against
 `state/career/trajectory.md`'s comp floor if one exists. Note explicitly
