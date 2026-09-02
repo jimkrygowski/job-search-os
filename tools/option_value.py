@@ -153,6 +153,52 @@ STAGE_DEFAULT_FAILURE_RATES = {
     "private": (GENERIC_PRIVATE_FAILURE_RATE_LOW, GENERIC_PRIVATE_FAILURE_RATE_HIGH),
 }
 
+# Confidence caveats for compute_valuation's "caveats" output, keyed by
+# company_stage. seed/series_a are cross-validated against two
+# independent sources (research.md#exit-rate-base-rates) and
+# deliberately have no entry here -- these three ARE the tool's best
+# available figures, but each rests on a single source (or, for
+# series_d_plus, no source at all for that specific transition), unlike
+# seed/series_a's two-source cross-validation. A point estimate here
+# isn't a sign the uncertainty resolved; it's a sign there's only one
+# study to point to.
+STAGE_CONFIDENCE_CAVEATS = {
+    "series_b": (
+        "The series_b exit-probability rate is derived from a single "
+        "source (Carta's \"Class of 2018\" cohort cascade), unlike the "
+        "seed/series_a tiers, which are cross-validated against two "
+        "independent datasets -- treat this as a reasonable "
+        "single-study estimate, not a cross-confirmed one."
+    ),
+    "series_c": (
+        "The series_c exit-probability rate is derived from the same "
+        "single source as series_b (Carta's \"Class of 2018\" cohort "
+        "cascade) -- treat this as a reasonable single-study estimate, "
+        "not a cross-confirmed one."
+    ),
+    "series_d_plus": (
+        "No transition data exists past this cohort's Series D+ "
+        "bucket -- the series_d_plus exit-probability rate is held "
+        "flat at the series_c rate as the best available anchor, not "
+        "an independently measured figure for this specific "
+        "transition."
+    ),
+}
+
+# Source: research.md#dlom -- Longstaff's grid values are explicit upper
+# bounds under an unrealistic perfect-timing assumption, not central
+# estimates (see compute_dynamic_dlom's docstring). Surfaced here too so
+# a caller reading only compute_valuation's JSON output -- not this
+# module's docstrings -- still sees it.
+DYNAMIC_DLOM_UPPER_BOUND_CAVEAT = (
+    "The time-value/illiquidity discount used here was computed "
+    "dynamically by interpolating the Longstaff (1995) grid, which "
+    "research.md documents as explicit upper bounds under an "
+    "unrealistic perfect-timing assumption -- the real discount is "
+    "likely lower than this figure, so this result may understate the "
+    "equity's value."
+)
+
 
 def _validate_stage(company_stage):
     if company_stage not in VALID_STAGES:
@@ -336,10 +382,22 @@ def compute_valuation(inputs):
     The returned dict always includes a 'caveats' key (a list of plain-
     language warning strings, empty by default) so callers reading only
     this JSON -- not this module's source comments -- still see any
-    known risk in how the figures combine. Currently the only condition
-    that populates it is the generic 'private' stage combined with an
-    applied preference-stack adjustment (see the double-counting caution
-    above GENERIC_PRIVATE_FAILURE_RATE_LOW/HIGH).
+    known risk in how the figures combine or confidence gaps in what's
+    being used. Three independent conditions can each add an entry:
+    (1) the generic 'private' stage combined with an applied
+    preference-stack adjustment (double-counting risk, see the caution
+    above GENERIC_PRIVATE_FAILURE_RATE_LOW/HIGH); (2) using a specific
+    stage tier's own default rate when that tier is single-source-
+    derived rather than cross-validated (series_b/series_c/
+    series_d_plus -- see STAGE_CONFIDENCE_CAVEATS; seed/series_a are
+    cross-validated and never add this one; supplying an explicit
+    exit_probability_override for the tier suppresses it, since the
+    caveat is about the tool's own default, not the caller's number);
+    (3) using the dynamic Longstaff-interpolation DLOM mode, whose grid
+    values are explicit upper bounds, not central estimates (see
+    DYNAMIC_DLOM_UPPER_BOUND_CAVEAT). These can combine -- e.g.
+    company_stage='series_b' with dynamic DLOM inputs supplied adds
+    both (2) and (3).
 
     'public' company_stage passes face_value through unchanged at every
     stage -- including skipping the preference-stack computation
@@ -399,6 +457,11 @@ def compute_valuation(inputs):
         )
 
     exit_override = inputs.get("exit_probability_override") or {}
+    if not exit_override and company_stage in STAGE_CONFIDENCE_CAVEATS:
+        # Only when the tool's own default is actually in use -- an
+        # explicit override replaces the figure this caveat is about.
+        caveats.append(STAGE_CONFIDENCE_CAVEATS[company_stage])
+
     exit_range = compute_exit_probability_range(
         base_for_exit, company_stage,
         override_low=exit_override.get("low"),
@@ -413,6 +476,9 @@ def compute_valuation(inputs):
         override_low=dlom_override.get("low"),
         override_high=dlom_override.get("high"),
     )
+
+    if final_range.get("method") == "dynamic-longstaff-interpolation":
+        caveats.append(DYNAMIC_DLOM_UPPER_BOUND_CAVEAT)
 
     result = {
         "face_value": face_value,

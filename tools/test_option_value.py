@@ -486,16 +486,18 @@ class ComputeValuationTest(unittest.TestCase):
         self.assertEqual(len(result["caveats"]), 1)
         self.assertIn("subordination", result["caveats"][0].lower())
 
-    def test_specific_stage_tier_with_applied_preference_adjustment_has_no_caveat(self):
+    def test_specific_stage_tier_with_applied_preference_adjustment_has_no_double_counting_caveat(self):
         # series_b is a specific stage tier, not the generic fallback --
         # the double-counting caveat should NOT fire here even though the
-        # preference adjustment is applied.
+        # preference adjustment is applied. It DOES get the single-source
+        # caveat (see test_series_b_stage_adds_single_source_caveat) --
+        # this test only asserts the double-counting one is absent.
         result = option_value.compute_valuation({
             "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
             "company_stage": "series_b",
             "preference_stack": 2_000_000, "fully_diluted_shares": 1_000_000,
         })
-        self.assertEqual(result["caveats"], [])
+        self.assertFalse(any("subordination" in c.lower() for c in result["caveats"]))
 
     def test_generic_private_stage_without_preference_adjustment_has_no_caveat(self):
         result = option_value.compute_valuation({
@@ -503,6 +505,76 @@ class ComputeValuationTest(unittest.TestCase):
             "company_stage": "private",
         })
         self.assertEqual(result["caveats"], [])
+
+    def test_series_b_stage_adds_single_source_caveat(self):
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "series_b",
+        })
+        self.assertEqual(len(result["caveats"]), 1)
+        self.assertIn("single source", result["caveats"][0].lower())
+
+    def test_series_c_stage_adds_single_source_caveat(self):
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "series_c",
+        })
+        self.assertEqual(len(result["caveats"]), 1)
+        self.assertIn("single source", result["caveats"][0].lower())
+
+    def test_series_d_plus_stage_adds_held_flat_caveat(self):
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "series_d_plus",
+        })
+        self.assertEqual(len(result["caveats"]), 1)
+        self.assertIn("held flat", result["caveats"][0].lower())
+
+    def test_seed_stage_has_no_single_source_caveat(self):
+        # seed and series_a are cross-validated against two independent
+        # sources -- they should not get the single-source caveat.
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "seed",
+        })
+        self.assertEqual(result["caveats"], [])
+
+    def test_series_a_stage_has_no_single_source_caveat(self):
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "series_a",
+        })
+        self.assertEqual(result["caveats"], [])
+
+    def test_dynamic_dlom_adds_upper_bound_caveat(self):
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "private",
+            "time_to_liquidity_years": 2, "volatility": 0.25,
+        })
+        self.assertEqual(len(result["caveats"]), 1)
+        self.assertIn("upper bound", result["caveats"][0].lower())
+
+    def test_flat_dlom_fallback_has_no_upper_bound_caveat(self):
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "private",
+        })
+        self.assertEqual(result["caveats"], [])
+
+    def test_series_b_with_dynamic_dlom_gets_both_caveats(self):
+        # Confirms caveats accumulate rather than overwrite -- single-source
+        # (from the stage tier) and upper-bound (from dynamic DLOM) are
+        # independent conditions that can both apply to the same call.
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "series_b",
+            "time_to_liquidity_years": 2, "volatility": 0.25,
+        })
+        self.assertEqual(len(result["caveats"]), 2)
+        joined = " ".join(result["caveats"]).lower()
+        self.assertIn("single source", joined)
+        self.assertIn("upper bound", joined)
 
 
 class OptionValueCLITest(unittest.TestCase):
