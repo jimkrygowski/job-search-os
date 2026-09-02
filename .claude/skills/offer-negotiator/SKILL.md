@@ -1,6 +1,6 @@
 ---
 name: offer-negotiator
-description: Use when a user needs help with compensation — defining or revisiting their target (walk-away numbers, BATNA, target/ask range, comp priorities) as part of first-time bootstrap, or prepping talking points for an early comp conversation before any offer exists. Builds or updates state/career/comp_target.md, or produces first-contact negotiation talking points.
+description: Use when a user needs help with compensation — defining or revisiting their target (walk-away numbers, BATNA, target/ask range, comp priorities) as part of first-time bootstrap, prepping talking points for an early comp conversation before any offer exists, or breaking down an actual offer's numbers (base/bonus/equity/benefits) against market data and running equity through option_value.py. Builds or updates state/career/comp_target.md, produces first-contact negotiation talking points, or writes a sourced offer breakdown to that opportunity's notes.md.
 ---
 
 # Offer Negotiator
@@ -8,11 +8,13 @@ description: Use when a user needs help with compensation — defining or revisi
 ## Purpose
 
 Helps a user navigate compensation across their job search: building and
-revisiting their standing compensation target (Setup Mode), and prepping
+revisiting their standing compensation target (Setup Mode), prepping
 talking points for an early comp conversation before any offer exists
-(First-Contact Prep). Grounded throughout in a real BATNA and
-`research.md`'s evidence-graded negotiation tactics, never in invented
-numbers or generic scripts.
+(First-Contact Prep), and breaking down an actual offer's numbers against
+sourced market data and a real equity valuation (Offer Breakdown).
+Grounded throughout in a real BATNA, `research.md`'s evidence-graded
+negotiation tactics, and `option_value.py`'s deterministic equity math —
+never in invented numbers or generic scripts.
 
 ## Session Start
 
@@ -25,6 +27,9 @@ numbers or generic scripts.
      asked about comp expectations and doesn't have an offer in hand yet
      (a recruiter screen, an early call) → **First-Contact Prep**. Skip
      the rest of this section and go straight to that section below.
+   - If the user has an actual offer in hand — numbers to break down
+     (base/bonus/equity/benefits) → **Offer Breakdown**. Skip the rest of
+     this section and go straight to that section below.
    - If it's ambiguous which the user wants, ask directly rather than
      guessing.
 2. (Setup Mode only) Check whether `state/career/comp_target.md` exists.
@@ -151,6 +156,81 @@ resolved opportunity folder for this conversation and the user wants it
 saved, append it to that opportunity's `notes.md` under a
 `## First-Contact Prep (<date>)` heading.
 
+## Offer Breakdown
+
+Breaks down an actual offer's numbers — base, bonus, equity, benefits —
+against market context, and runs any equity grant through
+`option_value.py` (below) rather than accepting the company's face-value
+pitch.
+
+This moment needs no `research.md` content directly — the Equity & Comp
+Mechanics reasoning is already baked into `option_value.py`'s docstrings
+(per `research.md`'s moment index); market-benchmark sourcing follows
+CLAUDE.md guardrail #2 (every claim needs a source and a date), not this
+file.
+
+### Session Start
+
+Confirm which opportunity this offer is for, then resolve its folder via
+`python3 tools/tracker.py opportunity-path "<Company>" "<Role>"` — never
+construct the path yourself. If that folder doesn't exist yet, run
+`score-opportunity` first, or ask whether to.
+
+### Gathering the Offer
+
+Get the offer numbers from the user — a pasted offer letter, or a verbal
+recap of what was said on a call. Never invent or assume a number that
+wasn't given. Capture, at minimum:
+- Base salary
+- Bonus (target %, and whether it's guaranteed in year one)
+- Equity grant: share count (or %), strike price (for options), and the
+  company's stated/quoted share price (last-round preferred price, 409A,
+  or public price — note which)
+- The company's funding stage (`public`, or `seed`/`series_a`/
+  `series_b`/`series_c`/`series_d_plus`/generic `private` if the specific
+  stage isn't known) — needed for `option_value.py`'s `company_stage`
+  input
+- Benefits: health/dental/vision, retirement match, PTO policy, any
+  other named perks
+
+### Market Context
+
+Research comparable comp for this role/level/geo using `WebSearch`/
+`WebFetch`. Every benchmark gets a source and a date — CLAUDE.md
+guardrail #2 applies directly; never assert a market figure without one.
+If no credible source is found, say so rather than guessing a number.
+
+### Valuing the Equity
+
+Never value equity at face value (shares × spread) alone — run it through
+`option_value.py`:
+
+```
+python3 tools/option_value.py compute
+```
+
+reading a JSON object on stdin with these keys (required: `shares`,
+`strike_price`, `quoted_price`, `company_stage`; optional:
+`preference_stack`, `fully_diluted_shares`, `exit_probability_override`
+(`{"low", "high"}`), `time_to_liquidity_years`, `volatility`,
+`dlom_override` (`{"low", "high"}`), `cash_alternative`) — see
+`tools/option_value.py`'s own docstrings for exactly what each optional
+key does and its sourcing. The tool prints a JSON breakdown (face value,
+preference-stack adjustment, exit-probability range, final risk-adjusted
+range, and any caveats) — relay this breakdown, including every caveat it
+returns, rather than collapsing it into a single number. If
+`preference_stack`/`fully_diluted_shares` weren't supplied, the tool's
+`preference_adjustment.applied` will be `false` with guidance on what to
+ask the company for — pass that guidance back to the user rather than
+silently treating the equity as fully at face value.
+
+### Output
+
+Write the breakdown to the resolved opportunity's `notes.md` under a
+`## Offer Breakdown (<date>)` heading: the raw offer numbers as given,
+the sourced market context, and `option_value.py`'s full output
+(including its caveats) for the equity component.
+
 ## Guardrails
 
 - Never invent a BATNA, a competing offer, or a timeline the user hasn't
@@ -161,3 +241,6 @@ saved, append it to that opportunity's `notes.md` under a
 - Never assert a target/ask number in First-Contact Prep that isn't
   grounded in `comp_target.md` or the user's own conversation — this
   moment coaches how to use a number, it doesn't invent one.
+- Never invent offer numbers, market benchmarks, or valuation figures in
+  Offer Breakdown that the user, a cited source, or `option_value.py`
+  itself didn't produce.
