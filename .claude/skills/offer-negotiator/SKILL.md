@@ -56,7 +56,7 @@ or generic scripts.
 
 ## Setup Mode — Sections
 
-Read only `research.md`'s "Anchoring & First Offers" and "BATNA" subsections (see the moment index near the top of that file) — skip the rest.
+Read only `research.md`'s "Anchoring & First Offers" and "BATNA (Best Alternative to a Negotiated Agreement)" subsections (see the moment index near the top of that file) — skip the rest.
 
 - **Last reviewed:** `<date>`
 - **BATNA (walk-away alternative)** — the real, concrete alternative that
@@ -309,6 +309,11 @@ If `state/career/comp_target.md` doesn't exist yet, mention that Setup Mode woul
    is consistent with what that research suggests reduces backlash risk
    — but never assert that gender predicts how someone should negotiate
    as a general rule.
+5. **Where the floor is** — state the walk-away minimum from
+   `comp_target.md` explicitly in the plan, and what the user does if
+   the company's best-and-final lands under it. If no walk-away number
+   exists (e.g. `comp_target.md` doesn't exist yet), say so rather than
+   implying one.
 
 ### Output
 
@@ -322,9 +327,8 @@ tactics present in the offer.
 Hands this opportunity's actual accept/decline decision off to
 `career-coach` rather than running its own decision session —
 `career-coach`'s Evaluation Template already scores "Compensation &
-upside" as one of five dimensions alongside role scope, growth
-trajectory, cultural fit, and problem fit, and its Session Start Protocol
-already reads this opportunity's `notes.md`. This moment's only job is to
+upside" as one of its Opportunity Fit dimensions, and its Session Start
+Protocol already reads this opportunity's `notes.md`. This moment's only job is to
 make sure that file has real comp facts for `career-coach` to read.
 
 This moment needs no `research.md` content — per design spec §6.4, it is

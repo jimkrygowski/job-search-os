@@ -1,7 +1,7 @@
 # Offer Negotiator — Design
 
-Status: approved by Jim. Bucket 1 (research) complete. Buckets 2-5 not
-yet started — see §10 for open items each remaining bucket must resolve.
+Status: approved by Jim. All 5 buckets complete — see §10 for what each
+one resolved.
 
 ## 1. Purpose
 
@@ -249,8 +249,11 @@ No new guardrails. Existing `CLAUDE.md` guardrails apply directly:
 
 Deliberately left for the bucket that builds them, not resolved here:
 
-- Exact field list and conversation shape for `comp_target.md` setup
-  (Bucket 3).
+- ~~Exact field list and conversation shape for `comp_target.md`
+  setup~~ — done in Bucket 3: `.claude/skills/offer-negotiator/SKILL.md`'s
+  `## Setup Mode — Sections` (BATNA, target/ask range, walk-away
+  minimums, cash/equity/benefits priority, equity risk tolerance,
+  deal-breakers).
 - ~~Specific cited exit-probability and preference-stack default
   figures~~ — done in Bucket 1: `research.md` now has the sourced
   figures and flags an explicit, unresolved conflict between the
@@ -263,7 +266,12 @@ Deliberately left for the bucket that builds them, not resolved here:
 - ~~`research.md`'s full evidence review of negotiation tactics~~ — done
   in Bucket 1 (`.claude/skills/offer-negotiator/research.md` +
   `research-source.md` for full citations).
-- **Context-efficiency: build-time vs. runtime content (Bucket 2).**
+- ~~**Context-efficiency: build-time vs. runtime content (Bucket 2).**~~
+  — resolved in Bucket 2: every default constant in `tools/option_value.py`
+  cites its `research.md` anchor in its own docstring/comment, so
+  `SKILL.md`'s Offer Breakdown section calls the tool and relays its
+  output without re-reading the Equity & Comp Mechanics prose. Original
+  framing of the problem, kept for context:
   `research.md`'s Equity & Comp Mechanics half (~458 lines) exists
   mainly to inform `option_value.py`'s hardcoded defaults, not to be
   re-read by the live skill every session. When designing Bucket 2,
@@ -273,7 +281,12 @@ Deliberately left for the bucket that builds them, not resolved here:
   the full DLOM/exit-rate/preference-stack prose at runtime. Don't
   leave this implicit — it's the single biggest lever on how much of
   `research.md` the live agent's context carries per session.
-- **Selective per-moment loading + a moment index (Bucket 4).**
+- ~~**Selective per-moment loading + a moment index (Bucket 4).**~~ —
+  resolved in Bucket 4: `research.md` has a "How to Use This Document"
+  index near the top mapping Setup Mode and all four negotiation moments
+  to their specific subsections, and every mode/moment in `SKILL.md`
+  states its own read-scope line pointing back to that index. Original
+  framing of the problem, kept for context:
   `SKILL.md` (moments 1 & 2, and by extension moment 3 in Bucket 5)
   must not read all of `research.md` for every moment — e.g. moment 1
   (first-contact prep) only needs Anchoring/BATNA/Deflecting, not
