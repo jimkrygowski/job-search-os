@@ -151,17 +151,32 @@ not just outputs a number:
 2. **Preference-stack / common-vs-preferred haircut** — the quoted "last
    round" price is what *preferred* investors paid; common stock (what
    options convert to) sits behind the liquidation preference stack and
-   is worth less, sometimes zero in a modest exit. Applied as a disclosed
-   default, overridable if the user knows the actual preference terms.
+   is worth less, sometimes zero in a modest exit. **Revised per
+   `research.md`'s finding (no credible generic "% of valuation" figure
+   exists): this is a required input with an explicit unconfirmed-
+   placeholder state, not a silently-applied default.** The tool computes
+   a real residual-claim value when the user supplies the company's total
+   preference stack and fully-diluted share count; when either is
+   missing, it outputs an explicit "UNCONFIRMED — placeholder, not a real
+   estimate" state rather than a quiet default number, plus concrete
+   guidance on what to ask the company for (total preferred capital
+   raised across all rounds, preference terms, fully-diluted share count)
+   so the user can go get the real figure.
 3. **Exit-probability haircut** — most venture-backed companies never
-   return value to common stockholders. Fixed, disclosed default rates by
-   company stage (public / late-stage private / early-stage private),
-   user-overridable per call. (Real cited base rates go in `research.md`
-   when that bucket is built — this design doc doesn't assert specific
-   percentages.)
+   return value to common stockholders. **Revised to two tiers, not
+   three:** public companies get no exit-probability haircut (a real
+   market price exists, the question is moot); private companies get one
+   flat, disclosed default rate (cited in `research.md`), user-overridable
+   per call. `research.md` found no source that credibly differentiates
+   early-stage from late-stage private — inventing that split would
+   assert a number no source supports, so it's collapsed to public vs.
+   private rather than the three-way stage split originally proposed
+   here.
 4. **Time-value discount** — illiquid startup equity warrants a higher
    discount rate than public-market investments, given undiversifiable,
-   concentrated risk and multi-year uncertain time-to-liquidity.
+   concentrated risk and multi-year uncertain time-to-liquidity. Public
+   companies get no discount (liquid); private companies get the default
+   range cited in `research.md`, user-overridable.
 
 Also flagged, not modeled: exercise cost and tax timing (ISO/AMT exposure
 can trigger real cash tax liability on paper gains before any liquidity
@@ -176,6 +191,12 @@ that exit clearing the preference stack with room left for common.
 Mirrors `score_table.py`: stdlib only, argparse subcommands, called by the
 skill rather than freehand-computed by the LLM — this is real financial
 math, not something that should be non-deterministic session to session.
+
+Per §10's context-efficiency item: every default constant's docstring
+cites the specific `research.md` subsection it comes from, so the tool is
+self-documenting and `SKILL.md` (Bucket 4) can call it and relay its
+output without re-reading `research.md`'s Equity & Comp Mechanics prose
+at runtime.
 
 ## 8. Guardrails
 
