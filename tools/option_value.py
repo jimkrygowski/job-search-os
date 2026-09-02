@@ -173,3 +173,97 @@ def compute_exit_probability_range(value, company_stage,
         "failure_rate_low": failure_rate_low,
         "failure_rate_high": failure_rate_high,
     }
+
+
+# Source: research.md#dlom -- Longstaff (1995) option-pricing model,
+# cited there at these exact (holding period, volatility) points. These
+# are the ONLY points research.md verified; compute_dynamic_dlom()
+# linearly interpolates between them -- it does not re-derive Longstaff's
+# actual closed-form formula, which this tool does not attempt to
+# reimplement -- and clamps inputs outside this grid to the nearest
+# cited bound rather than extrapolating beyond verified data.
+LONGSTAFF_GRID_YEARS = (1, 2, 5)
+LONGSTAFF_GRID_VOL_LOW = 0.20
+LONGSTAFF_GRID_VOL_HIGH = 0.30
+LONGSTAFF_DLOM_AT_VOL_LOW = (0.17, 0.25, 0.41)   # at 20% vol, by year
+LONGSTAFF_DLOM_AT_VOL_HIGH = (0.26, 0.39, 0.66)  # at 30% vol, by year
+
+# Source: research.md#dlom ("How to use correctly") -- a 20-30% default
+# is a defensible judgment call within a literature that spans roughly
+# 7% (Bajaj et al.'s controlled estimate) to 40%+ (pre-IPO / option-
+# pricing bounds), not a point of convergence. Used as the fallback band
+# when time-to-liquidity and volatility aren't supplied for the dynamic
+# calculation above. Applies only to private companies; public stock is
+# liquid.
+DLOM_LOW = 0.20
+DLOM_HIGH = 0.30
+
+
+def _interpolate_1d(x, xs, ys):
+    """Linear interpolation of x against sorted xs/ys, clamped at the
+    ends rather than extrapolated."""
+    if x <= xs[0]:
+        return ys[0]
+    if x >= xs[-1]:
+        return ys[-1]
+    for i in range(len(xs) - 1):
+        if xs[i] <= x <= xs[i + 1]:
+            weight = (x - xs[i]) / (xs[i + 1] - xs[i])
+            return ys[i] + weight * (ys[i + 1] - ys[i])
+
+
+def compute_dynamic_dlom(time_to_liquidity_years, volatility):
+    """DLOM interpolated from the Longstaff (1995) grid cited in
+    research.md#dlom. Clamps time and volatility to the cited range
+    (1-5 years, 20-30% volatility) rather than extrapolating beyond
+    verified data points."""
+    dlom_at_vol_low = _interpolate_1d(
+        time_to_liquidity_years, LONGSTAFF_GRID_YEARS, LONGSTAFF_DLOM_AT_VOL_LOW)
+    dlom_at_vol_high = _interpolate_1d(
+        time_to_liquidity_years, LONGSTAFF_GRID_YEARS, LONGSTAFF_DLOM_AT_VOL_HIGH)
+    clamped_vol = min(max(volatility, LONGSTAFF_GRID_VOL_LOW), LONGSTAFF_GRID_VOL_HIGH)
+    weight = (clamped_vol - LONGSTAFF_GRID_VOL_LOW) / (LONGSTAFF_GRID_VOL_HIGH - LONGSTAFF_GRID_VOL_LOW)
+    return dlom_at_vol_low + weight * (dlom_at_vol_high - dlom_at_vol_low)
+
+
+def compute_dlom_range(value_low, value_high, company_stage,
+                         time_to_liquidity_years=None, volatility=None,
+                         override_low=None, override_high=None):
+    """Applies the time-value/illiquidity (DLOM) discount as a range.
+    Precedence: public companies pass through unchanged (liquid) ->
+    an explicit override wins next -> a dynamic Longstaff-grid
+    interpolation when time_to_liquidity_years and volatility are both
+    given -> the flat default band from research.md#dlom otherwise."""
+    _validate_stage(company_stage)
+    if company_stage == "public":
+        return {"low": value_low, "high": value_high,
+                "dlom_low": 0.0, "dlom_high": 0.0,
+                "method": "public-no-discount"}
+    if override_low is not None or override_high is not None:
+        dlom_low = DLOM_LOW if override_low is None else override_low
+        dlom_high = DLOM_HIGH if override_high is None else override_high
+        _validate_rate(dlom_low, "override_low")
+        _validate_rate(dlom_high, "override_high")
+        return {
+            "low": value_low * (1 - dlom_high),
+            "high": value_high * (1 - dlom_low),
+            "dlom_low": dlom_low,
+            "dlom_high": dlom_high,
+            "method": "override",
+        }
+    if time_to_liquidity_years is not None and volatility is not None:
+        dlom = compute_dynamic_dlom(time_to_liquidity_years, volatility)
+        return {
+            "low": value_low * (1 - dlom),
+            "high": value_high * (1 - dlom),
+            "dlom_low": dlom,
+            "dlom_high": dlom,
+            "method": "dynamic-longstaff-interpolation",
+        }
+    return {
+        "low": value_low * (1 - DLOM_HIGH),
+        "high": value_high * (1 - DLOM_LOW),
+        "dlom_low": DLOM_LOW,
+        "dlom_high": DLOM_HIGH,
+        "method": "flat-default-band",
+    }
