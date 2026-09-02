@@ -14,9 +14,9 @@
 
 - Public-company inputs pass through **every** adjustment stage unchanged (no preference-stack, exit-probability, or DLOM adjustment applies — a real market price already exists) (spec §7 steps 2-4, §9).
 - The preference-stack adjustment is a **required input with an explicit unconfirmed-placeholder state, never a silently-applied default**: when `preference_stack` or `fully_diluted_shares` is missing, output `"applied": false` plus concrete guidance on what to ask the company for — do not fall back to any generic percentage (spec §7 step 2, revised).
-- The exit-probability haircut has **exactly two tiers — public and private** — never differentiate early-stage from late-stage private; `research.md` found no source that credibly supports that split (spec §7 step 3, revised).
-- Default constants: exit-probability failure rate **0.60–0.75** (source: `research.md#exit-rate-base-rates`). DLOM has two modes: a **dynamic mode** interpolating the Longstaff (1995) grid already cited in `research.md#dlom` (20% vol: 1yr=0.17, 2yr=0.25, 5yr=0.41; 30% vol: 1yr=0.26, 2yr=0.39, 5yr=0.66) when time-to-liquidity and volatility are supplied, clamped (never extrapolated) to that cited range; and a **flat 0.20–0.30 fallback band** (source: `research.md#dlom`) when they're not. Every default constant's docstring/comment must cite its `research.md` anchor.
-- The exit-probability tier structure was independently re-verified (fresh research pass, 2026-09-02) after two external AI chats proposed unsourced stage-differentiated tables — the two-tier design stands; no credible source differentiates private-stage exit probability by round. The dynamic-DLOM addition below is the one legitimate improvement that verification pass surfaced, and it's grounded entirely in Longstaff (1995), already cited in `research.md` before this plan existed.
+- The exit-probability haircut has **real per-stage tiers**: `public` (no haircut), five specific private-stage tiers (`seed`, `series_a`, `series_b`, `series_c`, `series_d_plus`, each with its own sourced failure-rate range/point from `research.md#exit-rate-base-rates`), and a generic `private` fallback (the old flat aggregate) for when the specific stage isn't known. `series_b`/`series_c`/`series_d_plus` intentionally share the same rate — not three independently-sourced numbers, but Mattermark's explicitly stated "halves and continues to halve" pattern applied identically per the source's own wording (spec §7 step 3, revised 2026-09-02).
+- Default constants: exit-probability failure rates per stage — seed 0.52–0.69, series_a 0.37–0.85, series_b/c/d_plus 0.50 (point), generic private fallback 0.60–0.75 (all sourced in `research.md#exit-rate-base-rates`). DLOM has two modes: a **dynamic mode** interpolating the Longstaff (1995) grid already cited in `research.md#dlom` (20% vol: 1yr=0.17, 2yr=0.25, 5yr=0.41; 30% vol: 1yr=0.26, 2yr=0.39, 5yr=0.66) when time-to-liquidity and volatility are supplied, clamped (never extrapolated) to that cited range; and a **flat 0.20–0.30 fallback band** (source: `research.md#dlom`) when they're not. Every default constant's docstring/comment must cite its `research.md` anchor.
+- This tier structure went through three rounds of revision within this plan's own history: (1) originally spec'd as three stage tiers with no real data; (2) collapsed to flat public/private after Bucket 1's research found no supporting source; (3) restored to five real private-stage tiers, 2026-09-02, after the user correctly objected that treating a Series A and a Series D company identically was indefensible, and further research found real, cross-validated per-stage data (CB Insights' "Venture Capital Funnel," Mattermark/Rowley, two Carta posts) — see `research.md#exit-rate-base-rates` for the full sourcing and the specific fabricated/unattributed sources that were checked and rejected along the way.
 - No personal tax modeling anywhere in this tool — ISO/AMT is out of scope entirely for `option_value.py`, not even as an optional field (spec §2, §7).
 - Every function must accept explicit overrides for its defaults; the tool never asserts a single confident number — the final output is always a range with every stage shown (spec §7).
 - Follow `tools/score_table.py`'s conventions exactly: stdlib only, `argparse` subcommand(s), JSON on stdin for input, a `unittest` suite with a separate CLI test class that shells out via `subprocess` (see `tools/test_score_table.py`).
@@ -278,7 +278,7 @@ git commit -m "Add option_value.py preference-stack residual-claim adjustment"
 
 ---
 
-### Task 3: Exit-probability range
+### Task 3: Exit-probability range — real per-stage tiers
 
 **Files:**
 - Modify: `tools/option_value.py`
@@ -286,7 +286,9 @@ git commit -m "Add option_value.py preference-stack residual-claim adjustment"
 
 **Interfaces:**
 - Consumes: nothing new
-- Produces: `compute_exit_probability_range(value, company_stage, override_low=None, override_high=None) -> dict` with keys `low`, `high`, `failure_rate_low`, `failure_rate_high`. Also produces shared helpers `_validate_stage(company_stage)` and `_validate_rate(rate, name)`, both raising `ValueError` — Task 4 reuses these exact helpers rather than redefining them.
+- Produces: `compute_exit_probability_range(value, company_stage, override_low=None, override_high=None) -> dict` with keys `low`, `high`, `failure_rate_low`, `failure_rate_high`. `company_stage` accepts `"public"`, a specific private-stage tier (`"seed"`, `"series_a"`, `"series_b"`, `"series_c"`, `"series_d_plus"`), or `"private"` as a generic fallback for when the specific stage isn't known. Also produces shared helpers `_validate_stage(company_stage)` and `_validate_rate(rate, name)`, both raising `ValueError` — Task 4 reuses these exact helpers rather than redefining them, and Task 4's existing `"private"`-based tests keep working unchanged since `"private"` remains a valid stage string.
+
+**Note on this task's history:** an earlier version of this plan had a flat two-tier (public/private) design, because Bucket 1's original research found no source differentiating private-stage exit rates. Jim correctly pushed back that treating a Series A and a Series D company identically was indefensible, and further research (documented in `research.md#exit-rate-base-rates`) found real, cross-validated per-stage data. This version replaces the flat design.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -301,7 +303,41 @@ class ComputeExitProbabilityRangeTest(unittest.TestCase):
             "failure_rate_low": 0.0, "failure_rate_high": 0.0,
         })
 
-    def test_private_company_default_range(self):
+    def test_seed_default_range(self):
+        # failure rate range 0.52-0.69 (CB Insights to Mattermark)
+        result = option_value.compute_exit_probability_range(1000.0, "seed")
+        self.assertEqual(result["low"], 310.0)
+        self.assertEqual(result["high"], 480.0)
+        self.assertEqual(result["failure_rate_low"], 0.52)
+        self.assertEqual(result["failure_rate_high"], 0.69)
+
+    def test_series_a_default_range(self):
+        # failure rate range 0.37-0.85 (CB Insights to Carta worst vintage)
+        result = option_value.compute_exit_probability_range(1000.0, "series_a")
+        self.assertEqual(result["low"], 150.0)
+        self.assertEqual(result["high"], 630.0)
+        self.assertEqual(result["failure_rate_low"], 0.37)
+        self.assertEqual(result["failure_rate_high"], 0.85)
+
+    def test_series_b_default_range(self):
+        # halving-pattern rate 0.50, both ends equal -> a point, not a range
+        result = option_value.compute_exit_probability_range(1000.0, "series_b")
+        self.assertEqual(result["low"], 500.0)
+        self.assertEqual(result["high"], 500.0)
+        self.assertEqual(result["failure_rate_low"], 0.50)
+        self.assertEqual(result["failure_rate_high"], 0.50)
+
+    def test_series_c_default_range_matches_halving_pattern(self):
+        result = option_value.compute_exit_probability_range(1000.0, "series_c")
+        self.assertEqual(result["low"], 500.0)
+        self.assertEqual(result["high"], 500.0)
+
+    def test_series_d_plus_default_range_matches_halving_pattern(self):
+        result = option_value.compute_exit_probability_range(1000.0, "series_d_plus")
+        self.assertEqual(result["low"], 500.0)
+        self.assertEqual(result["high"], 500.0)
+
+    def test_generic_private_default_range_when_stage_unknown(self):
         # failure rate range 0.60-0.75 -> survival range 0.25-0.40
         result = option_value.compute_exit_probability_range(1000.0, "private")
         self.assertEqual(result["low"], 250.0)
@@ -309,9 +345,9 @@ class ComputeExitProbabilityRangeTest(unittest.TestCase):
         self.assertEqual(result["failure_rate_low"], 0.60)
         self.assertEqual(result["failure_rate_high"], 0.75)
 
-    def test_private_company_override(self):
+    def test_stage_override(self):
         result = option_value.compute_exit_probability_range(
-            1000.0, "private", override_low=0.5, override_high=0.5,
+            1000.0, "series_a", override_low=0.5, override_high=0.5,
         )
         self.assertEqual(result["low"], 500.0)
         self.assertEqual(result["high"], 500.0)
@@ -346,17 +382,54 @@ Expected: FAIL with `AttributeError: module 'option_value' has no attribute 'com
 Append to `tools/option_value.py`:
 
 ```python
-VALID_STAGES = ("public", "private")
+VALID_STAGES = ("public", "private", "seed", "series_a", "series_b", "series_c", "series_d_plus")
 
-# Source: research.md#exit-rate-base-rates ("How to use correctly") --
-# roughly 60-75% of VC-backed positions return nothing or less than
-# invested capital to preferred. Applies only to private companies;
-# public companies have a real market price and no exit-probability
-# haircut applies. research.md explicitly found no source that credibly
-# differentiates early-stage from late-stage private -- do not add a
-# third tier without a real source.
-EXIT_FAILURE_RATE_LOW = 0.60
-EXIT_FAILURE_RATE_HIGH = 0.75
+# Source: research.md#exit-rate-base-rates -- CB Insights, "The Venture
+# Capital Funnel" (2018, cohort of 1,119 US tech companies seed-funded
+# 2008-2010): 48% graduate Seed->A (52% fail). Mattermark/Rowley (2016,
+# independent cohort of 2,011 US software companies seed-funded
+# 2009-2012): 31% graduate Seed->A (69% fail). Range reflects both real,
+# independent data points.
+SEED_FAILURE_RATE_LOW = 0.52
+SEED_FAILURE_RATE_HIGH = 0.69
+
+# Source: research.md#exit-rate-base-rates -- CB Insights: 63% graduate
+# A->B (37% fail), eventual outcome, 2008-2010 vintage. Carta (Peter
+# Walker, 2026, cohort of 10,562 US startups raising Series A 2018-2025):
+# graduation swings as low as ~10-12% (2022 vintage, 2-year window) -- a
+# shorter observation window than CB Insights', so likely somewhat
+# overstates eventual failure; the high end here is conservatively
+# rounded down from that raw figure for that reason.
+SERIES_A_FAILURE_RATE_LOW = 0.37
+SERIES_A_FAILURE_RATE_HIGH = 0.85
+
+# Source: research.md#exit-rate-base-rates -- Mattermark/Rowley (2016):
+# "the number of startups that raise a Series B halves and continues to
+# halve in a stepwise function through Series F and beyond." Applied
+# identically to the Series B->C, C->D, and D+ transitions per that
+# explicitly stated repeating pattern. Independently cross-validated for
+# the B->C step via CB Insights' own cumulative Seed->B (~30%, derived
+# from 0.48 x 0.63) vs. Seed->4th-round (15%, stated) figures, which
+# imply the same ~50% from an entirely different dataset.
+STAGE_HALVING_FAILURE_RATE = 0.50
+
+# Source: research.md#exit-rate-base-rates -- Correlation Ventures data
+# via Booth (2013)/Levine (2014), cross-referenced against CB Insights'
+# aggregate post-mortem tracking: roughly 60-75% of VC-backed positions,
+# across all stages combined, return nothing or less than invested
+# capital to preferred. This is the fallback for when the specific
+# funding stage isn't known -- prefer a specific stage tier when it is.
+GENERIC_PRIVATE_FAILURE_RATE_LOW = 0.60
+GENERIC_PRIVATE_FAILURE_RATE_HIGH = 0.75
+
+STAGE_DEFAULT_FAILURE_RATES = {
+    "seed": (SEED_FAILURE_RATE_LOW, SEED_FAILURE_RATE_HIGH),
+    "series_a": (SERIES_A_FAILURE_RATE_LOW, SERIES_A_FAILURE_RATE_HIGH),
+    "series_b": (STAGE_HALVING_FAILURE_RATE, STAGE_HALVING_FAILURE_RATE),
+    "series_c": (STAGE_HALVING_FAILURE_RATE, STAGE_HALVING_FAILURE_RATE),
+    "series_d_plus": (STAGE_HALVING_FAILURE_RATE, STAGE_HALVING_FAILURE_RATE),
+    "private": (GENERIC_PRIVATE_FAILURE_RATE_LOW, GENERIC_PRIVATE_FAILURE_RATE_HIGH),
+}
 
 
 def _validate_stage(company_stage):
@@ -371,17 +444,20 @@ def _validate_rate(rate, name):
 
 def compute_exit_probability_range(value, company_stage,
                                      override_low=None, override_high=None):
-    """Applies the exit-probability haircut as a range: public companies
-    pass through unchanged (a real market price already exists); private
-    companies apply the default failure-rate range from
-    research.md#exit-rate-base-rates (or an override), returning a
-    (low, high) value range plus the failure rates used."""
+    """Applies the exit-probability haircut as a range. 'public' passes
+    through unchanged (a real market price already exists). A specific
+    private-stage tier (seed/series_a/series_b/series_c/series_d_plus)
+    uses that stage's real, sourced failure-rate range from
+    research.md#exit-rate-base-rates. 'private' (unspecified stage) uses
+    the generic all-stage aggregate as a fallback. Any tier's default can
+    be overridden."""
     _validate_stage(company_stage)
     if company_stage == "public":
         return {"low": value, "high": value,
                 "failure_rate_low": 0.0, "failure_rate_high": 0.0}
-    failure_rate_low = EXIT_FAILURE_RATE_LOW if override_low is None else override_low
-    failure_rate_high = EXIT_FAILURE_RATE_HIGH if override_high is None else override_high
+    default_low, default_high = STAGE_DEFAULT_FAILURE_RATES[company_stage]
+    failure_rate_low = default_low if override_low is None else override_low
+    failure_rate_high = default_high if override_high is None else override_high
     _validate_rate(failure_rate_low, "override_low")
     _validate_rate(failure_rate_high, "override_high")
     return {
@@ -395,13 +471,13 @@ def compute_exit_probability_range(value, company_stage,
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `python3 -m pytest tools/test_option_value.py -v`
-Expected: PASS, all tests (10 prior + Task 3's 6 = 16).
+Expected: PASS, all tests (10 prior + Task 3's 11 = 21).
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add tools/option_value.py tools/test_option_value.py
-git commit -m "Add option_value.py exit-probability range adjustment"
+git commit -m "Add option_value.py exit-probability range: real per-stage tiers"
 ```
 
 ---
@@ -625,7 +701,7 @@ def compute_dlom_range(value_low, value_high, company_stage,
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `python3 -m pytest tools/test_option_value.py -v`
-Expected: PASS, all tests (16 prior + Task 4's 12 = 28).
+Expected: PASS, all tests (21 prior + Task 4's 12 = 33).
 
 - [ ] **Step 5: Commit**
 
@@ -749,6 +825,24 @@ class ComputeValuationTest(unittest.TestCase):
         self.assertEqual(result["final_range"]["method"], "dynamic-longstaff-interpolation")
         self.assertAlmostEqual(result["cash_vs_equity_low"], 830.0)
         self.assertAlmostEqual(result["cash_vs_equity_high"], 728.0)
+
+    def test_specific_stage_tier_pass_through_full_breakdown(self):
+        # face_value=3000.0; preference applied -> base_for_exit=1000.0
+        # exit range (series_b: failure 0.50/0.50) -> low=500.0, high=500.0
+        # dlom flat fallback (no time/vol given): low=500*0.70=350.0, high=500*0.80=400.0
+        # cash_alternative=1000.0 -> vs_low=1000-350=650.0, vs_high=1000-400=600.0
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "series_b",
+            "preference_stack": 2_000_000, "fully_diluted_shares": 1_000_000,
+            "cash_alternative": 1000.0,
+        })
+        self.assertEqual(result["exit_probability_range"]["low"], 500.0)
+        self.assertEqual(result["exit_probability_range"]["high"], 500.0)
+        self.assertEqual(result["final_range"]["low"], 350.0)
+        self.assertEqual(result["final_range"]["high"], 400.0)
+        self.assertEqual(result["cash_vs_equity_low"], 650.0)
+        self.assertEqual(result["cash_vs_equity_high"], 600.0)
 
 
 class OptionValueCLITest(unittest.TestCase):
@@ -905,7 +999,7 @@ Note: this task adds `import argparse`, `import json`, `import sys` at module le
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `python3 -m pytest tools/test_option_value.py -v`
-Expected: PASS, all tests (28 prior + Task 5's 10 = 38).
+Expected: PASS, all tests (33 prior + Task 5's 11 = 44).
 
 - [ ] **Step 5: Commit**
 
@@ -927,16 +1021,16 @@ git commit -m "Add option_value.py orchestration and compute CLI subcommand"
 
 - [ ] **Step 1: Docstring citation sweep**
 
-Read through `tools/option_value.py` top to bottom. Confirm every default constant (`EXIT_FAILURE_RATE_LOW`/`HIGH`, `DLOM_LOW`/`HIGH`, `LONGSTAFF_GRID_YEARS`/`LONGSTAFF_DLOM_AT_VOL_LOW`/`LONGSTAFF_DLOM_AT_VOL_HIGH`, `PREFERENCE_STACK_GUIDANCE`) has a comment citing its specific `research.md` anchor (`#exit-rate-base-rates`, `#dlom`, `#liquidation-preferences`). This is what lets `SKILL.md` (Bucket 4) call this tool without re-reading `research.md`'s prose at runtime — confirm the docstrings alone would let someone understand *why* each default is what it is, without opening `research.md`. Confirm `compute_dynamic_dlom`'s docstring is explicit that it interpolates already-cited data points rather than re-deriving Longstaff's actual closed-form formula — this tool does not implement option-pricing math from scratch.
+Read through `tools/option_value.py` top to bottom. Confirm every default constant (`SEED_FAILURE_RATE_LOW`/`HIGH`, `SERIES_A_FAILURE_RATE_LOW`/`HIGH`, `STAGE_HALVING_FAILURE_RATE`, `GENERIC_PRIVATE_FAILURE_RATE_LOW`/`HIGH`, `DLOM_LOW`/`HIGH`, `LONGSTAFF_GRID_YEARS`/`LONGSTAFF_DLOM_AT_VOL_LOW`/`LONGSTAFF_DLOM_AT_VOL_HIGH`, `PREFERENCE_STACK_GUIDANCE`) has a comment citing its specific `research.md` anchor (`#exit-rate-base-rates`, `#dlom`, `#liquidation-preferences`). This is what lets `SKILL.md` (Bucket 4) call this tool without re-reading `research.md`'s prose at runtime — confirm the docstrings alone would let someone understand *why* each default is what it is, without opening `research.md`, including why `series_b`/`series_c`/`series_d_plus` all share the same rate (Mattermark's explicitly stated halving pattern, not three independently-sourced numbers). Confirm `compute_dynamic_dlom`'s docstring is explicit that it interpolates already-cited data points rather than re-deriving Longstaff's actual closed-form formula — this tool does not implement option-pricing math from scratch.
 
 - [ ] **Step 2: Cross-check against spec §9's explicit test requirements**
 
-Re-read spec §9. Confirm the test suite covers all three explicitly named cases: (a) zero/negative strike spread — `test_underwater_options_floor_at_zero` (Task 1); (b) public-company case with no haircuts applied — `test_public_company_passes_through_every_stage` (Task 5); (c) user-overridden defaults — `test_private_company_override` (Task 3) and `test_private_company_override_takes_precedence_over_dynamic` (Task 4) and `test_exit_and_dlom_overrides_pass_through` (Task 5). If any is thin, strengthen it now.
+Re-read spec §9. Confirm the test suite covers all three explicitly named cases: (a) zero/negative strike spread — `test_underwater_options_floor_at_zero` (Task 1); (b) public-company case with no haircuts applied — `test_public_company_passes_through_every_stage` (Task 5); (c) user-overridden defaults — `test_stage_override` (Task 3) and `test_private_company_override_takes_precedence_over_dynamic` (Task 4) and `test_exit_and_dlom_overrides_pass_through` (Task 5). If any is thin, strengthen it now.
 
 - [ ] **Step 3: Run the full suite once and confirm pristine output**
 
 Run: `python3 -m pytest tools/test_option_value.py -v`
-Expected: PASS, 38/38, no warnings.
+Expected: PASS, 44/44, no warnings.
 
 - [ ] **Step 4: Commit (only if Steps 1-2 produced changes)**
 
@@ -951,7 +1045,8 @@ If Steps 1-3 found nothing to fix, skip this commit — no empty commits.
 
 ## Self-Review Notes (plan author)
 
-- **Spec coverage:** All four adjustment stages from spec §7 (as revised) are covered: Task 1 (face value), Task 2 (preference-stack, required-input-with-placeholder per the revision), Task 3 (exit-probability, two-tier per the revision), Task 4 (DLOM, dynamic Longstaff-grid interpolation with a flat-band fallback — added 2026-09-02 after independently re-verifying two external AI chats' unsourced stage-tier claims; see Global Constraints). Task 5 wires them together and adds the cash-alternative comparison spec §7 calls for. The context-efficiency requirement (docstrings cite `research.md`) is built into every task's implementation step, not deferred, and Task 6 verifies it explicitly. No personal tax modeling appears anywhere — ISO/AMT isn't referenced in this tool at all, consistent with spec §2/§7.
-- **Placeholder scan:** No TBD/TODO; every step has real, complete code with computed expected values (hand-verified in step comments, e.g. Task 5's `test_full_breakdown_with_preference_stack_and_cash_comparison` and `test_dynamic_dlom_inputs_pass_through_full_breakdown`).
-- **Type/interface consistency:** Verified `compute_preference_adjustment`'s return dict keys (`applied`, `adjusted_value`, `common_price`, `guidance`) are used identically in Task 5's `compute_valuation`. Verified `compute_exit_probability_range`'s and `compute_dlom_range`'s `low`/`high` keys chain correctly (Task 5 passes `exit_range["low"]`/`["high"]` into `compute_dlom_range`, and now also `time_to_liquidity_years`/`volatility`). Verified Task 4 reuses Task 3's `_validate_stage`/`_validate_rate` rather than redefining them (stated explicitly in Task 4's Interfaces block). Verified `compute_dlom_range`'s precedence order (public → override → dynamic → flat fallback) is exercised by a distinct test for each branch, including one confirming override beats dynamic when both are supplied.
-- **Test-count arithmetic re-verified after the Task 4 rewrite:** Task 1 (3) → Task 2 (+7=10) → Task 3 (+6=16) → Task 4 (+12=28) → Task 5 (+10=38). Every task's "Expected: PASS" step states the running total.
+- **Spec coverage:** All four adjustment stages from spec §7 (as revised) are covered: Task 1 (face value), Task 2 (preference-stack, required-input-with-placeholder per the revision), Task 3 (exit-probability, real per-stage tiers — rewritten 2026-09-02 after the flat two-tier design was correctly rejected; see below), Task 4 (DLOM, dynamic Longstaff-grid interpolation with a flat-band fallback). Task 5 wires them together and adds the cash-alternative comparison spec §7 calls for, plus a new test exercising a specific stage tier end-to-end. The context-efficiency requirement (docstrings cite `research.md`) is built into every task's implementation step, not deferred, and Task 6 verifies it explicitly, now including the new stage-tier constants. No personal tax modeling appears anywhere — ISO/AMT isn't referenced in this tool at all, consistent with spec §2/§7.
+- **Design history note:** Task 3 went through two prior versions before this one. Version 1 (spec's original) called for three unsourced stage tiers. Version 2 (Bucket 1's finding) collapsed to flat public/private after finding no supporting source. This version restores real per-stage differentiation after the user correctly objected that flat treatment was indefensible and three further research passes (browser-verified against primary sources — CB Insights, Mattermark, Carta) found real, cross-validated data. `_validate_stage`/`_validate_rate` (Task 3) and Task 4's reuse of them are unaffected by which version of the stage set is active, since Task 4's logic only branches on `== "public"` vs. everything else.
+- **Placeholder scan:** No TBD/TODO; every step has real, complete code with computed expected values (hand-verified in step comments, e.g. Task 3's per-tier tests and Task 5's `test_specific_stage_tier_pass_through_full_breakdown`).
+- **Type/interface consistency:** Verified `compute_preference_adjustment`'s return dict keys (`applied`, `adjusted_value`, `common_price`, `guidance`) are used identically in Task 5's `compute_valuation`. Verified `compute_exit_probability_range`'s and `compute_dlom_range`'s `low`/`high` keys chain correctly (Task 5 passes `exit_range["low"]`/`["high"]` into `compute_dlom_range`, and now also `time_to_liquidity_years`/`volatility`). Verified Task 4 reuses Task 3's `_validate_stage`/`_validate_rate` rather than redefining them, and that Task 4's existing `"private"`-based tests remain valid unchanged since `"private"` is still in the expanded `VALID_STAGES` tuple. Verified `compute_dlom_range`'s precedence order (public → override → dynamic → flat fallback) is exercised by a distinct test for each branch, including one confirming override beats dynamic when both are supplied. Verified `STAGE_DEFAULT_FAILURE_RATES` dict keys exactly match the non-`"public"` entries in `VALID_STAGES`.
+- **Test-count arithmetic re-verified after the Task 3 rewrite:** Task 1 (3) → Task 2 (+7=10) → Task 3 (+11=21) → Task 4 (+12=33) → Task 5 (+11=44). Every task's "Expected: PASS" step states the running total.
