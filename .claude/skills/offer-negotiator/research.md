@@ -5,6 +5,11 @@ claim the offer-negotiator skill relies on, what was evaluated, and why each
 choice was made. It exists so the skill's advice is grounded in evidence,
 not accumulated assumption — same purpose as `career-coach/research.md`.
 
+Full bibliographic detail (journal, volume, pages, DOI) for every citation
+lives in the companion file `research-source.md`, linked from each
+subsection's Source line — kept separate so this file stays focused on
+what actually drives the skill's advice.
+
 **Research conducted:** September 1, 2026
 **Scope:** Salary/offer negotiation tactics; equity and comp mechanics for a
 U.S. tech job search.
@@ -15,12 +20,8 @@ U.S. tech job search.
 
 ### Anchoring & First Offers
 
-**Source:** Galinsky, A.D. & Mussweiler, T. (2001). First offers as anchors:
-The role of perspective-taking and negotiator focus. *Journal of Personality
-and Social Psychology*, 81(4), 657–669. Extended by Loschelder, D.D.,
-Stuppi, J., & Trötschel, R. (2014). "€14,875?!": Precision boosts the
-anchoring potency of first offers. *Social Psychological and Personality
-Science*, 5(4), 491–499.
+**Source:** Galinsky & Mussweiler (2001); extended by Loschelder et al.
+(2014). [Full citation →](research-source.md#anchoring-first-offers)
 
 **Evidence quality: High.** This is one of the most replicated findings in
 negotiation research, running from Tversky & Kahneman's original anchoring
@@ -75,15 +76,9 @@ numbers, not bare assertion) make a first offer land harder.
 
 ### BATNA (Best Alternative to a Negotiated Agreement)
 
-**Source:** Fisher, R. & Ury, W. (1981). *Getting to Yes: Negotiating
-Agreement Without Giving In*. Houghton Mifflin (3rd ed. with Bruce Patton,
-Penguin, 2011). Originated at the Harvard Negotiation Project. Empirically
-tested by Pinkley, R.L., Neale, M.A., & Bennett, R.J. (1994). The
-impact of alternatives to settlement in dyadic negotiation. *Organizational
-Behavior and Human Decision Processes*, 57(1), 97–116. Extended by
-Pinkley, R.L. (1995). Impact of knowledge regarding alternatives to
-settlement in dyadic negotiations: Whose knowledge counts? *Journal of
-Applied Psychology*, 80(3), 403–417.
+**Source:** Fisher & Ury (1981), *Getting to Yes*; tested by Pinkley,
+Neale & Bennett (1994) and extended by Pinkley (1995).
+[Full citation →](research-source.md#batna)
 
 **Evidence quality: Moderate-High.** BATNA itself is a conceptual/practitioner
 framework, not an empirical finding — *Getting to Yes* is a practitioner
@@ -134,9 +129,8 @@ the extent the counterpart is made aware a credible alternative exists.
 
 ### Deflecting Salary History / Expectation Questions
 
-**Source (legislative fact):** HR Dive, *Salary history bans: A running
-list of states and localities* (tracker, last updated April 28, 2026).
-Cross-referenced against state government sources cited in the tracker.
+**Source (legislative fact):** HR Dive salary-history-ban tracker (last
+updated April 28, 2026). [Full citation →](research-source.md#deflecting-salary-history)
 
 **Evidence quality for the legal claim: High (it's a tracker of enacted
 law, not a research finding) — but time-sensitive.** As of the tracker's
@@ -199,17 +193,10 @@ an independently validated finding.
 
 ### Integrative (Multi-Issue) Negotiation
 
-**Source:** Walton, R.E. & McKersie, R.B. (1965). *A Behavioral Theory of
-Labor Negotiations*. McGraw-Hill — originated the distributive/integrative
-distinction. Operationalized experimentally by Pruitt, D.G. across
-multiple studies spanning the 1970s and 1980s, e.g. Pruitt, D.G. & Lewis,
-S.A. (1975), Development of integrative solutions in bilateral
-negotiation, *Journal of Personality and Social Psychology*, 31(4),
-621–633, using a three-issue negotiation task. Pruitt's later work
-includes Pruitt, D.G. & Carnevale, P.J. (1993), *Negotiation in Social
-Conflict*, a distinct collaboration from the 1975 study. Popularized for
-practitioners in Malhotra, D. & Bazerman, M.H. (2007). *Negotiation
-Genius*. Bantam.
+**Source:** Walton & McKersie (1965); operationalized experimentally by
+Pruitt & Lewis (1975) and colleagues through the 1970s–80s; popularized
+for practitioners in Malhotra & Bazerman (2007), *Negotiation Genius*.
+[Full citation →](research-source.md#integrative-negotiation)
 
 **Evidence quality: Moderate-High for the underlying mechanism, Low-Moderate
 for the popular practitioner packaging.** The core empirical finding —
@@ -270,20 +257,10 @@ across comp dimensions, ask for one before suggesting trade language.
 
 ### Gender and Framing Effects in Salary Negotiation
 
-**Source:** Babcock, L. & Laschever, S. (2003, updated ed. 2021). *Women
-Don't Ask: Negotiation and the Gender Divide*. Princeton University Press.
-Bowles, H.R., Babcock, L., & Lai, L. (2007). Social incentives for gender
-differences in the propensity to initiate negotiations: Sometimes it does
-hurt to ask. *Organizational Behavior and Human Decision Processes*,
-103(1), 84–103. Contested/updated by: Mazei, J., Hüffmeier, J., Freund,
-P.A., et al. (2015). A meta-analysis on gender differences in negotiation
-outcomes and their moderators. *Psychological Bulletin*, 141(1), 85–104.
-And: Kray, L.J., Kennedy, J.A., & Lee, M. (2024). Now, Women Do Ask: A
-Call to Update Beliefs about the Gender Pay Gap. *Academy of Management
-Discoveries*, 10(1), 7–33. DOI: 10.5465/amd.2022.0021. (Published online
-August 15, 2023; formal issue year 2024.) Cross-referenced against the
-journal's own page (journals.aom.org) and UC Berkeley Haas's research
-summary (haas.berkeley.edu/ibsi).
+**Source:** Babcock & Laschever (2003/2021), *Women Don't Ask*; Bowles,
+Babcock & Lai (2007); contested/updated by Mazei et al. (2015)
+meta-analysis and Kray, Kennedy & Lee (2024).
+[Full citation →](research-source.md#gender-framing-effects)
 
 **Evidence quality: Contested — treat with real caution.** This is
 explicitly one of the more high-profile areas of negotiation research
@@ -309,8 +286,9 @@ ask" as settled fact.
   rather than themselves. This is an important qualifier: the "gap" is not
   a fixed trait difference, it is heavily moderated by preparation and
   information, both of which a negotiation-prep skill can directly affect.
-- Kray, Kennedy & Lee (2024, *Academy of Management Discoveries* —
-  full citation above) surveyed graduates of a top U.S. MBA program about
+- Kray, Kennedy & Lee (2024, *Academy of Management Discoveries*, DOI
+  10.5465/amd.2022.0021 — see research-source.md#gender-framing-effects
+  for full citation) surveyed graduates of a top U.S. MBA program about
   whether they negotiated their first post-MBA salary, plus a second,
   larger survey of alumni about negotiating promotions/compensation more
   broadly. They found women now negotiate salary at rates equal to or
@@ -380,15 +358,9 @@ setting specifically.
 
 ### Deadline and Pressure Tactics
 
-**Source:** Stuhlmacher, A.F., Gillespie, T.L., & Champagne, M.V. (1998).
-The impact of time pressure in negotiation: A meta-analysis. *International
-Journal of Conflict Management*, 9(2), 97–116. Moore, D.A. (2004). Myopic
-prediction, self-destructive secrecy, and the unexpected benefits of
-revealing final deadlines in negotiation. *Organizational Behavior and
-Human Decision Processes*, 94(2), 125–139. On exploding offers
-specifically: Lau, N., Bart, Y., Bearden, J.N., & Tsetlin, I. (2014).
-Exploding offers can blow up in more than one way. *Decision Analysis*,
-11(3), 171–188.
+**Source:** Stuhlmacher, Gillespie & Champagne (1998) meta-analysis;
+Moore (2004); on exploding offers specifically, Lau, Bart, Bearden &
+Tsetlin (2014). [Full citation →](research-source.md#deadline-pressure-tactics)
 
 **Evidence quality: Moderate-High for the general time-pressure effect;
 Moderate for exploding-offer-specific outcomes — Lau et al. (2014) is
@@ -477,19 +449,9 @@ figure was found for that specific claim.
 ### Startup Exit-Rate Base Rates by Stage
 
 **Source:** Correlation Ventures proprietary deal database, reported via
-two independent intermediary sources presenting different cuts of what
-appears to be overlapping data: Bruce Booth (partner, Atlas Venture),
-"Correlation's Fresh Look At Venture Capital Returns," *LifeSciVC*,
-November 18, 2013 (analysis of 7,976 realized VC financings, 2003–2012,
-exit-year basis); and Seth Levine (partner, Foundry Group), "Venture
-Outcomes are Even More Skewed Than You Think," *VC Adventure*, August
-2014 (analysis of 21,640 financings, 2004–2013, financing-level return
-multiples). Also: Hassan, K., Varadan, M., & Zeisberger, C. (2020).
-[Institutional Investor op-ed] citing a related Correlation Ventures
-figure (0.4% of deals return 50x+). Cross-referenced against CB Insights,
-*Why Startups Fail* research / startup post-mortem database (483
-post-mortems tracked; 2024 update analyzed 431 VC-backed companies that
-shut down since 2023), cbinsights.com.
+Booth (2013) and Levine (2014); cross-referenced against CB Insights'
+startup post-mortem database.
+[Full citation →](research-source.md#exit-rate-base-rates)
 
 **Evidence quality: Low-Moderate, and this is the weakest-sourced
 subsection in this document — read the limitations below before treating
@@ -579,18 +541,10 @@ use a flat (or explicitly-unvalidated, stage-blind) default instead.
 
 ### Liquidation Preferences & the Preference Stack
 
-**Source:** National Venture Capital Association (NVCA), Model Legal
-Documents / Model Term Sheet, nvca.org (industry-standard template used
-across U.S. venture financings; individual model documents on nvca.org
-each carry their own revision date rather than one series-wide version —
-e.g. the Certificate of Incorporation and Stock Purchase Agreement show
-"Updated October 2025," the Voting Agreement "Updated June 2026," as of
-September 2026). Cooley LLP, *Venture Financing
-Report* (quarterly series; Q1 2026 edition checked directly, cooley.com) —
-an aggregated survey of deal terms across Cooley's own venture financing
-practice. The Holloway Guide to Venture Capital, "Liquidation Preference,"
-holloway.com, edition 1.1.4, updated September 15, 2023 — practitioner
-reference explaining preference-stack mechanics.
+**Source:** NVCA Model Legal Documents / Model Term Sheet; Cooley LLP
+*Venture Financing Report* (Q1 2026 edition); The Holloway Guide to
+Venture Capital, "Liquidation Preference" (edition 1.1.4).
+[Full citation →](research-source.md#liquidation-preferences)
 
 **Evidence quality: High for the mechanism and for current market-standard
 single-round terms; unverified for cross-round stacking base rates.**
@@ -688,22 +642,9 @@ default.
 
 ### 409A Valuation vs. Preferred Price Gap
 
-**Source:** Moon, C. (2020, February 13). "16 Things to Know About the
-409A Valuation." *Andreessen Horowitz (a16z)*, a16z.com. AICPA,
-*Valuation of Privately-Held-Company Equity Securities Issued as
-Compensation* (Accounting and Valuation Guide / Practice Aid), 2013
-revision (the last full revision as of September 2026; a working
-draft of an updated edition was released by AICPA's Financial Reporting
-Executive Committee for public comment in December 2025, with comments
-due June 1, 2026, but was not yet a finalized, citable edition) — the
-technical valuation-methodology document (option-pricing
-method, probability-weighted expected return method, current value
-method) industry-standard 409A appraisers work from. Underlying statutory
-basis:
-Internal Revenue Code §409A (enacted as part of the American Jobs
-Creation Act of 2004, post-Enron), which requires an independent,
-defensible fair-market-value determination for private-company stock
-used to set option strike prices.
+**Source:** Moon (2020), Andreessen Horowitz (a16z); AICPA Practice Aid
+(2013 revision, the last full revision as of September 2026); Internal
+Revenue Code §409A. [Full citation →](research-source.md#409a-valuation-gap)
 
 **Evidence quality: Moderate-High for the mechanism; Low for any specific
 numeric ratio — and the best source found here explicitly warns against
@@ -766,26 +707,10 @@ discount) rather than looking up a stage-based ratio table.
 
 ### Discount for Lack of Marketability (DLOM)
 
-**Source:** Damodaran, A. (2005, July). *Marketability and Value:
-Measuring the Illiquidity Discount* [Working paper]. Stern School of
-Business, New York University. pages.stern.nyu.edu (fetched and read
-directly). Primary studies synthesized within it: Maher, J.M. (1976).
-Discounts for Lack of Marketability for Closely Held Business Interests.
-*Taxes*, 54, 562–571. Silber, W.L. (1991). Discounts on Restricted Stock:
-The Impact of Illiquidity on Stock Prices. *Financial Analysts Journal*,
-47, 60–64. Johnson, B.A. (1999). Quantitative Support for Discounts for
-Lack of Marketability. *Business Valuation Review*, 16, 152–155. Wruck,
-K.H. (1989). Equity Ownership Concentration and Firm Value: Evidence from
-Private Equity Financings. *Journal of Financial Economics*, 23, 3–28.
-Hertzel, M. & Smith, R.L. (1993). Market Discounts and Shareholder Gains
-from Placing Equity Privately. *Journal of Finance*, 48, 459–486. Bajaj,
-M., Dennis, D.J., Ferris, S.P., & Sarin, A. (2001). Firm Value and
-Marketability Discounts. *Journal of Corporate Law*, 27. Emory, J.
-(1996), reported in Pratt, S., Reilly, R., & Schwiehs, R.P. (1997).
-*Valuing a Business: The Analysis and Appraisal of Closely Held
-Companies*. McGraw-Hill. Longstaff, F.A. (1995). How Much Can
-Marketability Affect Security Values? *Journal of Finance*, 50,
-1767–1774.
+**Source:** Damodaran (2005) synthesis of eight primary marketability-
+discount studies (Maher 1976; Silber 1991; Johnson 1999; Wruck 1989;
+Hertzel & Smith 1993; Bajaj et al. 2001; Emory 1996; Longstaff 1995).
+[Full citation →](research-source.md#dlom)
 
 **Evidence quality: High for the existence and rough order of magnitude of
 an illiquidity discount as a real, mainstream finance concept; Moderate at
@@ -898,14 +823,9 @@ applying one flat constant regardless of the user's actual situation.
 
 ### ISO vs. NSO Tax Treatment and AMT (flagged, not modeled)
 
-**Source:** National Center for Employee Ownership (NCEO), "Stock Options
-and the Alternative Minimum Tax (AMT)," nceo.org/articles (fetched and
-read directly; no individual author or date given on the page). Cross-
-referenced against the underlying statute: Internal Revenue Code §422
-(incentive stock option qualification and statutory holding-period
-requirements), §56(b)(3) (ISO exercise spread as an Alternative Minimum
-Tax preference item), and §83 (general rule that a nonqualified stock
-option's exercise spread is ordinary compensation income).
+**Source:** National Center for Employee Ownership (NCEO); Internal
+Revenue Code §422, §56(b)(3), §83.
+[Full citation →](research-source.md#iso-nso-tax-treatment)
 
 **Evidence quality: High.** This subsection describes settled, uncontested
 U.S. federal tax mechanism (Internal Revenue Code provisions), not a
