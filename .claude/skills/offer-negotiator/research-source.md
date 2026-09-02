@@ -164,6 +164,11 @@ Walker, P. (2026, March 18). "What Is a Good Seed to Series A Graduation
 Rate." *Carta*, carta.com/data/linkedin-seed-to-series-a-graduation-
 rates/.
 
+Walker, P. (2024, March 14). "The Startup Class of 2018 Where Are They
+Now." *Carta*, carta.com/data/linkedin-startup-class-2018-where-are-
+they/. Cohort: 3,067 US startups incorporated in 2018 that used Carta as
+their cap table provider, tracked ~6 years through the publication date.
+
 ---
 
 <a id="liquidation-preferences"></a>

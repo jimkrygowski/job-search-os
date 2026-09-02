@@ -451,8 +451,8 @@ figure was found for that specific claim.
 **Source:** Correlation Ventures proprietary deal database, reported via
 Booth (2013) and Levine (2014); cross-referenced against CB Insights'
 startup post-mortem database and CB Insights' "The Venture Capital
-Funnel" (2018); Mattermark/Rowley (2016); Carta (Peter Walker, 2026, two
-posts).
+Funnel" (2018); Mattermark/Rowley (2016); Carta (Peter Walker, three
+posts, 2024 and 2026).
 [Full citation →](research-source.md#exit-rate-base-rates)
 
 **Evidence quality: Moderate for stage-to-stage graduation rates (real,
@@ -509,6 +509,31 @@ the original research pass missed.
   elapsed since seed — Year 1: 5%/10%/20% (low/med/high); Year 2:
   15%/25%/35%; Year 3: 20%/35%/45% — explicitly caveated that "the macro
   matters" as much as the stage itself.
+- **Carta (Peter Walker), "The Startup Class of 2018 Where Are They
+  Now"** (Mar 14, 2024; cohort of 3,067 US startups incorporated in
+  2018, tracked ~6 years through 2024): gives a full furthest-stage-
+  reached distribution, not just adjacent-round graduation — 38%
+  pre-seed, 24% seed, 25% Series A, 10% Series B, 3.2% Series C, 0.7%
+  Series D+ (plus outcomes: 45% ongoing, 49% shut down, 5% acquired,
+  0.2% IPO'd). Converting this cascade into conditional stage-to-stage
+  rates (cumulative-reached-≥X ÷ cumulative-reached-≥previous-stage)
+  gives: Seed→A ~62% succeed (38% fail) — more optimistic than the
+  range above; A→B ~36% succeed (64% fail) — within the range above;
+  B→C ~28% succeed (**72% fail**); C→D+ ~18% succeed (**82% fail**).
+  The B→C and C→D+ figures are notably more pessimistic than
+  Mattermark's "halving" pattern (which implies ~50% at each of those
+  transitions) — plausibly because this cohort's later rounds landed
+  within the post-2022 funding correction.
+- **Methodology decision, 2026-09-02, made explicitly by the user:**
+  where sources disagree, this document uses the more pessimistic
+  (higher-failure) figure, and prefers this newer Carta cohort (tracked
+  through 2024) over Mattermark's older 2009–2012 cohort for the
+  Series B/C/D+ transitions specifically, since more recent data is
+  more likely to reflect the current fundraising climate. This is an
+  explicit, owned choice to be conservative, not an attempt to average
+  or split the difference — for the same reason, the Seed→A range
+  below keeps its existing 52%–69% bounds rather than widening toward
+  this cohort's more optimistic ~38% figure.
 - **Rejected sources during this pass** (documented so this gap in the
   record doesn't get re-litigated): a synthetic 6-tier exit-rate/DLOM
   table from an external AI chat, with no real citations and numbers too
@@ -531,16 +556,31 @@ the original research pass missed.
   specific funding stage isn't known — see "How to use correctly."
 
 **Known limitations:**
-- **Still no data past Series C/4th round with a real percentage
-  attached** — Mattermark's "continues to halve... through Series F and
-  beyond" is a real, explicitly stated pattern, not a fabricated
-  extrapolation, but it's a qualitative pattern applied identically
-  round over round, not independently re-measured at each later stage.
+- **No source directly re-measures a Series D+→later transition** — the
+  Series D+ default is held flat at the Series C→D rate as the most
+  recent, most pessimistic available anchor, not an independently
+  measured figure for that specific transition.
+- **The Series B/C/D+ figures are derived arithmetic** (dividing one
+  cohort's published cumulative-reach percentages), not a directly
+  published conditional rate — the underlying published numbers (38%,
+  24%, 25%, 10%, 3.2%, 0.7%) are real and cited exactly as Carta
+  published them, but the division into stage-to-stage conditional
+  rates is this document's own calculation, done transparently rather
+  than left for `option_value.py` to reconstruct.
+- **This document deliberately chose the more pessimistic, more recent
+  figures over Mattermark's more optimistic, older ones for Series
+  B/C/D+** — a real methodology disagreement exists between the two
+  sources, and this is a conscious, owned choice to be conservative,
+  not a claim that Mattermark's pattern was wrong.
 - **Time-windowed vs. eventual-outcome methodologies don't mix
   cleanly.** CB Insights and Mattermark measure eventual/terminal
   outcomes (tracked for years); Carta's vintage-cohort figures are
-  measured within a fixed 1–2 year window. This document keeps them
-  separate rather than blending them into one synthetic number.
+  measured within a fixed 1–2 year window; the "Class of 2018" cascade
+  is a 6-year snapshot, closer to eventual but still not fully
+  terminal (45% of that cohort was still "ongoing," not resolved
+  either way, as of the snapshot date). This document keeps these
+  methodologies separate rather than blending them into one synthetic
+  number.
 - **None of these sources directly measure whether *common* stockholders
   received a payout** — "didn't graduate to the next round" is not the
   same claim as "common stock got zero." CB Insights states 67% of its
@@ -559,13 +599,13 @@ haircut defaults (spec §7, step 3), use a specific stage tier when the
 user's company stage is known — real, sourced, per-stage figures now
 exist:
 
-| Stage tier | Failure-rate range | Source |
+| Stage tier | Failure rate | Source |
 |---|---|---|
-| Seed (→ Series A) | 52%–69% | CB Insights (52%) to Mattermark (69%) — two independent cohorts |
-| Series A (→ Series B) | 37%–85% | CB Insights eventual outcome (37%) to Carta's worst observed vintage, short window (~85%, conservatively rounded down from the raw ~88-90%) |
-| Series B (→ Series C) | ~50% | Mattermark's stated halving pattern, cross-validated via CB Insights' own cumulative arithmetic |
-| Series C (→ Series D) | ~50% | Same Mattermark pattern, explicitly stated to continue |
-| Series D+ (→ later) | ~50% | Same Mattermark pattern, explicitly stated to continue "through Series F and beyond" |
+| Seed (→ Series A) | 52%–69% (range) | CB Insights (52%) to Mattermark (69%) — two independent cohorts. Deliberately not widened toward the more recent Carta cohort's more optimistic ~38% implied figure — see methodology decision above. |
+| Series A (→ Series B) | 37%–85% (range) | CB Insights eventual outcome (37%) to Carta's worst observed vintage, short window (~85%). The 2018-cohort cascade implies ~64%, comfortably within this range. |
+| Series B (→ Series C) | 72% | Derived from Carta's "Class of 2018" cascade (cumulative reach 3.9%/13.9%), chosen over Mattermark's older, more optimistic ~50% halving-pattern estimate per the recency/conservatism decision above. |
+| Series C (→ Series D) | 82% | Same Carta cascade, same reasoning. |
+| Series D+ (→ later) | 82% | No transition data exists past this cohort's Series D+ bucket; held flat at the Series C rate as the most recent, most pessimistic available anchor. |
 
 When the specific stage isn't known, fall back to the generic all-stage
 aggregate (roughly 60–75%, per Booth/Levine/CB Insights above) rather
