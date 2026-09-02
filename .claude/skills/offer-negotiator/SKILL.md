@@ -1,20 +1,22 @@
 ---
 name: offer-negotiator
-description: Use when a user needs help with compensation — defining or revisiting their target (walk-away numbers, BATNA, target/ask range, comp priorities) as part of first-time bootstrap, prepping talking points for an early comp conversation before any offer exists, breaking down an actual offer's numbers (base/bonus/equity/benefits) against market data and running equity through option_value.py, or planning a specific counter-negotiation script once an offer is broken down. Builds or updates state/career/comp_target.md, produces first-contact negotiation talking points, writes a sourced offer breakdown, or writes a counter-negotiation plan to that opportunity's notes.md.
+description: Use when a user needs help with compensation — defining or revisiting their target (walk-away numbers, BATNA, target/ask range, comp priorities) as part of first-time bootstrap, prepping talking points for an early comp conversation before any offer exists, breaking down an actual offer's numbers against market data and option_value.py, planning a specific counter-negotiation script once an offer is broken down, or handing an opportunity's final accept/decline decision off to career-coach with the comp facts it needs. Builds or updates state/career/comp_target.md, and writes sourced offer breakdowns and counter-negotiation plans to that opportunity's notes.md.
 ---
 
 # Offer Negotiator
 
 ## Purpose
 
-Helps a user navigate compensation across their job search: building and
-revisiting their standing compensation target (Setup Mode), prepping
-talking points for an early comp conversation before any offer exists
-(First-Contact Prep), breaking down an actual offer's numbers against
-sourced market data and a real equity valuation (Offer Breakdown), and
-turning that breakdown into a specific counter-negotiation script
-(Counter-Negotiation Planning). Grounded throughout in a real BATNA,
-`research.md`'s evidence-graded negotiation tactics, and
+Helps a user navigate compensation across the full arc of a job search:
+building and revisiting their standing compensation target (Setup Mode),
+prepping talking points for an early comp conversation before any offer
+exists (First-Contact Prep), breaking down an actual offer's numbers
+against sourced market data and a real equity valuation (Offer
+Breakdown), turning that breakdown into a specific counter-negotiation
+script (Counter-Negotiation Planning), and — once negotiation is done —
+handing the actual accept/decline call to `career-coach` with real comp
+facts already in `notes.md` (Final Accept/Decline). Grounded throughout
+in a real BATNA, `research.md`'s evidence-graded negotiation tactics, and
 `option_value.py`'s deterministic equity math — never in invented numbers
 or generic scripts.
 
@@ -29,6 +31,9 @@ or generic scripts.
      - Plan how to counter or negotiate it → **Counter-Negotiation
        Planning**. Skip the rest of this section and go straight to that
        section below.
+     - Decide whether to accept or decline it → **Final Accept/Decline**.
+       Skip the rest of this section and go straight to that section
+       below.
    - If the user has an upcoming conversation where they expect to be
      asked about comp expectations and doesn't have an offer in hand yet
      (a recruiter screen, an early call) → **First-Contact Prep**. Skip
@@ -312,6 +317,42 @@ Write the counter-negotiation script to the resolved opportunity's
 specific ask, the package trade-offs, and how to handle any pressure
 tactics present in the offer.
 
+## Final Accept/Decline
+
+Hands this opportunity's actual accept/decline decision off to
+`career-coach` rather than running its own decision session —
+`career-coach`'s Evaluation Template already scores "Compensation &
+upside" as one of five dimensions alongside role scope, growth
+trajectory, cultural fit, and problem fit, and its Session Start Protocol
+already reads this opportunity's `notes.md`. This moment's only job is to
+make sure that file has real comp facts for `career-coach` to read.
+
+This moment needs no `research.md` content — per design spec §6.4, it is
+a hand-off, not its own research session.
+
+### Session Start
+
+Confirm which opportunity this is for, then resolve its folder via
+`python3 tools/tracker.py opportunity-path "<Company>" "<Role>"` — never
+construct the path yourself.
+
+### What to Do
+
+1. Check the resolved opportunity's `notes.md` for a clear, sourced comp
+   summary — an `## Offer Breakdown (<date>)` section and, ideally, a
+   `## Counter-Negotiation Plan (<date>)` section. If either is missing,
+   say so plainly and offer to run it first — but don't block if the user
+   wants to proceed with what's already there.
+2. Explicitly invoke `career-coach` for this opportunity's full decision
+   session — same in-session hand-off pattern `bootstrap` uses for
+   `build-profile`/`define-trajectory`.
+
+### Output
+
+None directly from this moment — the hand-off to `career-coach` produces
+the actual decision-session output, using the comp summary this moment
+confirmed is in `notes.md`.
+
 ## Guardrails
 
 - Never invent a BATNA, a competing offer, or a timeline the user hasn't
@@ -332,3 +373,6 @@ tactics present in the offer.
   never cite an unsourced statistic (e.g. a specific turnover rate) for
   exploding-offer consequences — per `research.md`'s explicit cautions on
   both.
+- Never render an accept/decline recommendation directly in Final
+  Accept/Decline — that's `career-coach`'s job. This moment only confirms
+  the comp facts it needs are in `notes.md` and hands off.

@@ -22,7 +22,7 @@ Eleven skills, each a focused piece of the search, invoked in a normal Claude Co
 | `bootstrap` | First-time setup — checks the Python preflight, then walks a new user through `build-profile`, `define-trajectory`, and comp-target setup |
 | `build-profile` | Guided conversation to build a real candidate profile: career history, best/worst jobs and bosses, and the patterns underneath them |
 | `define-trajectory` | Defines (and later revisits) the target role, shaped as a Mnookin Two-Pager — see below |
-| `offer-negotiator` | Compensation coaching end to end — builds your target, preps first-contact talking points, and breaks down a real offer with equity run through `option_value.py` |
+| `offer-negotiator` | Compensation coaching end to end — builds your target, preps first-contact talking points, breaks down a real offer with equity run through `option_value.py`, plans the counter, and hands the final call to `career-coach` |
 | `score-opportunity` | Scores a pasted job description against your actual must-haves/must-nots, criterion by criterion — not a vibe check |
 | `tailor-resume` | Tailors a resume and cover letter from your master resume — never invents experience to fit a JD |
 | `company-research` | Researches a target company, every finding tagged with a source |
