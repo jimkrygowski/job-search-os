@@ -19,17 +19,17 @@ never in invented numbers or generic scripts.
 ## Session Start
 
 1. Determine which moment this session is:
-   - If `state/career/comp_target.md` doesn't exist, or the user
-     explicitly wants to define/revisit their walk-away numbers, target
-     range, comp priorities, or deal-breakers → **Setup Mode**. Continue
-     with step 2 below.
+   - If the user has an actual offer in hand — numbers to break down
+     (base/bonus/equity/benefits) → **Offer Breakdown**. Skip the rest of
+     this section and go straight to that section below.
    - If the user has an upcoming conversation where they expect to be
      asked about comp expectations and doesn't have an offer in hand yet
      (a recruiter screen, an early call) → **First-Contact Prep**. Skip
      the rest of this section and go straight to that section below.
-   - If the user has an actual offer in hand — numbers to break down
-     (base/bonus/equity/benefits) → **Offer Breakdown**. Skip the rest of
-     this section and go straight to that section below.
+   - If the user explicitly wants to define/revisit their walk-away
+     numbers, target range, comp priorities, or deal-breakers, or if none
+     of the above apply and `state/career/comp_target.md` doesn't exist
+     yet → **Setup Mode**. Continue with step 2 below.
    - If it's ambiguous which the user wants, ask directly rather than
      guessing.
 2. (Setup Mode only) Check whether `state/career/comp_target.md` exists.
@@ -43,6 +43,8 @@ never in invented numbers or generic scripts.
    them.
 
 ## Setup Mode — Sections
+
+Read only `research.md`'s "Anchoring & First Offers" and "BATNA" subsections (see the moment index near the top of that file) — skip the rest.
 
 - **Last reviewed:** `<date>`
 - **BATNA (walk-away alternative)** — the real, concrete alternative that
@@ -115,9 +117,10 @@ first call — before any offer exists. No market-data research needed:
 this moment works entirely from the JD/conversation (role, level, geo)
 and, if it exists, `state/career/comp_target.md`.
 
-Read only `research.md`'s "Anchoring & First Offers", "BATNA", and
-"Deflecting Salary History / Expectation Questions" subsections (see the
-moment index near the top of that file) — skip the rest.
+Read only `research.md`'s "Anchoring & First Offers", "BATNA (Best
+Alternative to a Negotiated Agreement)", and "Deflecting Salary History /
+Expectation Questions" subsections (see the moment index near the top of
+that file) — skip the rest.
 
 ### Session Start
 
@@ -128,6 +131,8 @@ moment index near the top of that file) — skip the rest.
 2. Read `state/career/comp_target.md` if it exists, for the target/ask
    range and walk-away minimums — this moment should ground any number it
    suggests in that file, not invent one.
+
+If `state/career/comp_target.md` doesn't exist yet, mention that running Setup Mode first would ground this session's numbers better — but do the First-Contact Prep the user asked for first, don't block on it.
 
 ### What to Produce
 
@@ -176,6 +181,8 @@ Confirm which opportunity this offer is for, then resolve its folder via
 construct the path yourself. If that folder doesn't exist yet, run
 `score-opportunity` first, or ask whether to.
 
+If `state/career/comp_target.md` doesn't exist yet, mention that Setup Mode would give this breakdown a walk-away number to compare against — but do the Offer Breakdown the user asked for first, don't block on it.
+
 ### Gathering the Offer
 
 Get the offer numbers from the user — a pasted offer letter, or a verbal
@@ -218,11 +225,13 @@ reading a JSON object on stdin with these keys (required: `shares`,
 key does and its sourcing. The tool prints a JSON breakdown (face value,
 preference-stack adjustment, exit-probability range, final risk-adjusted
 range, and any caveats) — relay this breakdown, including every caveat it
-returns, rather than collapsing it into a single number. If
-`preference_stack`/`fully_diluted_shares` weren't supplied, the tool's
-`preference_adjustment.applied` will be `false` with guidance on what to
-ask the company for — pass that guidance back to the user rather than
-silently treating the equity as fully at face value.
+returns, rather than collapsing it into a single number. For a
+private-stage grant, if `preference_stack`/`fully_diluted_shares` weren't
+supplied, the tool's `preference_adjustment.applied` will be `false` with
+guidance on what to ask the company for — pass that guidance back to the
+user rather than silently treating the equity as fully at face value.
+
+For an RSU grant (no strike price), pass `strike_price: 0` — the tool's face-value math (`shares * max(0, quoted_price - strike_price)`) handles this correctly. If a required input (share count, quoted price, or company stage) genuinely isn't known, ask the user for it rather than guessing — the tool will reject a missing required key outright, and a guessed number is worse than an honest "we don't have this yet."
 
 ### Output
 

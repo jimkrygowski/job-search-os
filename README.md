@@ -22,7 +22,7 @@ Eleven skills, each a focused piece of the search, invoked in a normal Claude Co
 | `bootstrap` | First-time setup — checks the Python preflight, then walks a new user through `build-profile`, `define-trajectory`, and comp-target setup |
 | `build-profile` | Guided conversation to build a real candidate profile: career history, best/worst jobs and bosses, and the patterns underneath them |
 | `define-trajectory` | Defines (and later revisits) the target role, shaped as a Mnookin Two-Pager — see below |
-| `offer-negotiator` | Builds and revisits your compensation target — walk-away numbers, ask range, comp priorities, deal-breakers |
+| `offer-negotiator` | Compensation coaching end to end — builds your target, preps first-contact talking points, and breaks down a real offer with equity run through `option_value.py` |
 | `score-opportunity` | Scores a pasted job description against your actual must-haves/must-nots, criterion by criterion — not a vibe check |
 | `tailor-resume` | Tailors a resume and cover letter from your master resume — never invents experience to fit a JD |
 | `company-research` | Researches a target company, every finding tagged with a source |
@@ -58,6 +58,7 @@ state/                           gitignored — never part of this repo's git hi
   career/
     profile.md                   your background (built by build-profile)
     trajectory.md                your target role, Mnookin Two-Pager shape
+    comp_target.md               walk-away numbers, comp priorities, deal-breakers
     job_alert_sources.md         your job alert email sources
     resume/master_resume.md      your source-of-truth resume
   opportunity/<Company>/<Role>/  per-opportunity JD, contacts, notes, tailored resume, transcripts
@@ -66,6 +67,7 @@ state/                           gitignored — never part of this repo's git hi
 tools/
   tracker.py                     sole writer of tracker.md, locked, tested
   gmail_extract.py                extracts new content from a saved Gmail thread
+  option_value.py                deterministic equity valuation calculator
 
 .claude/
   skills/                        the eleven skills above

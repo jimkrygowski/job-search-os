@@ -24,6 +24,7 @@ given moment maps to below; skip the rest.
 
 | Moment | Needs |
 |---|---|
+| Setup Mode | Anchoring & First Offers, BATNA (Best Alternative to a Negotiated Agreement) |
 | 1. First-contact prep | Anchoring & First Offers, BATNA (Best Alternative to a Negotiated Agreement), Deflecting Salary History / Expectation Questions |
 | 2. Offer breakdown | None directly — the Equity & Comp Mechanics reasoning is already baked into `tools/option_value.py`'s docstrings and called, not re-read here; market-benchmark sourcing follows CLAUDE.md guardrail #2, not this file |
 | 3. Counter-negotiation planning | Integrative (Multi-Issue) Negotiation, Gender and Framing Effects in Salary Negotiation, Deadline and Pressure Tactics |
