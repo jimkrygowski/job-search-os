@@ -275,5 +275,155 @@ class ComputeDlomRangeTest(unittest.TestCase):
             )
 
 
+class ComputeValuationTest(unittest.TestCase):
+    def test_full_breakdown_with_preference_stack_and_cash_comparison(self):
+        # face_value = 1000 * (5.00 - 2.00) = 3000.0
+        # preference: common_price = 5.00 - 2,000,000/1,000,000 = 3.00
+        #             adjusted_value = 1000 * (3.00 - 2.00) = 1000.0
+        # exit range (private default): low=1000*0.25=250.0, high=1000*0.40=400.0
+        # dlom range (private default): low=250*0.70=175.0, high=400*0.80=320.0
+        # cash_alternative=1000.0 -> vs_low=1000-175=825.0, vs_high=1000-320=680.0
+        result = option_value.compute_valuation({
+            "shares": 1000,
+            "strike_price": 2.00,
+            "quoted_price": 5.00,
+            "company_stage": "private",
+            "preference_stack": 2_000_000,
+            "fully_diluted_shares": 1_000_000,
+            "cash_alternative": 1000.0,
+        })
+        self.assertEqual(result["face_value"], 3000.0)
+        self.assertTrue(result["preference_adjustment"]["applied"])
+        self.assertEqual(result["preference_adjustment"]["adjusted_value"], 1000.0)
+        self.assertEqual(result["exit_probability_range"]["low"], 250.0)
+        self.assertEqual(result["exit_probability_range"]["high"], 400.0)
+        self.assertEqual(result["final_range"]["low"], 175.0)
+        self.assertEqual(result["final_range"]["high"], 320.0)
+        self.assertEqual(result["cash_vs_equity_low"], 825.0)
+        self.assertEqual(result["cash_vs_equity_high"], 680.0)
+
+    def test_missing_preference_stack_falls_back_to_face_value_for_later_stages(self):
+        # preference not applied -> exit/dlom stages use face_value (3000.0)
+        # exit range: low=3000*0.25=750.0, high=3000*0.40=1200.0
+        # dlom range: low=750*0.70=525.0, high=1200*0.80=960.0
+        result = option_value.compute_valuation({
+            "shares": 1000,
+            "strike_price": 2.00,
+            "quoted_price": 5.00,
+            "company_stage": "private",
+        })
+        self.assertFalse(result["preference_adjustment"]["applied"])
+        self.assertIsNotNone(result["preference_adjustment"]["guidance"])
+        self.assertEqual(result["final_range"]["low"], 525.0)
+        self.assertEqual(result["final_range"]["high"], 960.0)
+
+    def test_public_company_passes_through_every_stage(self):
+        result = option_value.compute_valuation({
+            "shares": 1000,
+            "strike_price": 2.00,
+            "quoted_price": 5.00,
+            "company_stage": "public",
+        })
+        self.assertEqual(result["face_value"], 3000.0)
+        self.assertEqual(result["final_range"]["low"], 3000.0)
+        self.assertEqual(result["final_range"]["high"], 3000.0)
+
+    def test_no_cash_alternative_omits_comparison_keys(self):
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "public",
+        })
+        self.assertNotIn("cash_vs_equity_low", result)
+        self.assertNotIn("cash_alternative", result)
+
+    def test_missing_required_key_raises_with_key_name(self):
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "strike_price": 2.00, "quoted_price": 5.00, "company_stage": "public",
+            })
+        self.assertIn("shares", str(ctx.exception))
+
+    def test_exit_and_dlom_overrides_pass_through(self):
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "private",
+            "exit_probability_override": {"low": 0.5, "high": 0.5},
+            "dlom_override": {"low": 0.1, "high": 0.1},
+        })
+        # face_value=3000.0 -> exit override 0.5/0.5 -> 1500.0/1500.0
+        # -> dlom override 0.1/0.1 -> 1350.0/1350.0
+        self.assertEqual(result["final_range"]["low"], 1350.0)
+        self.assertEqual(result["final_range"]["high"], 1350.0)
+
+    def test_dynamic_dlom_inputs_pass_through_full_breakdown(self):
+        # face_value=3000.0; preference applied -> base_for_exit=1000.0
+        # exit range (private default): low=250.0, high=400.0
+        # dlom dynamic (T=2, vol=0.25) -> 0.32 (verified in Task 4)
+        # -> final_low=250*0.68=170.0, final_high=400*0.68=272.0
+        # cash_alternative=1000.0 -> vs_low=1000-170=830.0, vs_high=1000-272=728.0
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "private",
+            "preference_stack": 2_000_000, "fully_diluted_shares": 1_000_000,
+            "time_to_liquidity_years": 2, "volatility": 0.25,
+            "cash_alternative": 1000.0,
+        })
+        self.assertAlmostEqual(result["final_range"]["low"], 170.0)
+        self.assertAlmostEqual(result["final_range"]["high"], 272.0)
+        self.assertEqual(result["final_range"]["method"], "dynamic-longstaff-interpolation")
+        self.assertAlmostEqual(result["cash_vs_equity_low"], 830.0)
+        self.assertAlmostEqual(result["cash_vs_equity_high"], 728.0)
+
+    def test_specific_stage_tier_pass_through_full_breakdown(self):
+        # face_value=3000.0; preference applied -> base_for_exit=1000.0
+        # exit range (series_b: failure 0.72/0.72) -> low=280.0, high=280.0
+        # dlom flat fallback (no time/vol given): low=280*0.70=196.0, high=280*0.80=224.0
+        # cash_alternative=1000.0 -> vs_low=1000-196=804.0, vs_high=1000-224=776.0
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "series_b",
+            "preference_stack": 2_000_000, "fully_diluted_shares": 1_000_000,
+            "cash_alternative": 1000.0,
+        })
+        self.assertEqual(result["exit_probability_range"]["low"], 280.0)
+        self.assertEqual(result["exit_probability_range"]["high"], 280.0)
+        self.assertEqual(result["final_range"]["low"], 196.0)
+        self.assertEqual(result["final_range"]["high"], 224.0)
+        self.assertEqual(result["cash_vs_equity_low"], 804.0)
+        self.assertEqual(result["cash_vs_equity_high"], 776.0)
+
+
+class OptionValueCLITest(unittest.TestCase):
+    def setUp(self):
+        self.script = str(Path(__file__).parent / "option_value.py")
+
+    def run_cli(self, *args, input_text=None):
+        import subprocess
+        return subprocess.run(
+            [sys.executable, self.script, *args],
+            input=input_text, capture_output=True, text=True,
+        )
+
+    def test_compute_command_reads_stdin_and_prints_json_breakdown(self):
+        import json
+        inputs = json.dumps({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "public",
+        })
+        result = self.run_cli("compute", input_text=inputs)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        output = json.loads(result.stdout)
+        self.assertEqual(output["face_value"], 3000.0)
+
+    def test_compute_command_invalid_json_fails_nonzero(self):
+        result = self.run_cli("compute", input_text="not json")
+        self.assertNotEqual(result.returncode, 0)
+
+    def test_compute_command_missing_required_key_fails_nonzero(self):
+        result = self.run_cli("compute", input_text='{"shares": 1000}')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("strike_price", result.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -14,6 +14,10 @@ self-documenting -- see design spec section 7 for how the four stages
 compose.
 """
 
+import argparse
+import json
+import sys
+
 
 def compute_face_value(shares, strike_price, quoted_price):
     """shares x max(0, quoted_price - strike_price) -- naive face value,
@@ -267,3 +271,106 @@ def compute_dlom_range(value_low, value_high, company_stage,
         "dlom_high": DLOM_HIGH,
         "method": "flat-default-band",
     }
+
+
+REQUIRED_KEYS = ("shares", "strike_price", "quoted_price", "company_stage")
+
+
+def compute_valuation(inputs):
+    """Runs all four stages in sequence and returns a full breakdown.
+
+    inputs keys: shares, strike_price, quoted_price, company_stage
+    (required); preference_stack, fully_diluted_shares,
+    exit_probability_override ({'low', 'high'}), time_to_liquidity_years,
+    volatility, dlom_override ({'low', 'high'}), cash_alternative (all
+    optional). See compute_dlom_range for how time_to_liquidity_years/
+    volatility vs. dlom_override vs. neither are prioritized.
+    """
+    missing = [k for k in REQUIRED_KEYS if k not in inputs]
+    if missing:
+        raise ValueError(f"missing required input(s): {missing}")
+
+    shares = inputs["shares"]
+    strike_price = inputs["strike_price"]
+    quoted_price = inputs["quoted_price"]
+    company_stage = inputs["company_stage"]
+
+    face_value = compute_face_value(shares, strike_price, quoted_price)
+
+    preference = compute_preference_adjustment(
+        shares, strike_price, quoted_price,
+        preference_stack=inputs.get("preference_stack"),
+        fully_diluted_shares=inputs.get("fully_diluted_shares"),
+    )
+
+    base_for_exit = preference["adjusted_value"] if preference["applied"] else face_value
+
+    exit_override = inputs.get("exit_probability_override") or {}
+    exit_range = compute_exit_probability_range(
+        base_for_exit, company_stage,
+        override_low=exit_override.get("low"),
+        override_high=exit_override.get("high"),
+    )
+
+    dlom_override = inputs.get("dlom_override") or {}
+    final_range = compute_dlom_range(
+        exit_range["low"], exit_range["high"], company_stage,
+        time_to_liquidity_years=inputs.get("time_to_liquidity_years"),
+        volatility=inputs.get("volatility"),
+        override_low=dlom_override.get("low"),
+        override_high=dlom_override.get("high"),
+    )
+
+    result = {
+        "face_value": face_value,
+        "preference_adjustment": preference,
+        "exit_probability_range": exit_range,
+        "final_range": final_range,
+    }
+
+    cash_alternative = inputs.get("cash_alternative")
+    if cash_alternative is not None:
+        result["cash_alternative"] = cash_alternative
+        result["cash_vs_equity_low"] = cash_alternative - final_range["low"]
+        result["cash_vs_equity_high"] = cash_alternative - final_range["high"]
+
+    return result
+
+
+def cmd_compute(args):
+    try:
+        inputs = json.load(sys.stdin)
+    except json.JSONDecodeError as e:
+        print(f"invalid JSON on stdin: {e}", file=sys.stderr)
+        sys.exit(1)
+    try:
+        result = compute_valuation(inputs)
+    except (KeyError, ValueError) as e:
+        print(str(e), file=sys.stderr)
+        sys.exit(1)
+    print(json.dumps(result, indent=2))
+
+
+def build_parser():
+    parser = argparse.ArgumentParser(
+        description="Deterministic equity valuation calculator for offer-negotiator"
+    )
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    p_compute = sub.add_parser(
+        "compute",
+        help="read valuation inputs as JSON on stdin, print a staged breakdown as JSON",
+    )
+    p_compute.set_defaults(func=cmd_compute)
+
+    return parser
+
+
+def main():
+    parser = build_parser()
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()
