@@ -14,9 +14,9 @@
 
 - Public-company inputs pass through **every** adjustment stage unchanged (no preference-stack, exit-probability, or DLOM adjustment applies — a real market price already exists) (spec §7 steps 2-4, §9).
 - The preference-stack adjustment is a **required input with an explicit unconfirmed-placeholder state, never a silently-applied default**: when `preference_stack` or `fully_diluted_shares` is missing, output `"applied": false` plus concrete guidance on what to ask the company for — do not fall back to any generic percentage (spec §7 step 2, revised).
-- The exit-probability haircut has **real per-stage tiers**: `public` (no haircut), five specific private-stage tiers (`seed`, `series_a`, `series_b`, `series_c`, `series_d_plus`, each with its own sourced failure-rate range/point from `research.md#exit-rate-base-rates`), and a generic `private` fallback (the old flat aggregate) for when the specific stage isn't known. `series_b`/`series_c`/`series_d_plus` intentionally share the same rate — not three independently-sourced numbers, but Mattermark's explicitly stated "halves and continues to halve" pattern applied identically per the source's own wording (spec §7 step 3, revised 2026-09-02).
-- Default constants: exit-probability failure rates per stage — seed 0.52–0.69, series_a 0.37–0.85, series_b/c/d_plus 0.50 (point), generic private fallback 0.60–0.75 (all sourced in `research.md#exit-rate-base-rates`). DLOM has two modes: a **dynamic mode** interpolating the Longstaff (1995) grid already cited in `research.md#dlom` (20% vol: 1yr=0.17, 2yr=0.25, 5yr=0.41; 30% vol: 1yr=0.26, 2yr=0.39, 5yr=0.66) when time-to-liquidity and volatility are supplied, clamped (never extrapolated) to that cited range; and a **flat 0.20–0.30 fallback band** (source: `research.md#dlom`) when they're not. Every default constant's docstring/comment must cite its `research.md` anchor.
-- This tier structure went through three rounds of revision within this plan's own history: (1) originally spec'd as three stage tiers with no real data; (2) collapsed to flat public/private after Bucket 1's research found no supporting source; (3) restored to five real private-stage tiers, 2026-09-02, after the user correctly objected that treating a Series A and a Series D company identically was indefensible, and further research found real, cross-validated per-stage data (CB Insights' "Venture Capital Funnel," Mattermark/Rowley, two Carta posts) — see `research.md#exit-rate-base-rates` for the full sourcing and the specific fabricated/unattributed sources that were checked and rejected along the way.
+- The exit-probability haircut has **real per-stage tiers**: `public` (no haircut), five specific private-stage tiers (`seed`, `series_a`, `series_b`, `series_c`, `series_d_plus`, each with its own sourced failure-rate range/point from `research.md#exit-rate-base-rates`), and a generic `private` fallback (the old flat aggregate) for when the specific stage isn't known. `series_b` (0.72) and `series_c` (0.82) are each derived from Carta's "Class of 2018" cohort cascade; `series_d_plus` (0.82) is not independently sourced — it holds flat at the `series_c` rate because no transition data exists past that point (spec §7 step 3, revised 2026-09-02).
+- Default constants: exit-probability failure rates per stage — seed 0.52–0.69, series_a 0.37–0.85, series_b 0.72 (point), series_c 0.82 (point), series_d_plus 0.82 (point, held flat at series_c — no data past that transition), generic private fallback 0.60–0.75 (all sourced in `research.md#exit-rate-base-rates`; series_b/c/d_plus reflect an explicit 2026-09-02 decision to use more recent, more pessimistic Carta-derived figures over an older, more optimistic Mattermark-derived pattern — see `research.md`'s "Methodology decision" note). DLOM has two modes: a **dynamic mode** interpolating the Longstaff (1995) grid already cited in `research.md#dlom` (20% vol: 1yr=0.17, 2yr=0.25, 5yr=0.41; 30% vol: 1yr=0.26, 2yr=0.39, 5yr=0.66) when time-to-liquidity and volatility are supplied, clamped (never extrapolated) to that cited range; and a **flat 0.20–0.30 fallback band** (source: `research.md#dlom`) when they're not. Every default constant's docstring/comment must cite its `research.md` anchor.
+- This tier structure went through four rounds of revision within this plan's own history: (1) originally spec'd as three stage tiers with no real data; (2) collapsed to flat public/private after Bucket 1's research found no supporting source; (3) restored to five real private-stage tiers after the user correctly objected that treating a Series A and a Series D company identically was indefensible, using Mattermark/Rowley's "halving" pattern for series_b/c/d_plus; (4) same day, series_b/c/d_plus revised again after a fourth source (Carta's "Class of 2018" cohort) surfaced real, more pessimistic, more recent per-transition data — the user explicitly directed using the more conservative and more recent figures rather than averaging the two. See `research.md#exit-rate-base-rates` for the full sourcing, the derivation arithmetic, and the specific fabricated/unattributed sources that were checked and rejected along the way.
 - No personal tax modeling anywhere in this tool — ISO/AMT is out of scope entirely for `option_value.py`, not even as an optional field (spec §2, §7).
 - Every function must accept explicit overrides for its defaults; the tool never asserts a single confident number — the final output is always a range with every stage shown (spec §7).
 - Follow `tools/score_table.py`'s conventions exactly: stdlib only, `argparse` subcommand(s), JSON on stdin for input, a `unittest` suite with a separate CLI test class that shells out via `subprocess` (see `tools/test_score_table.py`).
@@ -320,22 +320,29 @@ class ComputeExitProbabilityRangeTest(unittest.TestCase):
         self.assertEqual(result["failure_rate_high"], 0.85)
 
     def test_series_b_default_range(self):
-        # halving-pattern rate 0.50, both ends equal -> a point, not a range
+        # failure rate 0.72 (Carta "Class of 2018" cascade, derived), both
+        # ends equal -> a point, not a range
         result = option_value.compute_exit_probability_range(1000.0, "series_b")
-        self.assertEqual(result["low"], 500.0)
-        self.assertEqual(result["high"], 500.0)
-        self.assertEqual(result["failure_rate_low"], 0.50)
-        self.assertEqual(result["failure_rate_high"], 0.50)
+        self.assertEqual(result["low"], 280.0)
+        self.assertEqual(result["high"], 280.0)
+        self.assertEqual(result["failure_rate_low"], 0.72)
+        self.assertEqual(result["failure_rate_high"], 0.72)
 
-    def test_series_c_default_range_matches_halving_pattern(self):
+    def test_series_c_default_range(self):
+        # failure rate 0.82 (Carta "Class of 2018" cascade, derived)
         result = option_value.compute_exit_probability_range(1000.0, "series_c")
-        self.assertEqual(result["low"], 500.0)
-        self.assertEqual(result["high"], 500.0)
+        self.assertEqual(result["low"], 180.0)
+        self.assertEqual(result["high"], 180.0)
+        self.assertEqual(result["failure_rate_low"], 0.82)
+        self.assertEqual(result["failure_rate_high"], 0.82)
 
-    def test_series_d_plus_default_range_matches_halving_pattern(self):
+    def test_series_d_plus_default_range_holds_flat_at_series_c_rate(self):
+        # no transition data exists past Series D+; holds flat at 0.82
         result = option_value.compute_exit_probability_range(1000.0, "series_d_plus")
-        self.assertEqual(result["low"], 500.0)
-        self.assertEqual(result["high"], 500.0)
+        self.assertEqual(result["low"], 180.0)
+        self.assertEqual(result["high"], 180.0)
+        self.assertEqual(result["failure_rate_low"], 0.82)
+        self.assertEqual(result["failure_rate_high"], 0.82)
 
     def test_generic_private_default_range_when_stage_unknown(self):
         # failure rate range 0.60-0.75 -> survival range 0.25-0.40
@@ -403,15 +410,29 @@ SEED_FAILURE_RATE_HIGH = 0.69
 SERIES_A_FAILURE_RATE_LOW = 0.37
 SERIES_A_FAILURE_RATE_HIGH = 0.85
 
-# Source: research.md#exit-rate-base-rates -- Mattermark/Rowley (2016):
-# "the number of startups that raise a Series B halves and continues to
-# halve in a stepwise function through Series F and beyond." Applied
-# identically to the Series B->C, C->D, and D+ transitions per that
-# explicitly stated repeating pattern. Independently cross-validated for
-# the B->C step via CB Insights' own cumulative Seed->B (~30%, derived
-# from 0.48 x 0.63) vs. Seed->4th-round (15%, stated) figures, which
-# imply the same ~50% from an entirely different dataset.
-STAGE_HALVING_FAILURE_RATE = 0.50
+# Source: research.md#exit-rate-base-rates -- Carta, "The Startup Class
+# of 2018 Where Are They Now" (Peter Walker, Mar 2024, cohort of 3,067 US
+# startups incorporated 2018, tracked ~6 years). Derived from the
+# published furthest-stage-reached cascade (cumulative reach: Seed 62.9%,
+# A 38.9%, B 13.9%, C 3.9%, D+ 0.7%) as B->C conditional failure. Chosen
+# over Mattermark/Rowley's older (2009-2012 cohort), more optimistic ~50%
+# "halving pattern" estimate for this transition -- an explicit,
+# documented choice to prefer the more recent, more pessimistic figure
+# (see research.md's "Methodology decision" note), not an averaging of
+# the two.
+SERIES_B_FAILURE_RATE = 0.72
+
+# Source: research.md#exit-rate-base-rates -- same Carta cohort and
+# reasoning as SERIES_B_FAILURE_RATE above, derived as the C->D
+# conditional failure rate from the same published cascade.
+SERIES_C_FAILURE_RATE = 0.82
+
+# Source: research.md#exit-rate-base-rates -- no transition data exists
+# past this cohort's Series D+ bucket (0.7% cumulative reach, no further
+# breakdown). Held flat at SERIES_C_FAILURE_RATE as the most recent, most
+# pessimistic available anchor, not an independently measured figure for
+# this specific transition.
+SERIES_D_PLUS_FAILURE_RATE = SERIES_C_FAILURE_RATE
 
 # Source: research.md#exit-rate-base-rates -- Correlation Ventures data
 # via Booth (2013)/Levine (2014), cross-referenced against CB Insights'
@@ -425,9 +446,9 @@ GENERIC_PRIVATE_FAILURE_RATE_HIGH = 0.75
 STAGE_DEFAULT_FAILURE_RATES = {
     "seed": (SEED_FAILURE_RATE_LOW, SEED_FAILURE_RATE_HIGH),
     "series_a": (SERIES_A_FAILURE_RATE_LOW, SERIES_A_FAILURE_RATE_HIGH),
-    "series_b": (STAGE_HALVING_FAILURE_RATE, STAGE_HALVING_FAILURE_RATE),
-    "series_c": (STAGE_HALVING_FAILURE_RATE, STAGE_HALVING_FAILURE_RATE),
-    "series_d_plus": (STAGE_HALVING_FAILURE_RATE, STAGE_HALVING_FAILURE_RATE),
+    "series_b": (SERIES_B_FAILURE_RATE, SERIES_B_FAILURE_RATE),
+    "series_c": (SERIES_C_FAILURE_RATE, SERIES_C_FAILURE_RATE),
+    "series_d_plus": (SERIES_D_PLUS_FAILURE_RATE, SERIES_D_PLUS_FAILURE_RATE),
     "private": (GENERIC_PRIVATE_FAILURE_RATE_LOW, GENERIC_PRIVATE_FAILURE_RATE_HIGH),
 }
 
@@ -828,21 +849,21 @@ class ComputeValuationTest(unittest.TestCase):
 
     def test_specific_stage_tier_pass_through_full_breakdown(self):
         # face_value=3000.0; preference applied -> base_for_exit=1000.0
-        # exit range (series_b: failure 0.50/0.50) -> low=500.0, high=500.0
-        # dlom flat fallback (no time/vol given): low=500*0.70=350.0, high=500*0.80=400.0
-        # cash_alternative=1000.0 -> vs_low=1000-350=650.0, vs_high=1000-400=600.0
+        # exit range (series_b: failure 0.72/0.72) -> low=280.0, high=280.0
+        # dlom flat fallback (no time/vol given): low=280*0.70=196.0, high=280*0.80=224.0
+        # cash_alternative=1000.0 -> vs_low=1000-196=804.0, vs_high=1000-224=776.0
         result = option_value.compute_valuation({
             "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
             "company_stage": "series_b",
             "preference_stack": 2_000_000, "fully_diluted_shares": 1_000_000,
             "cash_alternative": 1000.0,
         })
-        self.assertEqual(result["exit_probability_range"]["low"], 500.0)
-        self.assertEqual(result["exit_probability_range"]["high"], 500.0)
-        self.assertEqual(result["final_range"]["low"], 350.0)
-        self.assertEqual(result["final_range"]["high"], 400.0)
-        self.assertEqual(result["cash_vs_equity_low"], 650.0)
-        self.assertEqual(result["cash_vs_equity_high"], 600.0)
+        self.assertEqual(result["exit_probability_range"]["low"], 280.0)
+        self.assertEqual(result["exit_probability_range"]["high"], 280.0)
+        self.assertEqual(result["final_range"]["low"], 196.0)
+        self.assertEqual(result["final_range"]["high"], 224.0)
+        self.assertEqual(result["cash_vs_equity_low"], 804.0)
+        self.assertEqual(result["cash_vs_equity_high"], 776.0)
 
 
 class OptionValueCLITest(unittest.TestCase):
@@ -1021,7 +1042,7 @@ git commit -m "Add option_value.py orchestration and compute CLI subcommand"
 
 - [ ] **Step 1: Docstring citation sweep**
 
-Read through `tools/option_value.py` top to bottom. Confirm every default constant (`SEED_FAILURE_RATE_LOW`/`HIGH`, `SERIES_A_FAILURE_RATE_LOW`/`HIGH`, `STAGE_HALVING_FAILURE_RATE`, `GENERIC_PRIVATE_FAILURE_RATE_LOW`/`HIGH`, `DLOM_LOW`/`HIGH`, `LONGSTAFF_GRID_YEARS`/`LONGSTAFF_DLOM_AT_VOL_LOW`/`LONGSTAFF_DLOM_AT_VOL_HIGH`, `PREFERENCE_STACK_GUIDANCE`) has a comment citing its specific `research.md` anchor (`#exit-rate-base-rates`, `#dlom`, `#liquidation-preferences`). This is what lets `SKILL.md` (Bucket 4) call this tool without re-reading `research.md`'s prose at runtime — confirm the docstrings alone would let someone understand *why* each default is what it is, without opening `research.md`, including why `series_b`/`series_c`/`series_d_plus` all share the same rate (Mattermark's explicitly stated halving pattern, not three independently-sourced numbers). Confirm `compute_dynamic_dlom`'s docstring is explicit that it interpolates already-cited data points rather than re-deriving Longstaff's actual closed-form formula — this tool does not implement option-pricing math from scratch.
+Read through `tools/option_value.py` top to bottom. Confirm every default constant (`SEED_FAILURE_RATE_LOW`/`HIGH`, `SERIES_A_FAILURE_RATE_LOW`/`HIGH`, `SERIES_B_FAILURE_RATE`, `SERIES_C_FAILURE_RATE`, `SERIES_D_PLUS_FAILURE_RATE`, `GENERIC_PRIVATE_FAILURE_RATE_LOW`/`HIGH`, `DLOM_LOW`/`HIGH`, `LONGSTAFF_GRID_YEARS`/`LONGSTAFF_DLOM_AT_VOL_LOW`/`LONGSTAFF_DLOM_AT_VOL_HIGH`, `PREFERENCE_STACK_GUIDANCE`) has a comment citing its specific `research.md` anchor (`#exit-rate-base-rates`, `#dlom`, `#liquidation-preferences`). This is what lets `SKILL.md` (Bucket 4) call this tool without re-reading `research.md`'s prose at runtime — confirm the docstrings alone would let someone understand *why* each default is what it is, without opening `research.md`, including why `SERIES_D_PLUS_FAILURE_RATE` is just an alias for `SERIES_C_FAILURE_RATE` (no transition data exists past that point, not a coincidence) and why the Series B/C/D+ figures are notably higher than Mattermark's older, more optimistic pattern (an explicit, documented choice to prefer more recent and more pessimistic data, not an oversight). Confirm `compute_dynamic_dlom`'s docstring is explicit that it interpolates already-cited data points rather than re-deriving Longstaff's actual closed-form formula — this tool does not implement option-pricing math from scratch.
 
 - [ ] **Step 2: Cross-check against spec §9's explicit test requirements**
 
