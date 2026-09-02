@@ -15,6 +15,13 @@ plainly that setup hasn't been run yet and offer to run the `bootstrap`
 skill right now. Don't wait to be asked, and don't improvise your own
 setup flow.
 
+The same hook also checks a second, softer condition: if
+`state/career/profile.md` and `state/career/trajectory.md` both exist but
+`state/career/comp_target.md` doesn't, it injects a non-blocking note that
+`offer-negotiator` setup hasn't been run. Unlike the new-user note, this
+one doesn't gate your first reply — mention it and offer to set it up,
+but address whatever the user asked first.
+
 ## State Directory
 
 All personal data — everything under `state/` — is gitignored and never
