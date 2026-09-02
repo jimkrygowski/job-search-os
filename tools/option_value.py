@@ -130,6 +130,14 @@ SERIES_D_PLUS_FAILURE_RATE = SERIES_C_FAILURE_RATE
 # across all stages combined, return nothing or less than invested
 # capital to preferred. This is the fallback for when the specific
 # funding stage isn't known -- prefer a specific stage tier when it is.
+#
+# Caution -- double-counting risk (research.md#exit-rate-base-rates):
+# this generic tier's underlying data reflects return-to-preferred
+# outcomes, the same subordination effect compute_preference_adjustment
+# already models above. Applying both to the same valuation risks
+# discounting that effect twice. The seed/series_a/series_b/series_c/
+# series_d_plus tiers below are sourced from next-round-graduation data
+# instead and don't carry this same risk.
 GENERIC_PRIVATE_FAILURE_RATE_LOW = 0.60
 GENERIC_PRIVATE_FAILURE_RATE_HIGH = 0.75
 
