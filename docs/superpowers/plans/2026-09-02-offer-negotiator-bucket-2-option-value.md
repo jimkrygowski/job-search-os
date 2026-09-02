@@ -15,7 +15,8 @@
 - Public-company inputs pass through **every** adjustment stage unchanged (no preference-stack, exit-probability, or DLOM adjustment applies — a real market price already exists) (spec §7 steps 2-4, §9).
 - The preference-stack adjustment is a **required input with an explicit unconfirmed-placeholder state, never a silently-applied default**: when `preference_stack` or `fully_diluted_shares` is missing, output `"applied": false` plus concrete guidance on what to ask the company for — do not fall back to any generic percentage (spec §7 step 2, revised).
 - The exit-probability haircut has **exactly two tiers — public and private** — never differentiate early-stage from late-stage private; `research.md` found no source that credibly supports that split (spec §7 step 3, revised).
-- Default constants: exit-probability failure rate **0.60–0.75** (source: `research.md#exit-rate-base-rates`), DLOM discount **0.20–0.30** (source: `research.md#dlom`). Every default constant's docstring/comment must cite its `research.md` anchor.
+- Default constants: exit-probability failure rate **0.60–0.75** (source: `research.md#exit-rate-base-rates`). DLOM has two modes: a **dynamic mode** interpolating the Longstaff (1995) grid already cited in `research.md#dlom` (20% vol: 1yr=0.17, 2yr=0.25, 5yr=0.41; 30% vol: 1yr=0.26, 2yr=0.39, 5yr=0.66) when time-to-liquidity and volatility are supplied, clamped (never extrapolated) to that cited range; and a **flat 0.20–0.30 fallback band** (source: `research.md#dlom`) when they're not. Every default constant's docstring/comment must cite its `research.md` anchor.
+- The exit-probability tier structure was independently re-verified (fresh research pass, 2026-09-02) after two external AI chats proposed unsourced stage-differentiated tables — the two-tier design stands; no credible source differentiates private-stage exit probability by round. The dynamic-DLOM addition below is the one legitimate improvement that verification pass surfaced, and it's grounded entirely in Longstaff (1995), already cited in `research.md` before this plan existed.
 - No personal tax modeling anywhere in this tool — ISO/AMT is out of scope entirely for `option_value.py`, not even as an optional field (spec §2, §7).
 - Every function must accept explicit overrides for its defaults; the tool never asserts a single confident number — the final output is always a range with every stage shown (spec §7).
 - Follow `tools/score_table.py`'s conventions exactly: stdlib only, `argparse` subcommand(s), JSON on stdin for input, a `unittest` suite with a separate CLI test class that shells out via `subprocess` (see `tools/test_score_table.py`).
@@ -405,7 +406,7 @@ git commit -m "Add option_value.py exit-probability range adjustment"
 
 ---
 
-### Task 4: DLOM (time-value/illiquidity) range
+### Task 4: DLOM (time-value/illiquidity) range — dynamic + flat fallback
 
 **Files:**
 - Modify: `tools/option_value.py`
@@ -413,22 +414,67 @@ git commit -m "Add option_value.py exit-probability range adjustment"
 
 **Interfaces:**
 - Consumes: `_validate_stage` and `_validate_rate` from Task 3 (does not redefine them)
-- Produces: `compute_dlom_range(value_low, value_high, company_stage, override_low=None, override_high=None) -> dict` with keys `low`, `high`, `dlom_low`, `dlom_high` — Task 5's orchestration calls this exact signature.
+- Produces: `compute_dynamic_dlom(time_to_liquidity_years, volatility) -> float` and `compute_dlom_range(value_low, value_high, company_stage, time_to_liquidity_years=None, volatility=None, override_low=None, override_high=None) -> dict` with keys `low`, `high`, `dlom_low`, `dlom_high`, `method` — Task 5's orchestration calls this exact signature. Precedence when multiple inputs are given: stage=public always wins (no discount) → explicit override wins next → dynamic (time+volatility both given) → flat default band fallback.
 
 - [ ] **Step 1: Write the failing tests**
 
 Append to `tools/test_option_value.py`:
 
 ```python
+class ComputeDynamicDlomTest(unittest.TestCase):
+    def test_exact_grid_point_20_percent_vol_2_years(self):
+        self.assertAlmostEqual(
+            option_value.compute_dynamic_dlom(time_to_liquidity_years=2, volatility=0.20),
+            0.25,
+        )
+
+    def test_exact_grid_point_30_percent_vol_5_years(self):
+        self.assertAlmostEqual(
+            option_value.compute_dynamic_dlom(time_to_liquidity_years=5, volatility=0.30),
+            0.66,
+        )
+
+    def test_interpolates_between_volatility_curves(self):
+        # T=2 exactly on the grid: 20% vol -> 0.25, 30% vol -> 0.39.
+        # volatility=0.25 is halfway -> 0.25 + 0.5*(0.39-0.25) = 0.32
+        self.assertAlmostEqual(
+            option_value.compute_dynamic_dlom(time_to_liquidity_years=2, volatility=0.25),
+            0.32,
+        )
+
+    def test_interpolates_between_time_points(self):
+        # volatility=0.20 exactly on the low curve: T=1 -> 0.17, T=2 -> 0.25.
+        # T=1.5 is halfway -> 0.17 + 0.5*(0.25-0.17) = 0.21
+        self.assertAlmostEqual(
+            option_value.compute_dynamic_dlom(time_to_liquidity_years=1.5, volatility=0.20),
+            0.21,
+        )
+
+    def test_time_above_grid_clamps_to_5_years(self):
+        # T=10 clamps to T=5; volatility=0.20 exactly on the low curve -> 0.41
+        self.assertAlmostEqual(
+            option_value.compute_dynamic_dlom(time_to_liquidity_years=10, volatility=0.20),
+            0.41,
+        )
+
+    def test_volatility_below_grid_clamps_to_20_percent(self):
+        # volatility=0.05 clamps to 0.20; T=1 exactly on that curve -> 0.17
+        self.assertAlmostEqual(
+            option_value.compute_dynamic_dlom(time_to_liquidity_years=1, volatility=0.05),
+            0.17,
+        )
+
+
 class ComputeDlomRangeTest(unittest.TestCase):
     def test_public_company_passes_through_unchanged(self):
         result = option_value.compute_dlom_range(250.0, 400.0, "public")
-        self.assertEqual(result, {
-            "low": 250.0, "high": 400.0,
-            "dlom_low": 0.0, "dlom_high": 0.0,
-        })
+        self.assertEqual(result["low"], 250.0)
+        self.assertEqual(result["high"], 400.0)
+        self.assertEqual(result["dlom_low"], 0.0)
+        self.assertEqual(result["dlom_high"], 0.0)
+        self.assertEqual(result["method"], "public-no-discount")
 
-    def test_private_company_default_range(self):
+    def test_private_company_flat_default_band_when_no_dynamic_inputs(self):
         # dlom range 0.20-0.30: low end gets the bigger discount (0.30),
         # high end gets the smaller discount (0.20)
         result = option_value.compute_dlom_range(250.0, 400.0, "private")
@@ -436,13 +482,30 @@ class ComputeDlomRangeTest(unittest.TestCase):
         self.assertEqual(result["high"], 320.0)
         self.assertEqual(result["dlom_low"], 0.20)
         self.assertEqual(result["dlom_high"], 0.30)
+        self.assertEqual(result["method"], "flat-default-band")
 
-    def test_private_company_override(self):
+    def test_private_company_dynamic_mode_when_time_and_volatility_given(self):
+        # dlom = compute_dynamic_dlom(2, 0.25) = 0.32 (verified above)
+        # final_low = 250 * (1-0.32) = 170.0; final_high = 400 * (1-0.32) = 272.0
         result = option_value.compute_dlom_range(
-            250.0, 400.0, "private", override_low=0.1, override_high=0.1,
+            250.0, 400.0, "private",
+            time_to_liquidity_years=2, volatility=0.25,
+        )
+        self.assertAlmostEqual(result["low"], 170.0)
+        self.assertAlmostEqual(result["high"], 272.0)
+        self.assertAlmostEqual(result["dlom_low"], 0.32)
+        self.assertAlmostEqual(result["dlom_high"], 0.32)
+        self.assertEqual(result["method"], "dynamic-longstaff-interpolation")
+
+    def test_private_company_override_takes_precedence_over_dynamic(self):
+        result = option_value.compute_dlom_range(
+            250.0, 400.0, "private",
+            time_to_liquidity_years=2, volatility=0.25,
+            override_low=0.1, override_high=0.1,
         )
         self.assertEqual(result["low"], 225.0)
         self.assertEqual(result["high"], 360.0)
+        self.assertEqual(result["method"], "override")
 
     def test_invalid_stage_raises(self):
         with self.assertRaises(ValueError):
@@ -457,55 +520,118 @@ class ComputeDlomRangeTest(unittest.TestCase):
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `python3 -m pytest tools/test_option_value.py -v -k ComputeDlomRangeTest`
-Expected: FAIL with `AttributeError: module 'option_value' has no attribute 'compute_dlom_range'`.
+Run: `python3 -m pytest tools/test_option_value.py -v -k "ComputeDynamicDlomTest or ComputeDlomRangeTest"`
+Expected: FAIL with `AttributeError: module 'option_value' has no attribute 'compute_dynamic_dlom'` (and the same for `compute_dlom_range`).
 
 - [ ] **Step 3: Write the minimal implementation**
 
 Append to `tools/option_value.py`:
 
 ```python
+# Source: research.md#dlom -- Longstaff (1995) option-pricing model,
+# cited there at these exact (holding period, volatility) points. These
+# are the ONLY points research.md verified; compute_dynamic_dlom()
+# linearly interpolates between them -- it does not re-derive Longstaff's
+# actual closed-form formula, which this tool does not attempt to
+# reimplement -- and clamps inputs outside this grid to the nearest
+# cited bound rather than extrapolating beyond verified data.
+LONGSTAFF_GRID_YEARS = (1, 2, 5)
+LONGSTAFF_GRID_VOL_LOW = 0.20
+LONGSTAFF_GRID_VOL_HIGH = 0.30
+LONGSTAFF_DLOM_AT_VOL_LOW = (0.17, 0.25, 0.41)   # at 20% vol, by year
+LONGSTAFF_DLOM_AT_VOL_HIGH = (0.26, 0.39, 0.66)  # at 30% vol, by year
+
 # Source: research.md#dlom ("How to use correctly") -- a 20-30% default
 # is a defensible judgment call within a literature that spans roughly
 # 7% (Bajaj et al.'s controlled estimate) to 40%+ (pre-IPO / option-
-# pricing bounds), not a point of convergence. Applies only to private
-# companies; public stock is liquid.
+# pricing bounds), not a point of convergence. Used as the fallback band
+# when time-to-liquidity and volatility aren't supplied for the dynamic
+# calculation above. Applies only to private companies; public stock is
+# liquid.
 DLOM_LOW = 0.20
 DLOM_HIGH = 0.30
 
 
+def _interpolate_1d(x, xs, ys):
+    """Linear interpolation of x against sorted xs/ys, clamped at the
+    ends rather than extrapolated."""
+    if x <= xs[0]:
+        return ys[0]
+    if x >= xs[-1]:
+        return ys[-1]
+    for i in range(len(xs) - 1):
+        if xs[i] <= x <= xs[i + 1]:
+            weight = (x - xs[i]) / (xs[i + 1] - xs[i])
+            return ys[i] + weight * (ys[i + 1] - ys[i])
+
+
+def compute_dynamic_dlom(time_to_liquidity_years, volatility):
+    """DLOM interpolated from the Longstaff (1995) grid cited in
+    research.md#dlom. Clamps time and volatility to the cited range
+    (1-5 years, 20-30% volatility) rather than extrapolating beyond
+    verified data points."""
+    dlom_at_vol_low = _interpolate_1d(
+        time_to_liquidity_years, LONGSTAFF_GRID_YEARS, LONGSTAFF_DLOM_AT_VOL_LOW)
+    dlom_at_vol_high = _interpolate_1d(
+        time_to_liquidity_years, LONGSTAFF_GRID_YEARS, LONGSTAFF_DLOM_AT_VOL_HIGH)
+    clamped_vol = min(max(volatility, LONGSTAFF_GRID_VOL_LOW), LONGSTAFF_GRID_VOL_HIGH)
+    weight = (clamped_vol - LONGSTAFF_GRID_VOL_LOW) / (LONGSTAFF_GRID_VOL_HIGH - LONGSTAFF_GRID_VOL_LOW)
+    return dlom_at_vol_low + weight * (dlom_at_vol_high - dlom_at_vol_low)
+
+
 def compute_dlom_range(value_low, value_high, company_stage,
+                         time_to_liquidity_years=None, volatility=None,
                          override_low=None, override_high=None):
-    """Applies the time-value/illiquidity (DLOM) discount as a range:
-    public companies pass through unchanged (liquid); private companies
-    apply the default discount range from research.md#dlom (or an
-    override) to each end of the incoming range."""
+    """Applies the time-value/illiquidity (DLOM) discount as a range.
+    Precedence: public companies pass through unchanged (liquid) ->
+    an explicit override wins next -> a dynamic Longstaff-grid
+    interpolation when time_to_liquidity_years and volatility are both
+    given -> the flat default band from research.md#dlom otherwise."""
     _validate_stage(company_stage)
     if company_stage == "public":
         return {"low": value_low, "high": value_high,
-                "dlom_low": 0.0, "dlom_high": 0.0}
-    dlom_low = DLOM_LOW if override_low is None else override_low
-    dlom_high = DLOM_HIGH if override_high is None else override_high
-    _validate_rate(dlom_low, "override_low")
-    _validate_rate(dlom_high, "override_high")
+                "dlom_low": 0.0, "dlom_high": 0.0,
+                "method": "public-no-discount"}
+    if override_low is not None or override_high is not None:
+        dlom_low = DLOM_LOW if override_low is None else override_low
+        dlom_high = DLOM_HIGH if override_high is None else override_high
+        _validate_rate(dlom_low, "override_low")
+        _validate_rate(dlom_high, "override_high")
+        return {
+            "low": value_low * (1 - dlom_high),
+            "high": value_high * (1 - dlom_low),
+            "dlom_low": dlom_low,
+            "dlom_high": dlom_high,
+            "method": "override",
+        }
+    if time_to_liquidity_years is not None and volatility is not None:
+        dlom = compute_dynamic_dlom(time_to_liquidity_years, volatility)
+        return {
+            "low": value_low * (1 - dlom),
+            "high": value_high * (1 - dlom),
+            "dlom_low": dlom,
+            "dlom_high": dlom,
+            "method": "dynamic-longstaff-interpolation",
+        }
     return {
-        "low": value_low * (1 - dlom_high),
-        "high": value_high * (1 - dlom_low),
-        "dlom_low": dlom_low,
-        "dlom_high": dlom_high,
+        "low": value_low * (1 - DLOM_HIGH),
+        "high": value_high * (1 - DLOM_LOW),
+        "dlom_low": DLOM_LOW,
+        "dlom_high": DLOM_HIGH,
+        "method": "flat-default-band",
     }
 ```
 
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `python3 -m pytest tools/test_option_value.py -v`
-Expected: PASS, all tests (16 prior + Task 4's 5 = 21).
+Expected: PASS, all tests (16 prior + Task 4's 12 = 28).
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add tools/option_value.py tools/test_option_value.py
-git commit -m "Add option_value.py DLOM (time-value/illiquidity) range adjustment"
+git commit -m "Add option_value.py DLOM range: dynamic Longstaff-grid interpolation with flat-band fallback"
 ```
 
 ---
@@ -605,6 +731,25 @@ class ComputeValuationTest(unittest.TestCase):
         self.assertEqual(result["final_range"]["low"], 1350.0)
         self.assertEqual(result["final_range"]["high"], 1350.0)
 
+    def test_dynamic_dlom_inputs_pass_through_full_breakdown(self):
+        # face_value=3000.0; preference applied -> base_for_exit=1000.0
+        # exit range (private default): low=250.0, high=400.0
+        # dlom dynamic (T=2, vol=0.25) -> 0.32 (verified in Task 4)
+        # -> final_low=250*0.68=170.0, final_high=400*0.68=272.0
+        # cash_alternative=1000.0 -> vs_low=1000-170=830.0, vs_high=1000-272=728.0
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "private",
+            "preference_stack": 2_000_000, "fully_diluted_shares": 1_000_000,
+            "time_to_liquidity_years": 2, "volatility": 0.25,
+            "cash_alternative": 1000.0,
+        })
+        self.assertAlmostEqual(result["final_range"]["low"], 170.0)
+        self.assertAlmostEqual(result["final_range"]["high"], 272.0)
+        self.assertEqual(result["final_range"]["method"], "dynamic-longstaff-interpolation")
+        self.assertAlmostEqual(result["cash_vs_equity_low"], 830.0)
+        self.assertAlmostEqual(result["cash_vs_equity_high"], 728.0)
+
 
 class OptionValueCLITest(unittest.TestCase):
     def setUp(self):
@@ -660,8 +805,10 @@ def compute_valuation(inputs):
 
     inputs keys: shares, strike_price, quoted_price, company_stage
     (required); preference_stack, fully_diluted_shares,
-    exit_probability_override ({'low', 'high'}), dlom_override
-    ({'low', 'high'}), cash_alternative (all optional).
+    exit_probability_override ({'low', 'high'}), time_to_liquidity_years,
+    volatility, dlom_override ({'low', 'high'}), cash_alternative (all
+    optional). See compute_dlom_range for how time_to_liquidity_years/
+    volatility vs. dlom_override vs. neither are prioritized.
     """
     missing = [k for k in REQUIRED_KEYS if k not in inputs]
     if missing:
@@ -692,6 +839,8 @@ def compute_valuation(inputs):
     dlom_override = inputs.get("dlom_override") or {}
     final_range = compute_dlom_range(
         exit_range["low"], exit_range["high"], company_stage,
+        time_to_liquidity_years=inputs.get("time_to_liquidity_years"),
+        volatility=inputs.get("volatility"),
         override_low=dlom_override.get("low"),
         override_high=dlom_override.get("high"),
     )
@@ -756,7 +905,7 @@ Note: this task adds `import argparse`, `import json`, `import sys` at module le
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `python3 -m pytest tools/test_option_value.py -v`
-Expected: PASS, all tests (21 prior + Task 5's 9 = 30).
+Expected: PASS, all tests (28 prior + Task 5's 10 = 38).
 
 - [ ] **Step 5: Commit**
 
@@ -778,16 +927,16 @@ git commit -m "Add option_value.py orchestration and compute CLI subcommand"
 
 - [ ] **Step 1: Docstring citation sweep**
 
-Read through `tools/option_value.py` top to bottom. Confirm every default constant (`EXIT_FAILURE_RATE_LOW`/`HIGH`, `DLOM_LOW`/`HIGH`, `PREFERENCE_STACK_GUIDANCE`) has a comment citing its specific `research.md` anchor (`#exit-rate-base-rates`, `#dlom`, `#liquidation-preferences`). This is what lets `SKILL.md` (Bucket 4) call this tool without re-reading `research.md`'s prose at runtime — confirm the docstrings alone would let someone understand *why* each default is what it is, without opening `research.md`.
+Read through `tools/option_value.py` top to bottom. Confirm every default constant (`EXIT_FAILURE_RATE_LOW`/`HIGH`, `DLOM_LOW`/`HIGH`, `LONGSTAFF_GRID_YEARS`/`LONGSTAFF_DLOM_AT_VOL_LOW`/`LONGSTAFF_DLOM_AT_VOL_HIGH`, `PREFERENCE_STACK_GUIDANCE`) has a comment citing its specific `research.md` anchor (`#exit-rate-base-rates`, `#dlom`, `#liquidation-preferences`). This is what lets `SKILL.md` (Bucket 4) call this tool without re-reading `research.md`'s prose at runtime — confirm the docstrings alone would let someone understand *why* each default is what it is, without opening `research.md`. Confirm `compute_dynamic_dlom`'s docstring is explicit that it interpolates already-cited data points rather than re-deriving Longstaff's actual closed-form formula — this tool does not implement option-pricing math from scratch.
 
 - [ ] **Step 2: Cross-check against spec §9's explicit test requirements**
 
-Re-read spec §9. Confirm the test suite covers all three explicitly named cases: (a) zero/negative strike spread — `test_underwater_options_floor_at_zero` (Task 1); (b) public-company case with no haircuts applied — `test_public_company_passes_through_every_stage` (Task 5); (c) user-overridden defaults — `test_private_company_override` (Tasks 3 and 4) and `test_exit_and_dlom_overrides_pass_through` (Task 5). If any is thin, strengthen it now.
+Re-read spec §9. Confirm the test suite covers all three explicitly named cases: (a) zero/negative strike spread — `test_underwater_options_floor_at_zero` (Task 1); (b) public-company case with no haircuts applied — `test_public_company_passes_through_every_stage` (Task 5); (c) user-overridden defaults — `test_private_company_override` (Task 3) and `test_private_company_override_takes_precedence_over_dynamic` (Task 4) and `test_exit_and_dlom_overrides_pass_through` (Task 5). If any is thin, strengthen it now.
 
 - [ ] **Step 3: Run the full suite once and confirm pristine output**
 
 Run: `python3 -m pytest tools/test_option_value.py -v`
-Expected: PASS, 30/30, no warnings.
+Expected: PASS, 38/38, no warnings.
 
 - [ ] **Step 4: Commit (only if Steps 1-2 produced changes)**
 
@@ -802,6 +951,7 @@ If Steps 1-3 found nothing to fix, skip this commit — no empty commits.
 
 ## Self-Review Notes (plan author)
 
-- **Spec coverage:** All four adjustment stages from spec §7 (as revised) are covered: Task 1 (face value), Task 2 (preference-stack, required-input-with-placeholder per the revision), Task 3 (exit-probability, two-tier per the revision), Task 4 (DLOM). Task 5 wires them together and adds the cash-alternative comparison spec §7 calls for. The context-efficiency requirement (docstrings cite `research.md`) is built into every task's implementation step, not deferred, and Task 6 verifies it explicitly. No personal tax modeling appears anywhere — ISO/AMT isn't referenced in this tool at all, consistent with spec §2/§7.
-- **Placeholder scan:** No TBD/TODO; every step has real, complete code with computed expected values (hand-verified in step comments, e.g. Task 5's `test_full_breakdown_with_preference_stack_and_cash_comparison`).
-- **Type/interface consistency:** Verified `compute_preference_adjustment`'s return dict keys (`applied`, `adjusted_value`, `common_price`, `guidance`) are used identically in Task 5's `compute_valuation`. Verified `compute_exit_probability_range`'s and `compute_dlom_range`'s `low`/`high` keys chain correctly (Task 5 passes `exit_range["low"]`/`["high"]` into `compute_dlom_range`). Verified Task 4 reuses Task 3's `_validate_stage`/`_validate_rate` rather than redefining them (stated explicitly in Task 4's Interfaces block).
+- **Spec coverage:** All four adjustment stages from spec §7 (as revised) are covered: Task 1 (face value), Task 2 (preference-stack, required-input-with-placeholder per the revision), Task 3 (exit-probability, two-tier per the revision), Task 4 (DLOM, dynamic Longstaff-grid interpolation with a flat-band fallback — added 2026-09-02 after independently re-verifying two external AI chats' unsourced stage-tier claims; see Global Constraints). Task 5 wires them together and adds the cash-alternative comparison spec §7 calls for. The context-efficiency requirement (docstrings cite `research.md`) is built into every task's implementation step, not deferred, and Task 6 verifies it explicitly. No personal tax modeling appears anywhere — ISO/AMT isn't referenced in this tool at all, consistent with spec §2/§7.
+- **Placeholder scan:** No TBD/TODO; every step has real, complete code with computed expected values (hand-verified in step comments, e.g. Task 5's `test_full_breakdown_with_preference_stack_and_cash_comparison` and `test_dynamic_dlom_inputs_pass_through_full_breakdown`).
+- **Type/interface consistency:** Verified `compute_preference_adjustment`'s return dict keys (`applied`, `adjusted_value`, `common_price`, `guidance`) are used identically in Task 5's `compute_valuation`. Verified `compute_exit_probability_range`'s and `compute_dlom_range`'s `low`/`high` keys chain correctly (Task 5 passes `exit_range["low"]`/`["high"]` into `compute_dlom_range`, and now also `time_to_liquidity_years`/`volatility`). Verified Task 4 reuses Task 3's `_validate_stage`/`_validate_rate` rather than redefining them (stated explicitly in Task 4's Interfaces block). Verified `compute_dlom_range`'s precedence order (public → override → dynamic → flat fallback) is exercised by a distinct test for each branch, including one confirming override beats dynamic when both are supplied.
+- **Test-count arithmetic re-verified after the Task 4 rewrite:** Task 1 (3) → Task 2 (+7=10) → Task 3 (+6=16) → Task 4 (+12=28) → Task 5 (+10=38). Every task's "Expected: PASS" step states the running total.
