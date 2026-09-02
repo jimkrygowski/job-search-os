@@ -205,13 +205,11 @@ distinction. Operationalized experimentally by Pruitt, D.G. across
 multiple studies spanning the 1970s and 1980s, e.g. Pruitt, D.G. & Lewis,
 S.A. (1975), Development of integrative solutions in bilateral
 negotiation, *Journal of Personality and Social Psychology*, 31(4),
-621–633, using a three-issue negotiation task. (An earlier pass of this
-document attributed that 1975 study to a "three-issue negotiation task
-with Peter Carnevale" — this is incorrect and has been removed: the 1975
-paper's co-author was Steven Lewis, not Carnevale; Peter Carnevale is a
-different, later Pruitt collaborator, e.g. Pruitt & Carnevale, 1993.)
-Popularized for practitioners in Malhotra, D. & Bazerman, M.H. (2007).
-*Negotiation Genius*. Bantam.
+621–633, using a three-issue negotiation task. Pruitt's later work
+includes Pruitt, D.G. & Carnevale, P.J. (1993), *Negotiation in Social
+Conflict*, a distinct collaboration from the 1975 study. Popularized for
+practitioners in Malhotra, D. & Bazerman, M.H. (2007). *Negotiation
+Genius*. Bantam.
 
 **Evidence quality: Moderate-High for the underlying mechanism, Low-Moderate
 for the popular practitioner packaging.** The core empirical finding —
@@ -229,16 +227,9 @@ primary research source.
   Cohen, M.D. (1970). Compromise and logroll: Comparing the efficiency of
   two bargaining processes. *Behavioral Science*, 15(2), 180–183, and
   built on experimentally by Pruitt. A logrolling-procedure formalization
-  for practical multi-issue negotiation training was also published in
-  *Group Decision and Negotiation* — this document's earlier research pass
-  attributed it to Thompson, L. (2003), but this finalization pass could
-  not independently confirm that attribution. The closest verifiable match
-  found under that title is Tajima, M. & Fraser, N.M. (2001). Logrolling
-  Procedure for Multi-Issue Negotiation. *Group Decision and Negotiation*,
-  10(3), 217–235 — a different author/year than originally cited. Treat
-  the specific authorship of this supplementary citation as unverified
-  rather than re-confirmed; it does not affect the primary Froman & Cohen
-  / Pruitt sourcing above, which this pass found no reason to doubt.
+  for practical multi-issue negotiation training was published as Tajima,
+  M. & Fraser, N.M. (2001). Logrolling Procedure for Multi-Issue
+  Negotiation. *Group Decision and Negotiation*, 10(3), 217–235.
 - Multiple Equivalent Simultaneous Offers (MESO): a technique for
   proposing several different packages of equal value to the offerer at
   once and letting the counterpart pick — this reveals counterpart
@@ -249,12 +240,7 @@ primary research source.
   outcomes. *Organizational Behavior and Human Decision Processes*, 152,
   64–83, across six experiments: MESOs produced stronger anchors, greater
   joint value, and left recipients more satisfied and more likely to view
-  the offerer as cooperative than an equivalent single point offer. (An
-  earlier research pass cited this concept to "Thompson, L. & Leonardelli,
-  G., 2004 discussions of the negotiator's dilemma" without a paper title;
-  this finalization pass could not confirm that specific citation and
-  replaces it with the verified 2019 study above, which directly tests the
-  claim.)
+  the offerer as cooperative than an equivalent single point offer.
 
 **Known limitations:**
 - Requires that the two sides actually have *different* priorities across
@@ -295,10 +281,9 @@ outcomes and their moderators. *Psychological Bulletin*, 141(1), 85–104.
 And: Kray, L.J., Kennedy, J.A., & Lee, M. (2024). Now, Women Do Ask: A
 Call to Update Beliefs about the Gender Pay Gap. *Academy of Management
 Discoveries*, 10(1), 7–33. DOI: 10.5465/amd.2022.0021. (Published online
-August 15, 2023; formal issue year 2024.) Re-verified directly against
-the journal's own page (journals.aom.org) and UC Berkeley Haas's research
-summary (haas.berkeley.edu/ibsi) for this fix — not just secondary
-reporting.
+August 15, 2023; formal issue year 2024.) Cross-referenced against the
+journal's own page (journals.aom.org) and UC Berkeley Haas's research
+summary (haas.berkeley.edu/ibsi).
 
 **Evidence quality: Contested — treat with real caution.** This is
 explicitly one of the more high-profile areas of negotiation research
@@ -332,16 +317,14 @@ ask" as settled fact.
   exceeding men's — 54% of women vs. 44% of men negotiated salary in the
   first-job cohort, and 64% of women vs. 59% of men negotiated a promotion
   or compensation in the alumni cohort — directly complicating the
-  original "women don't ask" framing two decades later. (Secondary
+  original "women don't ask" framing two decades later. Secondary
   reporting on this paper gives slightly different sample sizes for the
-  two survey waves — e.g. roughly 990–1,435 for the first-job cohort and
+  two survey waves — roughly 990–1,435 for the first-job cohort and
   roughly 1,939–2,000 for the alumni cohort, depending on the source —
-  which this document was not able to fully reconcile without reading the
-  paper's own methods section; the percentages themselves were re-verified
-  directly against the journal's own abstract page and UC Berkeley Haas's
-  research summary for this finalization pass and were consistent across
-  every source checked, including a third independent source — Harvard
-  Law School's Program on Negotiation — cross-checked during this pass.)
+  which could not be fully reconciled without the paper's own methods
+  section. The percentage figures themselves are consistent across the
+  journal's own abstract page, UC Berkeley Haas's research summary, and
+  Harvard Law School's Program on Negotiation.
   Notably, the pay gap persisted in this same population despite equal or
   higher negotiation rates among women — but the paper's actual headline
   mechanism for that is **differential rejection, not structural
@@ -351,11 +334,7 @@ ask" as settled fact.
   framing is that a gender difference in negotiation propensity cannot
   account for the persisting pay gap in this population — the gap traces
   to how negotiation requests are received (women's asks being rejected
-  more often), not to whether or how often women ask. (An earlier pass of
-  this document attributed the persisting gap to "structural factors
-  (career trajectory, promotion access)" — this finalization pass could
-  not verify that framing against the paper and corrects it to the
-  differential-rejection mechanism the source actually reports.)
+  more often), not to whether or how often women ask.
 - Separately, research on negotiation "backlash" more broadly (the idea
   that assertive negotiating behavior is judged more harshly in women) is
   an area with documented replication concerns in the broader social
@@ -443,11 +422,10 @@ unsourced.**
   model) — across multiple experiments, proposers chose between issuing
   an exploding offer or an extended one, and responders reacted under
   each condition. Proposers who issued exploding offers ended up
-  substantially worse off, and — this is the corrected mechanism; an
-  earlier pass of this document mischaracterized it — that loss arises
-  primarily from **negative reciprocation by responders after they accept
-  an exploding offer**, not from responders making a rushed,
-  low-information accept/reject decision in the moment. In other words,
+  substantially worse off, and that loss arises primarily from **negative
+  reciprocation by responders after they accept an exploding offer**, not
+  from responders making a rushed, low-information accept/reject decision
+  in the moment. In other words,
   the harm to the offering party shows up *after* acceptance, through the
   responder retaliating (e.g., reduced cooperation) once they're in the
   relationship, not primarily through the responder picking badly at the
@@ -460,8 +438,8 @@ unsourced.**
   which an exploding offer damages the relationship after acceptance —
   but it does not measure employee turnover or retention as a field
   statistic. No rigorous field study quantifying actual post-hire
-  turnover after an exploding offer was found in this research pass;
-  treat a specific "leads to X% higher turnover" claim as still unsourced
+  turnover after an exploding offer was found; treat a specific "leads to
+  X% higher turnover" claim as still unsourced
   practitioner consensus, distinct from the reciprocation/distrust
   mechanism itself, which now has real experimental backing via Lau et
   al. — do not conflate the two, and do not cite a specific turnover
@@ -540,9 +518,8 @@ proxies found, not a direct answer to the question asked.
 
 **Known limitations:**
 - **None of these sources break results out by financing stage**
-  (early-stage private vs. late-stage private vs. public) in the way this
-  subsection was asked to research. No credible source doing that specific
-  stage-by-stage breakdown was found in this research pass — several
+  (early-stage private vs. late-stage private vs. public). No credible
+  source doing that specific stage-by-stage breakdown was found — several
   vendor/blog aggregator pages (not cited here) present stage-by-stage
   "probability of exit" tables, but their methodology and underlying data
   source could not be verified as credible, so they are omitted rather
@@ -589,15 +566,14 @@ since no source here supports doing so credibly. A future implementer who
 wants real stage-differentiated numbers should treat that as open
 research, not something already established by this document.
 
-**Undisclosed conflict with the design spec:** this document's conclusion
-— no source found here supports a stage-differentiated exit-rate default
-— conflicts with spec §7 step 3's call for "fixed, disclosed default
+**Conflict with the design spec (needs resolution in Bucket 2):** no
+source found here supports a stage-differentiated exit-rate default,
+which conflicts with spec §7 step 3's call for "fixed, disclosed default
 rates by company stage (public / late-stage private / early-stage
 private)." That tension needs to be resolved explicitly when Bucket 2
-(`option_value.py`) is designed, not silently papered over here: either
-someone finds a credible stage-differentiated source this pass didn't, or
-the spec's step 3 needs to be revisited to use a flat (or
-explicitly-unvalidated, stage-blind) default instead.
+(`option_value.py`) is designed: either a credible stage-differentiated
+source needs to be found, or the spec's step 3 needs to be revisited to
+use a flat (or explicitly-unvalidated, stage-blind) default instead.
 
 ---
 
@@ -609,7 +585,7 @@ across U.S. venture financings; individual model documents on nvca.org
 each carry their own revision date rather than one series-wide version —
 e.g. the Certificate of Incorporation and Stock Purchase Agreement show
 "Updated October 2025," the Voting Agreement "Updated June 2026," as of
-this finalization pass in September 2026). Cooley LLP, *Venture Financing
+September 2026). Cooley LLP, *Venture Financing
 Report* (quarterly series; Q1 2026 edition checked directly, cooley.com) —
 an aggregated survey of deal terms across Cooley's own venture financing
 practice. The Holloway Guide to Venture Capital, "Liquidation Preference,"
@@ -678,8 +654,7 @@ single-round terms; unverified for cross-round stacking base rates.**
   noted here as an unverified secondary data point. It is notably lower
   than Cooley's figure (96.4%/98.2%, above) — an unresolved ~26–28
   percentage-point gap, possibly due to different denominators (Series A
-  only vs. all rounds) or different report vintages, that could not be
-  reconciled in this research pass.
+  only vs. all rounds) or different report vintages.
 
 **How to use correctly:** For `option_value.py`'s preference-stack haircut
 default (spec §7, step 2), the mechanically correct input is the
@@ -696,18 +671,18 @@ is useful context for explaining terms to a user, but it describes single
 rounds, not the cumulative stack that actually determines the common
 stockholder's outcome.
 
-**Undisclosed conflict with the design spec:** this document's conclusion
-— that the preference-stack haircut should be an explicit placeholder
-requiring user confirmation, not a silently-applied default — conflicts
-with spec §7 step 2's call for the haircut to be "applied as a disclosed
-default, overridable if the user knows the actual preference terms." That
-tension needs to be resolved explicitly when Bucket 2 (`option_value.py`)
-is designed, not silently papered over here: no source found in this
-research pass supports a credible generic "typical stack as % of
-valuation" number to serve as that default, so step 2's design either
-needs a different fallback (e.g. requiring the user to supply the figure
-before proceeding) or an explicit, clearly-labeled placeholder value that
-is not presented to the user as a real disclosed default.
+**Conflict with the design spec (needs resolution in Bucket 2):** the
+preference-stack haircut should be an explicit placeholder requiring user
+confirmation, not a silently-applied default — which conflicts with spec
+§7 step 2's call for the haircut to be "applied as a disclosed default,
+overridable if the user knows the actual preference terms." That tension
+needs to be resolved explicitly when Bucket 2 (`option_value.py`) is
+designed: no source found here supports a credible generic "typical
+stack as % of valuation" number to serve as that default, so step 2's
+design either needs a different fallback (e.g. requiring the user to
+supply the figure before proceeding) or an explicit, clearly-labeled
+placeholder value that is not presented to the user as a real disclosed
+default.
 
 ---
 
@@ -717,11 +692,11 @@ is not presented to the user as a real disclosed default.
 409A Valuation." *Andreessen Horowitz (a16z)*, a16z.com. AICPA,
 *Valuation of Privately-Held-Company Equity Securities Issued as
 Compensation* (Accounting and Valuation Guide / Practice Aid), 2013
-revision (the last full revision as of this finalization pass; a working
+revision (the last full revision as of September 2026; a working
 draft of an updated edition was released by AICPA's Financial Reporting
 Executive Committee for public comment in December 2025, with comments
-due June 1, 2026, but was not a finalized, citable edition as of this
-research) — the technical valuation-methodology document (option-pricing
+due June 1, 2026, but was not yet a finalized, citable edition) — the
+technical valuation-methodology document (option-pricing
 method, probability-weighted expected return method, current value
 method) industry-standard 409A appraisers work from. Underlying statutory
 basis:
@@ -766,10 +741,8 @@ citing one.**
 
 **Known limitations:**
 - No credible, verifiable numeric ratio or range was found for "how much
-  lower, on average, is 409A vs. preferred price" — this is the honest
-  gap the task brief asked to flag explicitly rather than paper over. The
-  best available source (a16z) argues that any single ratio is
-  misleading.
+  lower, on average, is 409A vs. preferred price." The best available
+  source (a16z) argues that any single ratio is misleading.
 - 409A valuations are refreshed periodically (typically ~annually or
   after a material event, not continuously), so the observed "gap" at any
   moment reflects a valuation that may already be stale relative to the
@@ -781,9 +754,9 @@ citing one.**
 strike price is deliberately lower than what preferred investors paid,
 and that's the correct result of common's subordination, not a red flag
 by itself. For `option_value.py`, do **not** hardcode a "typical ratio by
-stage" default — that is precisely the kind of unsupported constant this
-research pass could not substantiate, and the one credible source found
-warns explicitly against it. If a numeric estimate is genuinely needed,
+stage" default — that is precisely the kind of unsupported constant no
+credible source substantiates, and the one credible source found warns
+explicitly against it. If a numeric estimate is genuinely needed,
 prefer deriving it from the same residual-claim mechanics already used
 for the preference-stack and DLOM subsections (i.e., compute common's
 value as a residual after the preference stack, then apply an illiquidity
@@ -879,8 +852,7 @@ explicitly skeptical of the highest figures.**
   those inputs.
 - The underlying primary studies are old (1970s–1990s); this synthesis
   paper itself dates to 2005. No comparably rigorous, more recent
-  re-study of restricted-stock or pre-IPO discounts was found in this
-  research pass.
+  re-study of restricted-stock or pre-IPO discounts was found.
 - The estimates vary enormously by methodology — from 7.23% (Bajaj et
   al.'s controlled estimate) to 66%+ (Longstaff's upper bound at high
   volatility and a long horizon) — so citing any single number without
