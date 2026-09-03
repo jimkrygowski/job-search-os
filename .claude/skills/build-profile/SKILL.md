@@ -14,11 +14,21 @@ must be concrete, not vague.
 
 ## Session Start
 
-1. Check whether `state/career/profile.md` already exists.
-   - If it exists, tell the user what's already captured and ask whether
-     they want to add to it, correct something, or redo a section — don't
-     silently overwrite.
-   - If it doesn't exist, this is a first-time build.
+1. Check whether `state/career/profile.md` already exists, and if so,
+   whether it's complete — every section in `## Output` below present as
+   a `##` heading with substantive content underneath, not just the
+   heading itself or a placeholder line (the same completeness standard
+   `tools/check_bootstrap_state.py` checks).
+   - **Doesn't exist → first-time build.**
+   - **Exists and complete → revisit mode.** Tell the user what's
+     already captured and ask whether they want to add to it, correct
+     something, or redo a section — don't silently overwrite.
+   - **Exists but incomplete → resume mode.** A previous session likely
+     got interrupted. Tell the user plainly what's already captured and
+     which sections are still missing or thin, then go straight to
+     finishing those — don't restart from scratch, and don't ask a
+     generic "what do you want to add" question when the gap is already
+     clear.
 2. Ask whether they have an existing resume to seed from
    (`state/career/resume/master_resume.md`, or a resume they can paste/upload).
    If yes, read it and draft an initial pass at the sections below for
@@ -45,6 +55,14 @@ Work through these one at a time — don't dump all the questions at once:
 6. **Patterns.** After all five, name back to the user what you're
    noticing — a real pattern across their answers, not a generic
    observation. This feeds `define-trajectory` directly.
+
+## Resume Mode — Conversation Guide
+
+Name which of the six sections in `## Output` are missing or thin, then
+work through only those — in the order listed in `## What to Capture` —
+one at a time, the same way `## What to Capture` describes. Skip
+sections that are already there with real content; don't re-ask
+questions the user already answered in a prior session.
 
 ## Output
 
