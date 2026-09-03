@@ -33,11 +33,13 @@ Eleven skills, each a focused piece of the search, invoked in a normal Claude Co
 
 ## Grounded in real frameworks
 
-Two things this system leans on that most "AI job search assistant" projects don't bother with:
+Three things this system leans on that most "AI job search assistant" projects don't bother with:
 
 **The coaching is evidence-graded, not aspirational.** `career-coach` draws on seven frameworks — Schein's Career Anchors, Self-Determination Theory, Ibarra's Working Identity, Opportunity Fit Assessment, Career Capital, Regret Minimization, Ikigai — and every one of them ships with a companion [research review](.claude/skills/career-coach/research.md) that grades its actual evidence quality, cites the primary literature, and says plainly when a framework is a practitioner heuristic dressed up as science. Self-Determination Theory gets used with confidence — 40+ years of replicated peer-reviewed research. Ikigai gets used as a conversation starter and nothing more — it's a Western blog invention from 2011, misattributed to Japan ever since. The skill doesn't pretend otherwise, and neither does this README.
 
 **The trajectory format comes from a real methodology.** `define-trajectory` builds a "Mnookin Two-Pager" — a concept from Phyl Terry's *Never Search Alone*, shaped as a genuine, shareable pitch document rather than internal notes. The system also implements Terry's Listening Tour idea directly: real feedback from an interview or a networking conversation is treated as a trigger to revisit the trajectory, not just a calendar-based staleness check. What's deliberately *not* here is Terry's Job Search Council — a peer accountability group is a real human structure, and no amount of agentic tooling should pretend to substitute for one.
+
+**Comp advice is sourced the same way, and equity math doesn't get freehanded.** `offer-negotiator` ships its own evidence-graded [research review](.claude/skills/offer-negotiator/research.md) — negotiation tactics and equity mechanics each rated for how solid the underlying evidence actually is, same treatment `career-coach` gets, right down to flagging where the research is genuinely contested (e.g. gender and negotiation outcomes) rather than picking the more comfortable narrative. And instead of letting an LLM eyeball what a stock grant is worth, `tools/option_value.py` computes it deterministically — a real, tested calculation for face value, preference-stack haircuts, exit-probability ranges, and illiquidity discounts, with every default constant citing exactly which part of the research backs it.
 
 ## Built like software, not a prompt
 
