@@ -63,14 +63,23 @@ numbers with a qualified tax advisor or CPA before exercising anything
    - If the user explicitly wants to define/revisit their walk-away
      numbers, target range, comp priorities, or deal-breakers, or if none
      of the above apply and `state/career/comp_target.md` doesn't exist
-     yet → **Setup Mode**. Continue with step 2 below.
+     or is incomplete → **Setup Mode**. Continue with step 2 below.
    - If it's ambiguous which the user wants, ask directly rather than
      guessing.
-2. (Setup Mode only) Check whether `state/career/comp_target.md` exists.
+2. (Setup Mode only) Check whether `state/career/comp_target.md` exists,
+   and if so, whether it's complete — every section in `## Setup Mode —
+   Sections` below present as a `##` heading with substantive content
+   underneath, not just the heading itself or a placeholder line (the
+   same completeness standard `tools/check_bootstrap_state.py` checks).
    - **Doesn't exist → initial mode.** Build it from scratch.
-   - **Exists → revisit mode.** Summarize it back to the user, ask what's
-     changed. Update in place — don't rebuild from scratch. Update the
-     `Last reviewed:` field when done, regardless of how much changed.
+   - **Exists and complete → revisit mode.** Summarize it back to the
+     user, ask what's changed. Update in place — don't rebuild from
+     scratch. Update the `Last reviewed:` field when done, regardless of
+     how much changed.
+   - **Exists but incomplete → resume mode.** A previous session likely
+     got interrupted. Tell the user plainly which sections are already
+     captured and which are still missing or thin, then go straight to
+     finishing those.
 3. (Setup Mode only) Read `state/career/trajectory.md` if it exists — its
    "Comp floor" must-have, if one is stated there, is a starting anchor
    for the more granular numbers this file captures, not a substitute for
@@ -144,6 +153,14 @@ substantially less than the headline valuation implies once illiquidity
 and exit probability are priced in — how much of an offer is the user
 comfortable having riding on that uncertain outcome versus locked in as
 cash?
+
+## Setup Mode — Resume Conversation Guide
+
+Name which sections from `## Setup Mode — Sections` are missing or thin,
+then work through only those, one at a time, using the same guidance as
+the Initial Conversation Guide above for each. Skip sections that are
+already there with real content. Update `Last reviewed:` when done, same
+as the Revisit Conversation Guide.
 
 ## Setup Mode — Revisit Conversation Guide
 
