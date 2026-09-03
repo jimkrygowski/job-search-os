@@ -80,6 +80,16 @@ numbers with a qualified tax advisor or CPA before exercising anything
 
 Read only `research.md`'s "Anchoring & First Offers" and "BATNA (Best Alternative to a Negotiated Agreement)" subsections (see the moment index near the top of that file) — skip the rest.
 
+Write `state/career/comp_target.md` with `**Last reviewed:** <date>` as
+a one-line field near the top (not its own section), then a `##`
+heading for each of the other six items below, using this exact wording
+as the start of the heading: `## BATNA`, `## Target / Ask Range`,
+`## Walk-Away Minimums`, `## Cash / Equity / Benefits Priority`,
+`## Equity Risk Tolerance`, `## Deal-Breakers`. These headings are
+load-bearing: `tools/check_bootstrap_state.py` checks for them (by
+prefix) to confirm this file represents finished setup, not an
+interrupted session.
+
 - **Last reviewed:** `<date>`
 - **BATNA (walk-away alternative)** — the real, concrete alternative that
   gives the numbers below their teeth: a competing offer (with real

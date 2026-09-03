@@ -48,7 +48,23 @@ Work through these one at a time — don't dump all the questions at once:
 
 ## Output
 
-Write `state/career/profile.md` with clear headers matching the sections above.
+Write `state/career/profile.md` with a `##` heading for each section
+above, using this exact wording as the start of the heading (a
+descriptive suffix after it is fine and encouraged — e.g. `## Best Job:
+Linkable Networks` rather than a bare `## Best Job`):
+
+- `## Career History`
+- `## Best Job` (append `: <company/role>` or similar)
+- `## Worst Job` (same)
+- `## Best Boss` (same)
+- `## Worst Boss` (same)
+- `## Patterns`
+
+These six headings are load-bearing: `tools/check_bootstrap_state.py`
+checks for them (by prefix) to confirm this file represents finished
+work, not an interrupted session. Additional `##` sections beyond these
+six (e.g. a callout the user's story clearly needs) are fine to add.
+
 Use the user's own words and specifics where possible — this file is
 read by skills that draft resumes and cover letters, and vague profile
 content produces vague drafts.
