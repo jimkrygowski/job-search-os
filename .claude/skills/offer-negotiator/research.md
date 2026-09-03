@@ -462,6 +462,7 @@ figure was found for that specific claim.
 
 ## Equity & Comp Mechanics
 
+<a id="exit-rate-base-rates"></a>
 ### Startup Exit-Rate Base Rates by Stage
 
 **Source:** Correlation Ventures proprietary deal database, reported via
@@ -638,6 +639,7 @@ explicitly rather than stacking both haircuts naively.
 
 ---
 
+<a id="liquidation-preferences"></a>
 ### Liquidation Preferences & the Preference Stack
 
 **Source:** NVCA Model Legal Documents / Model Term Sheet; Cooley LLP
@@ -804,6 +806,7 @@ discount) rather than looking up a stage-based ratio table.
 
 ---
 
+<a id="dlom"></a>
 ### Discount for Lack of Marketability (DLOM)
 
 **Source:** Damodaran (2005) synthesis of eight primary marketability-
