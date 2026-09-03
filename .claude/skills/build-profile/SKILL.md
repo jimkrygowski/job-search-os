@@ -29,7 +29,7 @@ must be concrete, not vague.
      finishing those — don't restart from scratch, and don't ask a
      generic "what do you want to add" question when the gap is already
      clear.
-2. (First-time build and resume mode) Ask whether they have an existing
+2. (Initial mode and resume mode) Ask whether they have an existing
    resume to seed from (`state/career/resume/master_resume.md`, or a
    resume they can paste/upload) — skip this if they already answered
    in a prior session. If yes, read it and draft an initial pass at the
