@@ -67,8 +67,8 @@ numbers with a qualified tax advisor or CPA before exercising anything
    - If it's ambiguous which the user wants, ask directly rather than
      guessing.
 2. (Setup Mode only) Check whether `state/career/comp_target.md` exists,
-   and if so, whether it's complete — every section in `## Setup Mode —
-   Sections` below present as a `##` heading with substantive content
+   and if so, whether it's complete — every `##` section listed in
+   `## Setup Mode — Sections` below present as a `##` heading with substantive content
    underneath, not just the heading itself or a placeholder line (the
    same completeness standard `tools/check_bootstrap_state.py` checks).
    - **Doesn't exist → initial mode.** Build it from scratch.

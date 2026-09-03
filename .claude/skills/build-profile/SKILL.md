@@ -19,7 +19,7 @@ must be concrete, not vague.
    a `##` heading with substantive content underneath, not just the
    heading itself or a placeholder line (the same completeness standard
    `tools/check_bootstrap_state.py` checks).
-   - **Doesn't exist → first-time build.**
+   - **Doesn't exist → initial mode.**
    - **Exists and complete → revisit mode.** Tell the user what's
      already captured and ask whether they want to add to it, correct
      something, or redo a section — don't silently overwrite.
@@ -29,11 +29,13 @@ must be concrete, not vague.
      finishing those — don't restart from scratch, and don't ask a
      generic "what do you want to add" question when the gap is already
      clear.
-2. Ask whether they have an existing resume to seed from
-   (`state/career/resume/master_resume.md`, or a resume they can paste/upload).
-   If yes, read it and draft an initial pass at the sections below for
-   them to correct rather than starting from a blank page. If no, build
-   the sections from conversation alone.
+2. (First-time build and resume mode) Ask whether they have an existing
+   resume to seed from (`state/career/resume/master_resume.md`, or a
+   resume they can paste/upload) — skip this if they already answered
+   in a prior session. If yes, read it and draft an initial pass at the
+   relevant sections for them to correct rather than starting from a
+   blank page (in resume mode, only the sections still missing or thin).
+   If no, build those sections from conversation alone.
    - If the user provides an existing resume (pasted, uploaded, or
      otherwise supplied) and `state/career/resume/master_resume.md` doesn't
      already exist, write it there as-is (creating the `state/career/resume/`

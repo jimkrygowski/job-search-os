@@ -50,13 +50,13 @@ to a working `state/career/profile.md`, `state/career/trajectory.md`, and
      exist but `state/career/comp_target.md` doesn't, skip to step 5.
 
 3. **Run `build-profile`.** Don't proceed to step 4 until
-   `state/career/profile.md` is written.
+   `state/career/profile.md` is complete (see step 2's definition).
 
-4. **Run `define-trajectory`** (initial mode, since
-   `state/career/trajectory.md` doesn't exist yet).
+4. **Run `define-trajectory`** — it will detect from the file itself
+   whether that's initial mode (missing) or resume mode (incomplete).
 
-5. **Run `offer-negotiator`** (initial mode, since
-   `state/career/comp_target.md` doesn't exist yet).
+5. **Run `offer-negotiator`** — it will detect from the file itself
+   whether that's initial mode (missing) or resume mode (incomplete).
 
 6. **Wrap up.** Tell the user what was created and point them at
    `score-opportunity` as the natural next step — pasting in a JD to

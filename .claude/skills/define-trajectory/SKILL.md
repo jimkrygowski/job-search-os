@@ -16,8 +16,8 @@ something the user could actually hand to a recruiter or a contact.
 ## Session Start
 
 1. Check whether `state/career/trajectory.md` exists, and if so, whether
-   it's complete — every section in `## Sections (Mnookin Two-Pager
-   shape)` below present as a `##` heading with substantive content
+   it's complete — every `##` section listed in `## Sections (Mnookin
+   Two-Pager shape)` below present as a `##` heading with substantive content
    underneath, not just the heading itself or a placeholder line (the
    same completeness standard `tools/check_bootstrap_state.py` checks).
    - **Doesn't exist → initial mode.** Build it from scratch.
