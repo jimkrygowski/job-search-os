@@ -143,6 +143,13 @@ class SectionHasContentTest(unittest.TestCase):
         )
         self.assertTrue(check_bootstrap_state._section_has_content(text, "Career History"))
 
+    def test_sub_heading_level_does_not_satisfy_required_heading(self):
+        # Complementary case to the nested-content test above: a "###"
+        # heading must NOT itself count as satisfying a required "##"
+        # section, even if its text matches the required prefix.
+        text = "### Best Job: Some Co\n\nReal content here, over the length floor.\n"
+        self.assertFalse(check_bootstrap_state._section_has_content(text, "Best Job"))
+
     def test_matching_is_case_insensitive(self):
         text = "## foo\n\nReal content here, well over the length floor.\n"
         self.assertTrue(check_bootstrap_state._section_has_content(text, "Foo"))

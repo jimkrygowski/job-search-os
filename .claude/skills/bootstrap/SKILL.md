@@ -28,13 +28,22 @@ to a working `state/career/profile.md`, `state/career/trajectory.md`, and
    change outside this repo, and the user should control it. Once they
    confirm Python is available, re-run the check before continuing.
 
-2. **Check existing state.**
+2. **Check existing state.** "Exists" below means exists AND has all of
+   its required sections filled in with real content (see
+   `build-profile`, `define-trajectory`, and `offer-negotiator`'s own
+   `SKILL.md` for each file's required headings) — not just present on
+   disk. A file with the right headings but empty or stub content under
+   them doesn't count; treat it the same as if the file didn't exist,
+   and re-run the skill that produces it rather than skipping past it.
    - If `state/career/profile.md`, `state/career/trajectory.md`, and
-     `state/career/comp_target.md` all already exist, tell the user setup
-     already looks complete and ask if they want to revisit any of them
-     (hand off to `build-profile`, `define-trajectory`, or
+     `state/career/comp_target.md` all exist by that standard, tell the
+     user setup already looks complete and ask if they want to revisit
+     any of them (hand off to `build-profile`, `define-trajectory`, or
      `offer-negotiator` directly) rather than re-running bootstrap.
-   - If `state/career/profile.md` doesn't exist, continue to step 3.
+   - If `state/career/profile.md` doesn't exist (by that standard),
+     continue to step 3 — if the file is present but incomplete, mention
+     that a previous session may have been interrupted before finishing
+     it.
    - If `state/career/profile.md` exists but `state/career/trajectory.md`
      doesn't, skip to step 4.
    - If `state/career/profile.md` and `state/career/trajectory.md` both

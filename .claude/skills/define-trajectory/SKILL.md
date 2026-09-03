@@ -35,6 +35,18 @@ something the user could actually hand to a recruiter or a contact.
 - **Strengths** — grounded in `state/career/profile.md`, not generic.
 - **Weaknesses / stretch areas** — honest, not softened.
 
+Write `**Last reviewed:** <date>` as a one-line field near the top (not
+its own section), then a `##` heading for each of the other eight items
+above, using this exact wording as the start of the heading: `## What I
+Love Doing`, `## What I Hate Doing`, `## Must-Haves`, `## Must-Nots`,
+`## Short-Term Goal (Next Role)`, `## Long-Term Goal (3-5 years)`,
+`## Strengths`, `## Weaknesses / Stretch Areas`. These headings are
+load-bearing in two places: `tools/score_table.py` requires the
+Must-Haves/Must-Nots/Short-Term-Goal headings verbatim to parse scoring
+criteria, and `tools/check_bootstrap_state.py` checks all eight (by
+prefix) to confirm this file represents finished work, not an
+interrupted session.
+
 ## Initial Mode — Conversation Guide
 
 Ask one at a time, in the order above. For must-haves/must-nots, push for

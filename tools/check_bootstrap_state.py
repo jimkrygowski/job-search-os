@@ -81,7 +81,10 @@ def _section_has_content(text, heading_prefix):
 def _file_is_complete(path, required_sections):
     if not path.exists():
         return False
-    text = path.read_text()
+    try:
+        text = path.read_text()
+    except (OSError, UnicodeDecodeError):
+        return False
     return all(_section_has_content(text, s) for s in required_sections)
 
 

@@ -9,19 +9,24 @@ facts about them beyond what's written there, in `state/tracker.md`, or
 in `state/opportunity/*/notes.md`.
 
 A `SessionStart` hook (`tools/check_bootstrap_state.py`) checks whether
-`state/career/profile.md` exists and, if it doesn't, injects a note that
-this is a new user. When that note is present, your very first reply
-this session — before addressing anything else the user asked — must say
-plainly that setup hasn't been run yet and offer to run the `bootstrap`
-skill right now. Don't wait to be asked, and don't improvise your own
-setup flow.
+`state/career/profile.md` exists and has all its required sections
+filled in with real content — existence alone isn't enough, since an
+interrupted session can leave a stub file. If it's missing or
+incomplete, the hook injects a note that this is a new user (or one who
+started setup and didn't finish). When that note is present, your very
+first reply this session — before addressing anything else the user
+asked — must say so plainly (for a stub file, that means offering to
+pick up where they left off, not just "run bootstrap from scratch") and
+offer to run the `bootstrap` skill right now. Don't wait to be asked,
+and don't improvise your own setup flow.
 
 The same hook also checks a second, softer condition: if
-`state/career/profile.md` and `state/career/trajectory.md` both exist but
-`state/career/comp_target.md` doesn't, it injects a non-blocking note that
-`offer-negotiator` setup hasn't been run. Unlike the new-user note, this
-one doesn't gate your first reply — mention it and offer to set it up,
-but address whatever the user asked first.
+`state/career/profile.md` and `state/career/trajectory.md` are both
+complete but `state/career/comp_target.md` is missing or incomplete, it
+injects a non-blocking note that `offer-negotiator` setup hasn't been
+run (or wasn't finished). Unlike the new-user note, this one doesn't
+gate your first reply — mention it and offer to set it up, but address
+whatever the user asked first.
 
 ## State Directory
 
