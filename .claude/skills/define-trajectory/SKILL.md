@@ -15,11 +15,20 @@ something the user could actually hand to a recruiter or a contact.
 
 ## Session Start
 
-1. Check whether `state/career/trajectory.md` exists.
+1. Check whether `state/career/trajectory.md` exists, and if so, whether
+   it's complete — every section in `## Sections (Mnookin Two-Pager
+   shape)` below present as a `##` heading with substantive content
+   underneath, not just the heading itself or a placeholder line (the
+   same completeness standard `tools/check_bootstrap_state.py` checks).
    - **Doesn't exist → initial mode.** Build it from scratch.
-   - **Exists → revisit mode.** Summarize it back to the user, ask what's
-     changed. Update in place — don't rebuild from scratch. Update the
-     `Last reviewed:` field when done, regardless of how much changed.
+   - **Exists and complete → revisit mode.** Summarize it back to the
+     user, ask what's changed. Update in place — don't rebuild from
+     scratch. Update the `Last reviewed:` field when done, regardless of
+     how much changed.
+   - **Exists but incomplete → resume mode.** A previous session likely
+     got interrupted. Tell the user plainly which sections are already
+     captured and which are still missing or thin, then go straight to
+     finishing those.
 2. Read `state/career/profile.md` first if it exists — trajectory should build
    on the patterns identified there, not ignore them.
 
@@ -58,6 +67,15 @@ For the short-term goal, do an honest stretch assessment: given
 reach? Say so directly. If it's a stretch or reach, talk through how to
 position existing experience or what gap needs filling before or during
 the search.
+
+## Resume Mode — Conversation Guide
+
+Name which sections from `## Sections (Mnookin Two-Pager shape)` are
+missing or thin, then work through only those, one at a time, using the
+same guidance as Initial Mode above for each. Skip sections that are
+already there with real content — don't re-ask what the user already
+answered in a prior session. Update `Last reviewed:` when done, same as
+Revisit Mode.
 
 ## Revisit Mode — Conversation Guide
 
