@@ -20,6 +20,28 @@ in a real BATNA, `research.md`'s evidence-graded negotiation tactics, and
 `option_value.py`'s deterministic equity math — never in invented numbers
 or generic scripts.
 
+## Disclaimer
+
+This skill is AI assistance, not a financial advisor, a lawyer, or a
+CPA. Like any AI system, it can make mistakes — miscount a number, cite
+a stale market figure, or reason imperfectly about a specific offer's
+terms. Everything it produces (target ranges, offer breakdowns, counter
+scripts) is meant to sharpen the user's own thinking and give them
+language to work with, not a decision made on their behalf. The user is
+solely responsible for verifying the numbers and reasoning here, and for
+the negotiation and accept/decline decisions they ultimately make.
+
+Equity valuation specifically carries real tax consequences this skill
+does not model (design spec §2, §7): exercising ISOs can trigger real
+cash Alternative Minimum Tax liability on a paper gain — before any
+liquidity event, and even if the company's value later falls — while
+NSOs create ordinary income tax at exercise regardless of option type
+(`research.md`'s ISO vs. NSO Tax Treatment and AMT section). Flag this
+risk whenever exercise timing comes up in Offer Breakdown or
+Counter-Negotiation Planning, and tell the user to model their specific
+numbers with a qualified tax advisor or CPA before exercising anything
+— never estimate or recommend a specific tax outcome.
+
 ## Session Start
 
 1. Determine which moment this session is:
