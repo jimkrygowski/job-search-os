@@ -121,12 +121,12 @@ opportunity, written to its `notes.md`.
 
 ### 6.4 Final accept/decline — hands off to `career-coach`
 
-`career-coach` already scores "Compensation & upside" as one of five
-dimensions in its Evaluation Template (`career-coach/SKILL.md`) alongside
-role scope, growth trajectory, cultural fit, and problem fit — it's not
-comp-only, and it already reads `notes.md` per its existing Session Start
-Protocol. So `offer-negotiator` does **not** run its own decision session
-at this moment. Instead it:
+`career-coach` already scores "Compensation & upside" as one of its
+Opportunity Fit dimensions in its Evaluation Template
+(`career-coach/SKILL.md`) alongside role scope, growth trajectory,
+cultural fit, and problem fit — it's not comp-only, and it already reads
+`notes.md` per its existing Session Start Protocol. So `offer-negotiator`
+does **not** run its own decision session at this moment. Instead it:
 
 1. Ensures the opportunity's `notes.md` has a clear, sourced comp summary
    (offer breakdown + `option_value.py` output + fit against
