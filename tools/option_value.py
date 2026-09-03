@@ -16,7 +16,17 @@ compose.
 
 import argparse
 import json
+import math
 import sys
+
+
+def _validate_finite(value, name):
+    """Rejects NaN/Infinity, which json.load() accepts by default (a
+    non-standard JSON extension) and which every existing negativity
+    check here silently lets through -- comparisons against NaN are
+    always False in Python, so `value < 0` never catches it."""
+    if not math.isfinite(value):
+        raise ValueError(f"{name} must be a finite number, got {value!r}")
 
 
 def compute_face_value(shares, strike_price, quoted_price):
@@ -65,8 +75,10 @@ def compute_preference_adjustment(shares, strike_price, quoted_price,
             "common_price": None,
             "guidance": PREFERENCE_STACK_GUIDANCE,
         }
+    _validate_finite(fully_diluted_shares, "fully_diluted_shares")
     if fully_diluted_shares <= 0:
         raise ValueError("fully_diluted_shares must be positive")
+    _validate_finite(preference_stack, "preference_stack")
     if preference_stack < 0:
         raise ValueError("preference_stack cannot be negative")
     common_price = max(0.0, quoted_price - preference_stack / fully_diluted_shares)
@@ -197,6 +209,19 @@ DYNAMIC_DLOM_UPPER_BOUND_CAVEAT = (
     "unrealistic perfect-timing assumption -- the real discount is "
     "likely lower than this figure, so this result may understate the "
     "equity's value."
+)
+
+# Surfaced when a *partial* dlom_override (only override_low or only
+# override_high) is supplied alongside time_to_liquidity_years/
+# volatility -- see compute_dlom_range's docstring for why the partial
+# override wins precedence over the dynamic calculation entirely rather
+# than blending the two, which would otherwise be silent.
+PARTIAL_DLOM_OVERRIDE_DISCARDS_DYNAMIC_CAVEAT = (
+    "A partial dlom_override (only override_low or only override_high) "
+    "was supplied together with time_to_liquidity_years/volatility -- "
+    "the missing override side used the flat 20-30% default band, not "
+    "the dynamic Longstaff calculation; the two inputs were not "
+    "blended."
 )
 
 
@@ -413,10 +438,13 @@ def compute_valuation(inputs):
     quoted_price = inputs["quoted_price"]
     company_stage = inputs["company_stage"]
 
+    _validate_finite(shares, "shares")
     if shares < 0:
         raise ValueError(f"shares cannot be negative, got {shares!r}")
+    _validate_finite(strike_price, "strike_price")
     if strike_price < 0:
         raise ValueError(f"strike_price cannot be negative, got {strike_price!r}")
+    _validate_finite(quoted_price, "quoted_price")
     if quoted_price < 0:
         raise ValueError(f"quoted_price cannot be negative, got {quoted_price!r}")
 
@@ -441,9 +469,7 @@ def compute_valuation(inputs):
             fully_diluted_shares=inputs.get("fully_diluted_shares"),
         )
 
-    base_for_exit = face_value if company_stage == "public" else (
-        preference["adjusted_value"] if preference["applied"] else face_value
-    )
+    base_for_exit = preference["adjusted_value"] if preference["applied"] else face_value
 
     caveats = []
     if company_stage == "private" and preference["applied"]:
@@ -457,9 +483,15 @@ def compute_valuation(inputs):
         )
 
     exit_override = inputs.get("exit_probability_override") or {}
-    if not exit_override and company_stage in STAGE_CONFIDENCE_CAVEATS:
-        # Only when the tool's own default is actually in use -- an
-        # explicit override replaces the figure this caveat is about.
+    if (
+        company_stage in STAGE_CONFIDENCE_CAVEATS
+        and (exit_override.get("low") is None or exit_override.get("high") is None)
+    ):
+        # Fires whenever EITHER side is still using the tool's own
+        # default -- not just when no override was supplied at all. A
+        # caller who overrides only one side still has the other side
+        # silently defaulting, which is exactly the confidence gap this
+        # caveat exists to surface.
         caveats.append(STAGE_CONFIDENCE_CAVEATS[company_stage])
 
     exit_range = compute_exit_probability_range(
@@ -469,6 +501,22 @@ def compute_valuation(inputs):
     )
 
     dlom_override = inputs.get("dlom_override") or {}
+    dlom_override_partial = (
+        dlom_override.get("low") is None) != (dlom_override.get("high") is None
+    )
+    if (
+        dlom_override_partial
+        and company_stage != "public"
+        and inputs.get("time_to_liquidity_years") is not None
+        and inputs.get("volatility") is not None
+    ):
+        # A partial dlom_override wins precedence over the dynamic
+        # Longstaff calculation entirely (see compute_dlom_range's
+        # docstring) -- the missing side falls back to the flat default
+        # band, and time_to_liquidity_years/volatility are discarded,
+        # not blended. Surface that here since it's otherwise silent.
+        caveats.append(PARTIAL_DLOM_OVERRIDE_DISCARDS_DYNAMIC_CAVEAT)
+
     final_range = compute_dlom_range(
         exit_range["low"], exit_range["high"], company_stage,
         time_to_liquidity_years=inputs.get("time_to_liquidity_years"),

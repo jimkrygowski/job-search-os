@@ -93,6 +93,25 @@ class ComputePreferenceAdjustmentTest(unittest.TestCase):
                 preference_stack=-1, fully_diluted_shares=1_000_000,
             )
 
+    def test_nan_preference_stack_raises(self):
+        # Regression test: NaN < 0 is always False in Python, so the
+        # existing negativity check silently let NaN through before this
+        # fix -- poisoning the whole downstream computation with NaN.
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_preference_adjustment(
+                shares=1000, strike_price=2.00, quoted_price=5.00,
+                preference_stack=float("nan"), fully_diluted_shares=1_000_000,
+            )
+        self.assertIn("preference_stack", str(ctx.exception))
+
+    def test_nan_fully_diluted_shares_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_preference_adjustment(
+                shares=1000, strike_price=2.00, quoted_price=5.00,
+                preference_stack=2_000_000, fully_diluted_shares=float("nan"),
+            )
+        self.assertIn("fully_diluted_shares", str(ctx.exception))
+
 
 class ComputeExitProbabilityRangeTest(unittest.TestCase):
     def test_public_company_passes_through_unchanged(self):
@@ -576,6 +595,130 @@ class ComputeValuationTest(unittest.TestCase):
         self.assertIn("single source", joined)
         self.assertIn("upper bound", joined)
 
+    def test_partial_exit_probability_override_low_only_still_adds_single_source_caveat(self):
+        # Regression test: a caller supplying only override_low used to
+        # suppress the single-source caveat entirely, even though the
+        # unspecified high side still silently used the tool's own
+        # single-source STAGE_DEFAULT_FAILURE_RATES default.
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "series_b",
+            "exit_probability_override": {"low": 0.5},
+        })
+        self.assertEqual(len(result["caveats"]), 1)
+        self.assertIn("single source", result["caveats"][0].lower())
+        self.assertEqual(result["exit_probability_range"]["failure_rate_high"], 0.72)
+
+    def test_partial_exit_probability_override_high_only_still_adds_single_source_caveat(self):
+        # override_high must stay >= series_b's flat 0.72 default (which
+        # still applies to the un-overridden low side) to avoid an
+        # unrelated inverted-range error.
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "series_b",
+            "exit_probability_override": {"high": 0.9},
+        })
+        self.assertEqual(len(result["caveats"]), 1)
+        self.assertIn("single source", result["caveats"][0].lower())
+        self.assertEqual(result["exit_probability_range"]["failure_rate_low"], 0.72)
+
+    def test_full_exit_probability_override_suppresses_single_source_caveat(self):
+        # Both sides explicitly supplied -- the tool's own default isn't
+        # in use at all, so the caveat about that default correctly
+        # doesn't fire.
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "series_b",
+            "exit_probability_override": {"low": 0.5, "high": 0.5},
+        })
+        self.assertEqual(result["caveats"], [])
+
+    def test_partial_dlom_override_with_dynamic_inputs_adds_discard_caveat(self):
+        # Regression test: a partial dlom_override wins precedence over
+        # the dynamic Longstaff calculation entirely for this call, and
+        # the missing side silently falls back to the flat default band
+        # -- time_to_liquidity_years/volatility are discarded, not
+        # blended, with no prior indication of that in the output.
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "private",
+            "time_to_liquidity_years": 2, "volatility": 0.25,
+            "dlom_override": {"low": 0.05},
+        })
+        self.assertEqual(len(result["caveats"]), 1)
+        self.assertIn("not blended", result["caveats"][0].lower())
+        self.assertEqual(result["final_range"]["dlom_high"], option_value.DLOM_HIGH)
+
+    def test_full_dlom_override_with_dynamic_inputs_has_no_discard_caveat(self):
+        # Both sides explicitly supplied -- nothing is ambiguously
+        # discarded, the caller clearly overrode the whole range on
+        # purpose.
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "private",
+            "time_to_liquidity_years": 2, "volatility": 0.25,
+            "dlom_override": {"low": 0.05, "high": 0.10},
+        })
+        self.assertEqual(result["caveats"], [])
+
+    def test_partial_dlom_override_without_dynamic_inputs_has_no_discard_caveat(self):
+        # No time_to_liquidity_years/volatility supplied at all -- the
+        # dynamic path was never in play, so nothing was discarded.
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "private",
+            "dlom_override": {"low": 0.05},
+        })
+        self.assertEqual(result["caveats"], [])
+
+    def test_public_stage_with_partial_dlom_override_and_dynamic_inputs_has_no_discard_caveat(self):
+        # DLOM doesn't apply to public stock at all -- the caveat about
+        # discarding a dynamic calculation would be nonsensical here.
+        result = option_value.compute_valuation({
+            "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+            "company_stage": "public",
+            "time_to_liquidity_years": 2, "volatility": 0.25,
+            "dlom_override": {"low": 0.05},
+        })
+        self.assertEqual(result["caveats"], [])
+
+    def test_nan_shares_raises(self):
+        # Regression test: NaN comparisons are always False in Python
+        # (nan < 0 is False), so the existing negativity check silently
+        # let NaN through -- poisoning face_value and every downstream
+        # figure with NaN, and producing invalid (non-standard) JSON
+        # output via json.dumps.
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "shares": float("nan"), "strike_price": 2.00, "quoted_price": 5.00,
+                "company_stage": "public",
+            })
+        self.assertIn("shares", str(ctx.exception))
+
+    def test_nan_strike_price_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "shares": 1000, "strike_price": float("nan"), "quoted_price": 5.00,
+                "company_stage": "public",
+            })
+        self.assertIn("strike_price", str(ctx.exception))
+
+    def test_nan_quoted_price_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "shares": 1000, "strike_price": 2.00, "quoted_price": float("nan"),
+                "company_stage": "public",
+            })
+        self.assertIn("quoted_price", str(ctx.exception))
+
+    def test_infinite_quoted_price_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "shares": 1000, "strike_price": 2.00, "quoted_price": float("inf"),
+                "company_stage": "public",
+            })
+        self.assertIn("quoted_price", str(ctx.exception))
+
 
 class OptionValueCLITest(unittest.TestCase):
     def setUp(self):
@@ -618,6 +761,19 @@ class OptionValueCLITest(unittest.TestCase):
         ))
         self.assertNotEqual(result.returncode, 0)
         self.assertNotIn("Traceback", result.stderr)
+
+    def test_compute_command_nan_input_fails_cleanly(self):
+        # Regression test: Python's json module accepts the literal
+        # token NaN by default (a non-standard JSON extension), so this
+        # sails past json.load and used to poison the whole computation
+        # instead of raising a clean, catchable error.
+        result = self.run_cli("compute", input_text=(
+            '{"shares": NaN, "strike_price": 2.00, "quoted_price": 5.00, '
+            '"company_stage": "public"}'
+        ))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertIn("shares", result.stderr)
 
 
 if __name__ == "__main__":
