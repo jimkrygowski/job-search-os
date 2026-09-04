@@ -3,17 +3,22 @@
 first reply.
 
 Checks state/career/profile.md, trajectory.md, and comp_target.md and
-injects at most one note. A file only counts as done if it exists AND
-has every one of its required sections present with real content --
-existence alone doesn't prove a workflow ran to completion (a session
-that gets interrupted mid-build-profile can leave a stub file that
-exists but is empty or missing whole sections).
+injects at most one note, naming which required sections are missing or
+empty. This is a presence check, not a sufficiency judgment: it only
+asks whether each required section has *something* written under its
+heading, not whether that content is actually good. This hook runs as a
+plain subprocess before Claude's turn starts -- it has no LLM available
+to judge whether content is substantive, so it doesn't try. That
+judgment belongs entirely to the skill that actually reads the file when
+a user engages with it (build-profile/define-trajectory/offer-
+negotiator's own Session Start checks), which is where it happens
+correctly.
 
-- profile.md missing or incomplete: hard-gate new-user note (must lead
-  the first reply).
-- profile.md complete, trajectory.md complete, comp_target.md missing
-  or incomplete: soft, non-blocking note that offer-negotiator setup
-  hasn't been run.
+- profile.md missing or has empty/missing required sections: hard-gate
+  new-user note (must lead the first reply), naming which sections.
+- profile.md complete (by presence), trajectory.md complete,
+  comp_target.md missing or has empty/missing required sections: soft,
+  non-blocking note, naming which sections.
 - All three complete: no note.
 """
 import json
@@ -47,20 +52,19 @@ COMP_TARGET_REQUIRED_SECTIONS = [
     "Cash / Equity / Benefits Priority", "Equity Risk Tolerance", "Deal-Breakers",
 ]
 
-# Length floor (characters, after .strip()) for a section's body text to
-# count as real content rather than an empty/placeholder stub. Long
-# enough to reject "TBD" or nothing at all; short enough not to reject a
-# genuinely terse real answer. A judgment call, not a measured constant
-# -- this is a fast, deterministic hook, not an LLM call, so it can't
-# make a quality judgment, only a presence-and-length one.
-MIN_SECTION_CONTENT_LENGTH = 20
-
 
 def _section_has_content(text, heading_prefix):
     """True if `text` has a "##"-level heading starting with
-    heading_prefix (case-insensitive), followed by at least
-    MIN_SECTION_CONTENT_LENGTH characters of stripped content before the
-    next "##"-or-higher heading or end of string.
+    heading_prefix (case-insensitive), followed by non-empty content
+    before the next "##"-or-higher heading or end of string.
+
+    This is a presence check, not a sufficiency judgment -- "is there
+    anything here at all," not "is this good enough." Whether present
+    content is actually substantive is a real judgment call, and this
+    hook has no LLM available to make it (it runs as a plain subprocess
+    before Claude's turn starts). That judgment happens exactly once,
+    correctly, in the skill that actually reads the file -- not
+    approximated here with a character-count threshold.
 
     Mirrors score_table.py's _section_body regex approach (same stop-
     boundary: the next "##" heading or EOF, so a "###" sub-heading is
@@ -75,17 +79,20 @@ def _section_has_content(text, heading_prefix):
     m = pattern.search(text)
     if m is None:
         return False
-    return len(m.group(1).strip()) >= MIN_SECTION_CONTENT_LENGTH
+    return len(m.group(1).strip()) > 0
 
 
-def _file_is_complete(path, required_sections):
+def _missing_sections(path, required_sections):
+    """Returns the subset of required_sections that are missing or
+    empty. A missing or unreadable file trivially returns the full
+    list -- every required section is "missing" in that case."""
     if not path.exists():
-        return False
+        return list(required_sections)
     try:
         text = path.read_text()
     except (OSError, UnicodeDecodeError):
-        return False
-    return all(_section_has_content(text, s) for s in required_sections)
+        return list(required_sections)
+    return [s for s in required_sections if not _section_has_content(text, s)]
 
 
 def _emit(context):
@@ -98,28 +105,34 @@ def _emit(context):
 
 
 def main():
-    if not _file_is_complete(PROFILE_PATH, PROFILE_REQUIRED_SECTIONS):
+    profile_missing = _missing_sections(PROFILE_PATH, PROFILE_REQUIRED_SECTIONS)
+    if profile_missing:
+        if not PROFILE_PATH.exists():
+            detail = "does not exist"
+        else:
+            detail = "is missing: " + ", ".join(profile_missing)
         _emit(
-            "state/career/profile.md does not exist or is incomplete. "
-            "This is a new user who has not run bootstrap yet (or "
-            "started it and didn't finish). Your very first reply this "
-            "session, before addressing anything else the user asked, "
-            "must say so plainly and offer to run the `bootstrap` skill "
-            "now."
+            f"state/career/profile.md {detail}. This is a new user who "
+            "has not run bootstrap yet (or started it and didn't "
+            "finish). Your very first reply this session, before "
+            "addressing anything else the user asked, must say so "
+            "plainly and offer to run the `bootstrap` skill now."
         )
         return
 
-    if (
-        _file_is_complete(TRAJECTORY_PATH, TRAJECTORY_REQUIRED_SECTIONS)
-        and not _file_is_complete(COMP_TARGET_PATH, COMP_TARGET_REQUIRED_SECTIONS)
-    ):
+    trajectory_missing = _missing_sections(TRAJECTORY_PATH, TRAJECTORY_REQUIRED_SECTIONS)
+    comp_target_missing = _missing_sections(COMP_TARGET_PATH, COMP_TARGET_REQUIRED_SECTIONS)
+    if not trajectory_missing and comp_target_missing:
+        if not COMP_TARGET_PATH.exists():
+            detail = "doesn't exist yet"
+        else:
+            detail = "is missing: " + ", ".join(comp_target_missing)
         _emit(
-            "state/career/comp_target.md doesn't exist yet or is "
-            "incomplete — offer-negotiator (comp coaching/benchmarking) "
-            "won't be able to ground its advice in your actual "
-            "walk-away numbers until it's set up. Mention this and "
-            "offer to set it up, but address whatever the user asked "
-            "first."
+            f"state/career/comp_target.md {detail} — offer-negotiator "
+            "(comp coaching/benchmarking) won't be able to ground its "
+            "advice in your actual walk-away numbers until it's set up. "
+            "Mention this and offer to set it up, but address whatever "
+            "the user asked first."
         )
 
 
