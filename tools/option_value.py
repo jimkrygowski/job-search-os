@@ -247,6 +247,18 @@ def _validate_range_order(low, high, low_name, high_name):
         )
 
 
+def _validate_override_dict(value, name):
+    """Guards against a non-dict override value -- e.g. an LLM caller
+    assembling this JSON from conversation passing a list or string
+    where {"low": ..., "high": ...} is expected. Without this, calling
+    .get() on the malformed value raises an unhandled AttributeError
+    instead of the tool's normal clean ValueError."""
+    if value is not None and not isinstance(value, dict):
+        raise ValueError(
+            f"{name} must be an object with 'low'/'high' keys, got {value!r}"
+        )
+
+
 def compute_exit_probability_range(value, company_stage,
                                      override_low=None, override_high=None):
     """Applies the exit-probability haircut as a range. 'public' passes
@@ -448,6 +460,16 @@ def compute_valuation(inputs):
     if quoted_price < 0:
         raise ValueError(f"quoted_price cannot be negative, got {quoted_price!r}")
 
+    time_to_liquidity_years = inputs.get("time_to_liquidity_years")
+    if time_to_liquidity_years is not None:
+        _validate_finite(time_to_liquidity_years, "time_to_liquidity_years")
+    volatility = inputs.get("volatility")
+    if volatility is not None:
+        _validate_finite(volatility, "volatility")
+    cash_alternative = inputs.get("cash_alternative")
+    if cash_alternative is not None:
+        _validate_finite(cash_alternative, "cash_alternative")
+
     face_value = compute_face_value(shares, strike_price, quoted_price)
 
     if company_stage == "public":
@@ -482,7 +504,9 @@ def compute_valuation(inputs):
             "precise figure."
         )
 
-    exit_override = inputs.get("exit_probability_override") or {}
+    exit_override = inputs.get("exit_probability_override")
+    _validate_override_dict(exit_override, "exit_probability_override")
+    exit_override = exit_override or {}
     if (
         company_stage in STAGE_CONFIDENCE_CAVEATS
         and (exit_override.get("low") is None or exit_override.get("high") is None)
@@ -500,15 +524,17 @@ def compute_valuation(inputs):
         override_high=exit_override.get("high"),
     )
 
-    dlom_override = inputs.get("dlom_override") or {}
+    dlom_override = inputs.get("dlom_override")
+    _validate_override_dict(dlom_override, "dlom_override")
+    dlom_override = dlom_override or {}
     dlom_override_partial = (
         dlom_override.get("low") is None) != (dlom_override.get("high") is None
     )
     if (
         dlom_override_partial
         and company_stage != "public"
-        and inputs.get("time_to_liquidity_years") is not None
-        and inputs.get("volatility") is not None
+        and time_to_liquidity_years is not None
+        and volatility is not None
     ):
         # A partial dlom_override wins precedence over the dynamic
         # Longstaff calculation entirely (see compute_dlom_range's
@@ -519,8 +545,8 @@ def compute_valuation(inputs):
 
     final_range = compute_dlom_range(
         exit_range["low"], exit_range["high"], company_stage,
-        time_to_liquidity_years=inputs.get("time_to_liquidity_years"),
-        volatility=inputs.get("volatility"),
+        time_to_liquidity_years=time_to_liquidity_years,
+        volatility=volatility,
         override_low=dlom_override.get("low"),
         override_high=dlom_override.get("high"),
     )
@@ -536,7 +562,6 @@ def compute_valuation(inputs):
         "caveats": caveats,
     }
 
-    cash_alternative = inputs.get("cash_alternative")
     if cash_alternative is not None:
         result["cash_alternative"] = cash_alternative
         result["cash_vs_equity_low"] = cash_alternative - final_range["low"]

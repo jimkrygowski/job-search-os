@@ -719,6 +719,66 @@ class ComputeValuationTest(unittest.TestCase):
             })
         self.assertIn("quoted_price", str(ctx.exception))
 
+    def test_nan_time_to_liquidity_years_raises(self):
+        # Regression test: time_to_liquidity_years/volatility/
+        # cash_alternative were missing the same NaN/Infinity guard
+        # already applied to shares/strike_price/quoted_price/
+        # preference_stack/fully_diluted_shares. Worse than the other
+        # cases: a NaN time_to_liquidity_years doesn't even propagate
+        # NaN -- _interpolate_1d's bracket search is always False against
+        # NaN, so it silently falls through to the 5-year/max-DLOM
+        # fallback value instead, a plausible-looking but wrong discount
+        # with no error and no caveat.
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+                "company_stage": "private",
+                "time_to_liquidity_years": float("nan"), "volatility": 0.25,
+            })
+        self.assertIn("time_to_liquidity_years", str(ctx.exception))
+
+    def test_nan_volatility_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+                "company_stage": "private",
+                "time_to_liquidity_years": 2, "volatility": float("nan"),
+            })
+        self.assertIn("volatility", str(ctx.exception))
+
+    def test_nan_cash_alternative_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+                "company_stage": "public",
+                "cash_alternative": float("nan"),
+            })
+        self.assertIn("cash_alternative", str(ctx.exception))
+
+    def test_non_dict_exit_probability_override_raises_cleanly(self):
+        # Regression test: exit_override.get(...)/dlom_override.get(...)
+        # assume the caller-supplied override is a dict. A non-dict JSON
+        # value (list, string, number) used to raise an unhandled
+        # AttributeError instead of the tool's normal clean ValueError --
+        # a realistic failure mode since this JSON is assembled by an
+        # LLM from conversation, not hand-typed.
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+                "company_stage": "private",
+                "exit_probability_override": ["low", "high"],
+            })
+        self.assertIn("exit_probability_override", str(ctx.exception))
+
+    def test_non_dict_dlom_override_raises_cleanly(self):
+        with self.assertRaises(ValueError) as ctx:
+            option_value.compute_valuation({
+                "shares": 1000, "strike_price": 2.00, "quoted_price": 5.00,
+                "company_stage": "private",
+                "dlom_override": "not-a-dict",
+            })
+        self.assertIn("dlom_override", str(ctx.exception))
+
 
 class OptionValueCLITest(unittest.TestCase):
     def setUp(self):
@@ -774,6 +834,28 @@ class OptionValueCLITest(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertNotIn("Traceback", result.stderr)
         self.assertIn("shares", result.stderr)
+
+    def test_compute_command_nan_volatility_fails_cleanly(self):
+        result = self.run_cli("compute", input_text=(
+            '{"shares": 1000, "strike_price": 2.00, "quoted_price": 5.00, '
+            '"company_stage": "private", "time_to_liquidity_years": 2, '
+            '"volatility": NaN}'
+        ))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertIn("volatility", result.stderr)
+
+    def test_compute_command_non_dict_override_fails_cleanly(self):
+        # Regression test: a malformed override shape (e.g. an LLM caller
+        # passing a list instead of {"low": ..., "high": ...}) used to
+        # crash with an unhandled AttributeError instead of a clean error.
+        result = self.run_cli("compute", input_text=(
+            '{"shares": 1000, "strike_price": 2.00, "quoted_price": 5.00, '
+            '"company_stage": "private", "dlom_override": "not-a-dict"}'
+        ))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertIn("dlom_override", result.stderr)
 
 
 if __name__ == "__main__":
