@@ -9,24 +9,37 @@ facts about them beyond what's written there, in `state/tracker.md`, or
 in `state/opportunity/*/notes.md`.
 
 A `SessionStart` hook (`tools/check_bootstrap_state.py`) checks whether
-`state/career/profile.md` exists and has all its required sections
-filled in with real content — existence alone isn't enough, since an
-interrupted session can leave a stub file. If it's missing or
-incomplete, the hook injects a note that this is a new user (or one who
-started setup and didn't finish). When that note is present, your very
-first reply this session — before addressing anything else the user
-asked — must say so plainly (for a stub file, that means offering to
-pick up where they left off, not just "run bootstrap from scratch") and
-offer to run the `bootstrap` skill right now. Don't wait to be asked,
-and don't improvise your own setup flow.
+`state/career/profile.md` exists and whether each required section has
+something written under it, naming the specific sections that are empty
+or missing. This is a presence check only — it has no way to tell a
+real, terse answer from a placeholder like "TBD," so it can't judge
+whether existing content is actually good. If a required section is
+missing or empty, the hook injects a note naming it. When that note is
+present, your very first reply this session — before addressing
+anything else the user asked — must say so plainly (for a file that's
+partly filled in, that means offering to pick up on the specific
+sections named, not "run bootstrap from scratch") and offer to run the
+`bootstrap` skill right now. Don't wait to be asked, and don't improvise
+your own setup flow.
+
+The hook's silence isn't a guarantee the content is good — only that
+something is written. When you read `state/career/profile.md`,
+`trajectory.md`, or `comp_target.md` at session start (per the first
+paragraph above) and notice a section is obviously a placeholder (e.g.
+literally "TBD," a single word, or something that doesn't actually
+answer the section's question), say so plainly and offer the relevant
+skill (`build-profile`/`define-trajectory`/`offer-negotiator`) to finish
+it — the same sufficiency judgment those skills already make when
+they're run directly, just applied proactively here since the hook
+can't make it for you.
 
 The same hook also checks a second, softer condition: if
-`state/career/profile.md` and `state/career/trajectory.md` are both
-complete but `state/career/comp_target.md` is missing or incomplete, it
-injects a non-blocking note that `offer-negotiator` setup hasn't been
-run (or wasn't finished). Unlike the new-user note, this one doesn't
-gate your first reply — mention it and offer to set it up, but address
-whatever the user asked first.
+`state/career/profile.md` and `state/career/trajectory.md` both have
+every required section present, but `state/career/comp_target.md` is
+missing or has empty/missing sections, it injects a non-blocking note
+naming them. Unlike the new-user note, this one doesn't gate your first
+reply — mention it and offer to set it up, but address whatever the
+user asked first.
 
 ## State Directory
 

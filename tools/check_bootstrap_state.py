@@ -85,7 +85,17 @@ def _section_has_content(text, heading_prefix):
 def _missing_sections(path, required_sections):
     """Returns the subset of required_sections that are missing or
     empty. A missing or unreadable file trivially returns the full
-    list -- every required section is "missing" in that case."""
+    list -- every required section is "missing" in that case.
+
+    Caveat: main()'s note wording branches on path.exists(), not on
+    whether the file was actually readable -- an existing-but-unreadable
+    file (bad permissions, non-UTF-8 bytes) gets the same "is missing:
+    <all sections>" wording as a genuinely stub file. Not wrong (the
+    hook genuinely can't find that content), but worth knowing if this
+    ever needs a clearer distinction -- the skill this note prompts the
+    user toward reads the file for real and would surface any actual
+    read error there.
+    """
     if not path.exists():
         return list(required_sections)
     try:
