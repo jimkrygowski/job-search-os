@@ -17,9 +17,14 @@ something the user could actually hand to a recruiter or a contact.
 
 1. Check whether `state/career/trajectory.md` exists, and if so, whether
    it's complete — every `##` section listed in `## Sections (Mnookin
-   Two-Pager shape)` below present as a `##` heading with substantive content
-   underneath, not just the heading itself or a placeholder line (the
-   same completeness standard `tools/check_bootstrap_state.py` checks).
+   Two-Pager shape)` below present as a `##` heading with real,
+   substantive content underneath, not just the heading itself or a
+   placeholder like "TBD." `tools/check_bootstrap_state.py`'s
+   SessionStart hook only checks that each heading exists with
+   *something* under it (a cheap presence check, no judgment call) to
+   decide whether to flag this file at all — the actual judgment of
+   whether the content is good enough is yours to make here, reading
+   the real file.
    - **Doesn't exist → initial mode.** Build it from scratch.
    - **Exists and complete → revisit mode.** Summarize it back to the
      user, ask what's changed. Update in place — don't rebuild from
