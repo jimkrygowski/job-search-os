@@ -24,14 +24,14 @@ your own setup flow.
 
 The hook's silence isn't a guarantee the content is good — only that
 something is written. When you read `state/career/profile.md`,
-`trajectory.md`, or `comp_target.md` at session start (per the first
-paragraph above) and notice a section is obviously a placeholder (e.g.
-literally "TBD," a single word, or something that doesn't actually
-answer the section's question), say so plainly and offer the relevant
-skill (`build-profile`/`define-trajectory`/`offer-negotiator`) to finish
-it — the same sufficiency judgment those skills already make when
-they're run directly, just applied proactively here since the hook
-can't make it for you.
+`trajectory.md`, or `comp_target.md` at session start (per this
+document's opening paragraph) and notice a section is obviously a
+placeholder (e.g. literally "TBD," a single word, or something that
+doesn't actually answer the section's question), say so plainly and
+offer the relevant skill (`build-profile`/`define-trajectory`/
+`offer-negotiator`) to finish it — the same sufficiency judgment those
+skills already make when they're run directly, just applied proactively
+here since the hook can't make it for you.
 
 The same hook also checks a second, softer condition: if
 `state/career/profile.md` and `state/career/trajectory.md` both have
