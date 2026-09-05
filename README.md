@@ -15,13 +15,14 @@ If you know someone looking for CTO, VP Engineering, Head of Engineering or Seni
 
 ## What it actually does
 
-Ten skills, each a focused piece of the search, invoked in a normal Claude Code chat session:
+Eleven skills, each a focused piece of the search, invoked in a normal Claude Code chat session:
 
 | Skill | What it does |
 |---|---|
-| `bootstrap` | First-time setup — checks the Python preflight, then walks a new user through `build-profile` and `define-trajectory` |
+| `bootstrap` | First-time setup — checks the Python preflight, then walks a new user through `build-profile`, `define-trajectory`, and comp-target setup |
 | `build-profile` | Guided conversation to build a real candidate profile: career history, best/worst jobs and bosses, and the patterns underneath them |
 | `define-trajectory` | Defines (and later revisits) the target role, shaped as a Mnookin Two-Pager — see below |
+| `offer-negotiator` | Compensation coaching end to end — builds your target, preps first-contact talking points, breaks down a real offer with equity run through `option_value.py`, plans the counter, and hands the final call to `career-coach` |
 | `score-opportunity` | Scores a pasted job description against your actual must-haves/must-nots, criterion by criterion — not a vibe check |
 | `tailor-resume` | Tailors a resume and cover letter from your master resume — never invents experience to fit a JD |
 | `company-research` | Researches a target company, every finding tagged with a source |
@@ -32,11 +33,13 @@ Ten skills, each a focused piece of the search, invoked in a normal Claude Code 
 
 ## Grounded in real frameworks
 
-Two things this system leans on that most "AI job search assistant" projects don't bother with:
+Three things this system leans on that most "AI job search assistant" projects don't bother with:
 
 **The coaching is evidence-graded, not aspirational.** `career-coach` draws on seven frameworks — Schein's Career Anchors, Self-Determination Theory, Ibarra's Working Identity, Opportunity Fit Assessment, Career Capital, Regret Minimization, Ikigai — and every one of them ships with a companion [research review](.claude/skills/career-coach/research.md) that grades its actual evidence quality, cites the primary literature, and says plainly when a framework is a practitioner heuristic dressed up as science. Self-Determination Theory gets used with confidence — 40+ years of replicated peer-reviewed research. Ikigai gets used as a conversation starter and nothing more — it's a Western blog invention from 2011, misattributed to Japan ever since. The skill doesn't pretend otherwise, and neither does this README.
 
 **The trajectory format comes from a real methodology.** `define-trajectory` builds a "Mnookin Two-Pager" — a concept from Phyl Terry's *Never Search Alone*, shaped as a genuine, shareable pitch document rather than internal notes. The system also implements Terry's Listening Tour idea directly: real feedback from an interview or a networking conversation is treated as a trigger to revisit the trajectory, not just a calendar-based staleness check. What's deliberately *not* here is Terry's Job Search Council — a peer accountability group is a real human structure, and no amount of agentic tooling should pretend to substitute for one.
+
+**Comp advice is sourced the same way, and equity math doesn't get freehanded.** `offer-negotiator` ships its own evidence-graded [research review](.claude/skills/offer-negotiator/research.md) — negotiation tactics and equity mechanics each rated for how solid the underlying evidence actually is, same treatment `career-coach` gets, right down to flagging where the research is genuinely contested (e.g. gender and negotiation outcomes) rather than picking the more comfortable narrative. And instead of letting an LLM eyeball what a stock grant is worth, `tools/option_value.py` computes it deterministically — a real, tested calculation for face value, preference-stack haircuts, exit-probability ranges, and illiquidity discounts, with every default constant citing exactly which part of the research backs it.
 
 ## Built like software, not a prompt
 
@@ -57,6 +60,7 @@ state/                           gitignored — never part of this repo's git hi
   career/
     profile.md                   your background (built by build-profile)
     trajectory.md                your target role, Mnookin Two-Pager shape
+    comp_target.md               walk-away numbers, comp priorities, deal-breakers
     job_alert_sources.md         your job alert email sources
     resume/master_resume.md      your source-of-truth resume
   opportunity/<Company>/<Role>/  per-opportunity JD, contacts, notes, tailored resume, transcripts
@@ -65,9 +69,10 @@ state/                           gitignored — never part of this repo's git hi
 tools/
   tracker.py                     sole writer of tracker.md, locked, tested
   gmail_extract.py                extracts new content from a saved Gmail thread
+  option_value.py                deterministic equity valuation calculator
 
 .claude/
-  skills/                        the ten skills above
+  skills/                        the eleven skills above
   commands/
     summarize-call.md            turns a call transcript into structured notes
 ```
@@ -79,7 +84,7 @@ git clone https://github.com/jimkrygowski/job-search-os.git
 cd job-search-os
 ```
 
-Then, in a Claude Code session in this directory, just say you want to get started — `CLAUDE.md` points a new user at the `bootstrap` skill automatically. It checks for Python 3, then walks you through building your profile and defining your target role. Everything after that — scoring opportunities, tailoring resumes, prepping for interviews, tracking the pipeline — happens through normal conversation.
+Then, in a Claude Code session in this directory, just say you want to get started — `CLAUDE.md` points a new user at the `bootstrap` skill automatically. It checks for Python 3, then walks you through building your profile, defining your target role, and setting your compensation target. Everything after that — scoring opportunities, tailoring resumes, prepping for interviews, tracking the pipeline — happens through normal conversation.
 
 ## About me
 
