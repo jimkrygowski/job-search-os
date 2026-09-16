@@ -88,6 +88,6 @@ Then, in a Claude Code session in this directory, just say you want to get start
 
 ## About me
 
-Jim Krygowski — engineering executive, Boston MA. 20+ years building and scaling engineering organizations, most recently at the VP Engineering / Senior Director level, with a track record spanning large established orgs and growth-stage companies. Currently looking for the next CTO, VP Engineering, or Senior Director role where the problem is genuinely hard.
+I was most recently a Director of Engineering at Jellyfish, where I headed up the teams building the AI platform and features on top of it. Before that I led a 55-person multi-geo engineering org at Charles River Development, and, earlier, was the first engineering hire at Linkable Networks, where I built and owned engineering and operations from zero through the company's acquisition. I'm looking for my next engineering leadership role, ideally partnering closely CEO, CTO to CPO and working to develop strategy and translate it to engineering delivery. I'm open to remote or hybrid. In the meantime, I'm also open to short-term consulting or advisory engagements, engineering leadership, org design, AI/agentic infrastructure strategy, so if you know of something that could use a hand, I'd welcome the conversation.
 
 [linkedin.com/in/jimkrygowski](https://linkedin.com/in/jimkrygowski)
