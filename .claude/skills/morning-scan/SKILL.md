@@ -79,6 +79,24 @@ python3 tools/tracker.py record-event "<Company>" "<Role>" \
 Flag any conflicts with expected pipeline activity in the summary as
 well.
 
+**Also check for resolved pending confirmations, beyond the week window.**
+Confirmed 2026-09-17: a networking coffee was confirmed and put on the
+calendar for 9 days out, but the scan's own week-window fetch couldn't
+see that far, so it kept reporting the tracker's stale "unconfirmed,
+TBD" line instead of catching that it had already been resolved. The
+week-window fetch above is for routine visibility, not for catching
+this — it won't, by construction.
+
+So separately: for every `state/tracker.md` row whose Next Action reads
+as a pending scheduling/confirmation ask (contains language like
+"confirm," "awaiting," "requested," or has a `TBD` Next Action Date),
+run a targeted search — `list_events` with `fullText` set to the
+contact's name or company — over the next 30 days, independent of the
+week-window fetch. If it turns up a confirmed event the tracker doesn't
+yet reflect, update the tracker (`update-status`, with the real
+date/next-action) before writing the summary, and report it as newly
+resolved rather than repeating the stale line.
+
 ## Summary Format
 
 **Pipeline** — one line per company with new activity. Flag replies, silence-breaks, or next actions due.
