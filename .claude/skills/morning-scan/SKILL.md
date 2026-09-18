@@ -19,17 +19,15 @@ This skill uses the following tools. Add them to your always-allow list in Claud
 ToolSearch: select:mcp__claude_ai_Gmail__search_threads,mcp__claude_ai_Gmail__get_thread,mcp__claude_ai_Google_Calendar__list_events,mcp__claude-in-chrome__tabs_context_mcp,mcp__claude-in-chrome__navigate,mcp__claude-in-chrome__read_page,mcp__claude-in-chrome__find,mcp__claude-in-chrome__tabs_create_mcp,mcp__claude-in-chrome__tabs_close_mcp
 ```
 
-**Tier 4 also needs, one time only:** LinkedIn granted as an allowed site
-in the Claude in Chrome extension, and an active logged-in LinkedIn
-session in that browser. Neither is something this skill can arrange; if
-either is missing, Tier 4 reports that and the scan continues.
+**Tier 4 also needs, one time only:** LinkedIn allowed as a site in the
+Claude in Chrome extension, and a logged-in LinkedIn session in that
+browser. If either is missing, Tier 4 reports it and the scan continues.
 
 1. Check the date and time.
 2. Write the date and time to the console using the following pattern: Morning Scan for [DATE] [TIME]
 3. Read `state/tracker.md` (the source of truth for pipeline state) so the scan is grounded in each company's current stage, last activity, and next action before pulling email/calendar.
-4. Run Tiers 1-3 in parallel. **Then** run Tier 4, which is browser-driven
-   and materially slower than the other three combined — running it last
-   means a slow or broken LinkedIn never delays the fast tiers.
+4. Run Tiers 1-3 in parallel, **then** Tier 4 — it is browser-driven and
+   slower, so running it last keeps it from delaying the others.
 5. Summarize — cross-check findings from all four tiers against
    `state/tracker.md` and flag any mismatches (e.g. a "next action" already
    resolved, a stage that's stale).
@@ -105,162 +103,102 @@ stale line.
 
 ## Tier 4 — LinkedIn Messages
 
-Recruiter and hiring-manager outreach frequently arrives on LinkedIn and
-never touches email, so Tiers 1-2 cannot see it. Confirmed 2026-09-18:
-three separate live conversations — two of them already scheduled calls
-— originated as LinkedIn messages and were invisible to the
-email-and-calendar scan until they surfaced indirectly as calendar
-bookings days later. That is the gap this tier closes.
+Recruiter and hiring-manager outreach often arrives on LinkedIn and never
+touches email.
 
 ### Read-only — no exceptions
 
-**This tier never sends, replies to, accepts, declines, archives,
-connects, withdraws, or marks anything.** It reads and reports. This
-restates guardrail #3 in `CLAUDE.md` at the tier level because that
-guardrail is instruction-level only for browser automation: the
-`.claude/settings.json` deny-list covers three Gmail tool names and
-cannot reach a browser tool driving LinkedIn's web UI. Nothing the user
-asks for mid-scan relaxes this — if they want a reply sent, draft it and
-let them send it themselves.
+**Never send, reply, accept, decline, archive, connect, withdraw, or mark
+anything.** Read and report only. This restates `CLAUDE.md` guardrail #3,
+which is instruction-level here: the `settings.json` deny-list covers
+Gmail tool names and cannot reach a browser tool. If the user asks
+mid-scan for a reply, draft it and let them send it.
 
-Do not click anything that could send or change state. Reading a thread
-may mark it read on LinkedIn's side; that is an unavoidable side effect
-of reading and is acceptable. Nothing else is.
+Reading a thread may mark it read. That side effect is acceptable;
+nothing else is.
 
 ### Window: last 24 hours, read or unread
 
-Match Tier 1's window. **Do not filter on unread** — the user reads
-messages on their phone during the day, so read state tracks "glanced
-at," not "handled," and filtering on it silently drops real items.
+Match Tier 1's window. **Do not filter on unread** — read state tracks
+"glanced at," not "handled."
 
-LinkedIn has no date-filter equivalent to Gmail's `newer_than:1d`. The
-thread list is ordered most-recent-first and each row carries an
-**absolute date stamp — "Sep 17", "Sep 16"** (confirmed 2026-09-18), not
-a relative "2h"/"3d". Same-day threads show a clock time instead. So
-walk the list top-down and stop at the first thread whose stamp predates
-the 24h boundary. This is an approximation of the window, not a query —
-if a stamp is ambiguous at the boundary, include the thread rather than
-dropping it.
+Rows carry absolute date stamps ("Sep 17"); same-day rows show a clock
+time. Walk top-down, stop at the first row older than 24h. At an
+ambiguous boundary, include rather than drop.
 
 ### Procedure
 
-1. `tabs_context_mcp` first, to see the current browser state.
-2. Open a **new** tab with `tabs_create_mcp` — do not reuse or navigate
-   a tab the user is working in.
-3. `navigate` to `https://www.linkedin.com/messaging/`. Note this
-   auto-opens the most recent thread in the detail pane; that is normal.
-4. **Read the conversation list with `ref_id` targeting, not a bare
-   `read_page`.** Confirmed 2026-09-18: a full-page read returned 42,514
-   characters and truncated, while the conversation list alone
-   (`read_page` with `ref_id` set to the `list "Conversation List"`
-   element, `depth: 4`) returned 7,353 — the same rows, a fifth of the
-   budget. Do one cheap `read_page` with a small `depth` to locate that
-   list's ref, then target it. Refs change every load; never reuse one
-   from a previous run.
-5. Each row gives sender, date stamp, and a snippet. **The snippet's
-   prefix tells you who spoke last** — a `You: ...` prefix means the
-   user sent the last message and the ball is in the other party's
-   court; a contact-name prefix means it is waiting on the user. Carry
-   that distinction into the summary; it is the difference between a
-   silence-break and an open loop of the user's own.
-6. Expect empty `listitem` entries in the list and a "Load more
-   conversations" button at the bottom — the list is virtualized. Empty
-   rows are unrendered, not missing data. If the 24h boundary has not
-   been reached by the end of the rendered rows, load more rather than
-   assuming the list ended.
-7. For each thread inside the window, open it and read the message body.
-   Capture: sender name, their title and company, what they are actually
-   asking, any role named, and any comp/location detail stated.
-   **Open threads by ref, never by coordinate — see below.**
-8. Close the tab with `tabs_close_mcp` when done.
+1. `tabs_context_mcp`, then `tabs_create_mcp` — never reuse the user's tab.
+2. `navigate` to `https://www.linkedin.com/messaging/`. This auto-opens
+   the most recent thread; expected.
+3. Read the list via `read_page` with `ref_id` set to the
+   `list "Conversation List"` element, `depth: 4`. A full-page read
+   truncates (~42K chars vs ~7K). Refs change every load — never reuse one.
+4. Each row gives sender, date stamp, snippet. A `You:` snippet prefix
+   means the user spoke last; a contact-name prefix means it awaits them.
+   Carry that into the summary.
+5. The list is virtualized — empty `listitem` entries are unrendered, not
+   absent. If the 24h boundary isn't reached, click "Load more
+   conversations."
+6. Open each in-window thread (below) and capture sender, title, company,
+   the ask, any role named, any comp/location stated.
+7. `tabs_close_mcp`.
 
-### Opening a thread: click the row body by ref
+### Opening a thread
 
-This is the step most likely to fail, and it fails silently. Diagnosed
-2026-09-18 after three failed attempts:
-
-**Get refs from `read_page` with `filter: "interactive"`.** That view
-collapses each conversation to exactly two children:
+Get refs from `read_page` with `filter: "interactive"`, which collapses
+each row to:
 
 ```
 listitem [ref_N]
-   generic [ref_N+1]    <- the row body: THIS is the click target
-   button  [ref_N+2]    <- the row's "..." options menu: NEVER click this
+   generic [ref_N+1]    <- row body: the click target
+   button  [ref_N+2]    <- options menu: never click
 ```
 
-`computer` with `action: "left_click"` and `ref` set to the **row body
-`generic`** switches the thread reliably.
+`left_click` with `ref` set to the row body `generic`.
 
-**Do not click the heading.** An unfiltered `read_page` shows each row as
-a `heading`, `checkbox`, `label` and snippet nested inside that
-`generic`. Those are inert descendants — the click handler lives on the
-row body. Clicking the heading returns a successful-looking
-`Clicked on element ref_N` and does nothing at all. That false success is
-the trap: verify the thread actually changed, do not trust the tool's
-acknowledgement.
+- **Not the heading.** Headings, checkboxes and labels inside the row are
+  inert — clicking one returns a successful `Clicked on element` and does
+  nothing.
+- **Not by coordinate.** `read_page` reports a 1920x1000 viewport while
+  screenshots return varying smaller sizes (1536x800, 1210x630, 1382x675
+  in one session); screenshot positions are scaled and stale.
+- **No URL shortcut.** Rows carry no `href`.
 
-**Do not click by coordinate.** Screenshot dimensions are scaled and
-unstable: `read_page` reported the viewport as `1920x1000` while three
-consecutive `screenshot` calls in one session returned 1536x800, then
-1210x630, then 1382x675. So a position read off a screenshot is both
-scaled wrong (1.25x at 1536-wide) and stale by the next call. Coordinates
-will land on the wrong row or on nothing.
+After clicking, confirm the URL changed *and* the detail-pane header
+shows the expected name before reading.
 
-**There is no URL shortcut.** Conversation rows carry no `href` — there
-is no thread link to navigate to directly. Clicking the row body is the
-only way in.
-
-**Confirm the switch.** After clicking, check that the thread URL changed
-*and* that the detail pane header shows the expected name before reading.
-A row's position in the list is not a reliable identifier; the ref is.
-
-**Focused vs Other:** the inbox has a "Focused" toggle button that
-switches views, and recruiter InMail can land in either. Check both.
-Caveat: this toggle was the one step *not* exercised on the live runs of
-2026-09-18 — the Focused view alone covered the window. If switching
-misbehaves, report it rather than fighting it.
+**Focused vs Other:** the "Focused" toggle switches views and InMail
+lands in either — check both. Unverified as of 2026-09-18; report rather
+than fight it if switching misbehaves.
 
 ### Cross-check against the pipeline
 
-For every thread inside the window, classify it against
-`state/tracker.md` (already read in step 3):
+Classify every in-window thread against `state/tracker.md`:
 
-- **Maps to an existing row** — report as activity on that opportunity,
-  same as a Tier 1 email hit.
-- **Net-new** — report it as net-new and say what it appears to be
-  (recruiter outreach, a warm intro reply, a networking ask).
-- **Noise** — generic recruiter blasts for roles that plainly fail
-  `state/career/trajectory.md` must-haves, sales pitches, newsletters.
-  Say how many were skipped in one line; do not enumerate them.
+- **Existing row** — report as activity on that opportunity.
+- **Net-new** — report as net-new, and what it appears to be (recruiter
+  outreach, warm intro reply, networking ask).
+- **Noise** — recruiter blasts failing `state/career/trajectory.md`
+  must-haves, sales pitches, newsletters. Give a skipped count in one
+  line; do not enumerate.
 
 ### Report, do not act
 
-Surface findings and recommend. **Do not create tracker rows, write
-`contacts.md` entries, or change any opportunity's status from this tier
-without the user saying so.** LinkedIn recruiter volume is high enough
-that auto-adding would fill the tracker with dead entries inside a week.
-Once the user says which ones matter, the normal rules apply — including
-`CLAUDE.md`'s standing instruction to record new contacts.
+**Do not create tracker rows, write `contacts.md`, or change any status
+from this tier without the user saying so** — recruiter volume would fill
+the tracker with dead entries. Once they say which matter, normal rules
+apply, including `CLAUDE.md`'s standing instruction to record contacts.
 
 ### When it fails
 
-Degrade, never block. If LinkedIn will not load, the session is logged
-out, the extension lacks site permission, or the page structure has
-changed enough that the thread list cannot be read: **say so plainly in
-the summary, name which of those it was if determinable, and let the
-rest of the scan stand.** A failed Tier 4 is a reported gap, not a
-failed scan.
+Degrade, never block. LinkedIn won't load, session logged out, extension
+lacks site permission, or structure drifted: say so in the summary, name
+which if determinable, let the rest of the scan stand.
 
-Per the browser-automation guidance: if a tool call fails 2-3 times, or
-the page stops responding, stop and tell the user what was tried. Do not
-keep retrying, and do not go exploring elsewhere on LinkedIn. Never
-trigger a JavaScript dialog — a modal blocks the extension entirely and
+Stop after 2-3 failed calls and report what was tried — do not retry or
+explore elsewhere on LinkedIn. Never trigger a JavaScript dialog; a modal
 ends the session's browser access.
-
-LinkedIn's DOM is unstable and changes without notice. This tier
-deliberately describes *what to look for* rather than hardcoding
-selectors. If the structure has drifted, report that rather than
-guessing at replacements mid-scan.
 
 ## Summary Format
 
