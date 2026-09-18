@@ -171,13 +171,54 @@ dropping it.
 7. For each thread inside the window, open it and read the message body.
    Capture: sender name, their title and company, what they are actually
    asking, any role named, and any comp/location detail stated.
+   **Open threads by ref, never by coordinate — see below.**
 8. Close the tab with `tabs_close_mcp` when done.
+
+### Opening a thread: click the row body by ref
+
+This is the step most likely to fail, and it fails silently. Diagnosed
+2026-09-18 after three failed attempts:
+
+**Get refs from `read_page` with `filter: "interactive"`.** That view
+collapses each conversation to exactly two children:
+
+```
+listitem [ref_N]
+   generic [ref_N+1]    <- the row body: THIS is the click target
+   button  [ref_N+2]    <- the row's "..." options menu: NEVER click this
+```
+
+`computer` with `action: "left_click"` and `ref` set to the **row body
+`generic`** switches the thread reliably.
+
+**Do not click the heading.** An unfiltered `read_page` shows each row as
+a `heading`, `checkbox`, `label` and snippet nested inside that
+`generic`. Those are inert descendants — the click handler lives on the
+row body. Clicking the heading returns a successful-looking
+`Clicked on element ref_N` and does nothing at all. That false success is
+the trap: verify the thread actually changed, do not trust the tool's
+acknowledgement.
+
+**Do not click by coordinate.** Screenshot dimensions are scaled and
+unstable: `read_page` reported the viewport as `1920x1000` while three
+consecutive `screenshot` calls in one session returned 1536x800, then
+1210x630, then 1382x675. So a position read off a screenshot is both
+scaled wrong (1.25x at 1536-wide) and stale by the next call. Coordinates
+will land on the wrong row or on nothing.
+
+**There is no URL shortcut.** Conversation rows carry no `href` — there
+is no thread link to navigate to directly. Clicking the row body is the
+only way in.
+
+**Confirm the switch.** After clicking, check that the thread URL changed
+*and* that the detail pane header shows the expected name before reading.
+A row's position in the list is not a reliable identifier; the ref is.
 
 **Focused vs Other:** the inbox has a "Focused" toggle button that
 switches views, and recruiter InMail can land in either. Check both.
-Caveat: this toggle was the one step *not* exercised on the first live
-run (2026-09-18) — the Focused view alone covered the window. If
-switching misbehaves, report it rather than fighting it.
+Caveat: this toggle was the one step *not* exercised on the live runs of
+2026-09-18 — the Focused view alone covered the window. If switching
+misbehaves, report it rather than fighting it.
 
 ### Cross-check against the pipeline
 
