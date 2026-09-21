@@ -8,7 +8,7 @@ I'm Jim Krygowski, an engineering executive with 20+ years running and scaling e
 
 While I was at Jellyfish I built myself a chief of staff agent system to help take some of toil out of my job. That experience opened my eyes to the possibilities of personal productivity systems built around an LLM. I've spoken to a lot of folks who are on the market now and have a deep appreciation for the labor that goes into the job search. I've read a lot about using chatbots to write cover letters but I wanted more. An assistant and coach capable of tackling the process end to end: candidate profile and target-role definition as real artifacts, a pipeline tracker to stay focused, opportunity based research and planning and research-grounded coaching instead of vibes. I also built this using Claude and as much as was reasonable followed good engineering practice in the construction of the agent, the building of test coverage and code review that I'd want in any software product I built or used.
 
-I'm sharing this work in this repo for anyone who's interested in getting a boost in managing their job search. The code in this repo is 100% agent authored but it's also a fair sample of how I think about building software: what I choose to make rigorous, what I choose to leave simple, and where I draw the line between "good enough" and "worth getting right." The direction taken by Claude came from me.
+I'm sharing this work in this repo for anyone who's interested in getting a boost in managing their job search. The code in this repo was written by an agent working to my specifications, under continuous review and revision. It's a fair sample of how I think about building software: what I choose to make rigorous, what I choose to leave simple, and where I draw the line between "good enough" and "worth getting right."
 
 If you know someone looking for CTO, VP Engineering, Head of Engineering or Senior Director role don't hesitate to reach out to me via my [LinkedIn](https://linkedin.com/in/jimkrygowski).
 
@@ -85,6 +85,17 @@ cd job-search-os
 ```
 
 Then, in a Claude Code session in this directory, just say you want to get started — `CLAUDE.md` points a new user at the `bootstrap` skill automatically. It checks for Python 3, then walks you through building your profile, defining your target role, and setting your compensation target. Everything after that — scoring opportunities, tailoring resumes, prepping for interviews, tracking the pipeline — happens through normal conversation.
+
+## License
+
+[PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0)
+— free for any noncommercial purpose. Running your own job search with it counts,
+including a search for paid employment; so does use by charities, schools, and
+government. Selling it, or building a commercial product or service on it, does
+not.
+
+Not an open source license: the Open Source Definition forbids restricting
+commercial use, and this does restrict it.
 
 ## About me
 
