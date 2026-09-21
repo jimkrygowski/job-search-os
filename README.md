@@ -86,6 +86,17 @@ cd job-search-os
 
 Then, in a Claude Code session in this directory, just say you want to get started — `CLAUDE.md` points a new user at the `bootstrap` skill automatically. It checks for Python 3, then walks you through building your profile, defining your target role, and setting your compensation target. Everything after that — scoring opportunities, tailoring resumes, prepping for interviews, tracking the pipeline — happens through normal conversation.
 
+## License
+
+[PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0)
+— free for any noncommercial purpose. Running your own job search with it counts,
+including a search for paid employment; so does use by charities, schools, and
+government. Selling it, or building a commercial product or service on it, does
+not.
+
+Not an open source license: the Open Source Definition forbids restricting
+commercial use, and this does restrict it.
+
 ## About me
 
 I was most recently a Director of Engineering at Jellyfish, where I headed up the teams building the AI platform and features on top of it. Before that I led a 55-person multi-geo engineering org at Charles River Development, and, earlier, was the first engineering hire at Linkable Networks, where I built and owned engineering and operations from zero through the company's acquisition. I'm looking for my next engineering leadership role, ideally partnering closely CEO, CTO to CPO and working to develop strategy and translate it to engineering delivery. I'm open to remote or hybrid. In the meantime, I'm also open to short-term consulting or advisory engagements, engineering leadership, org design, AI/agentic infrastructure strategy, so if you know of something that could use a hand, I'd welcome the conversation.
