@@ -1,3 +1,9 @@
+# SEPTEMBER 28 UPDATE
+
+This job-search-os repo is being deprecated in favor of [job-search-os-plugin](https://github.com/jimkrygowski/job-search-os-plugin). The ergonomics of using a plugin are much better than the approach of checking out the skills from this repo to a local file system to run the os. I'll keep this repo around for a while but if you're just getting here jump over to the link posted above and follow the install guide in the read me to get started. 
+
+If you're currently using the approach from this repository don't worry! I've built a migrate skill into the new plugin that will port your existing job search over to the new approach. Directions for migration are also found in the new repository's readme. 
+
 # Job Search OS
 
 An agentic system for running a job search with the same rigor you'd bring to any other engineering problem. Built on [Claude Code](https://claude.com/claude-code), it turns a job search into a structured pipeline — grounded in actual research rather than generic AI life-coach platitudes, and engineered with the guardrails, tests, and separation of concerns you'd expect from production software.
